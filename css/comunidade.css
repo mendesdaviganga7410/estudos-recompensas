@@ -136,6 +136,7 @@
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
+    padding: 4px 8px;
 }
 .player-card {
     background: var(--surface);
@@ -157,8 +158,8 @@
     box-shadow: 2px 2px 0px var(--shadow-color);
 }
 .player-banner {
-    height: 130px;
-    background: var(--panel);
+    height: 180px;
+    background-color: var(--panel);
     background-size: cover;
     background-position: center;
     border-bottom: 2px solid var(--stroke);
@@ -167,7 +168,7 @@
 .player-banner-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, var(--surface));
+    background: linear-gradient(to bottom, transparent 60%, var(--surface));
 }
 .player-card-body {
     padding: 1rem 1rem 1.15rem;
@@ -182,7 +183,7 @@
     border-radius: var(--card-radius);
     border: 3px solid var(--stroke);
     object-fit: cover;
-    margin-top: -56px;
+    margin-top: -66px;
     background: var(--surface);
     box-shadow: 4px 4px 0px var(--shadow-color);
     position: relative;
@@ -254,7 +255,7 @@
     box-shadow: 3px 3px 0px var(--shadow-color);
 }
 .community-loading .skeleton-banner {
-    height: 130px;
+    height: 180px;
     background: var(--panel);
     border-bottom: 2px solid var(--stroke);
     animation: skeletonPulse 1.2s ease-in-out infinite;
@@ -270,7 +271,7 @@
     height: 80px;
     border-radius: var(--card-radius);
     background: var(--panel);
-    margin-top: -56px;
+    margin-top: -66px;
     border: 3px solid var(--stroke);
     animation: skeletonPulse 1.2s ease-in-out infinite 0.1s;
 }
@@ -372,8 +373,8 @@
 }
 .pd-banner {
     width: 100%;
-    height: 220px;
-    background: var(--bg);
+    height: 270px;
+    background-color: var(--bg);
     background-size: cover;
     background-position: center;
     border-bottom: 3px solid var(--stroke);
@@ -383,7 +384,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, var(--surface));
+    background: linear-gradient(to bottom, transparent 55%, var(--surface));
 }
 .pd-identity {
     display: flex;
@@ -483,16 +484,16 @@
     .community-guest-notice { padding: 2rem 1rem; }
     .community-guest-notice .btn-theme { font-size: 0.75rem; padding: 0.5rem 0.75rem; }
 
-    .player-banner { height: 90px; }
+    .player-banner { height: 130px; }
     .player-card-body { padding: 0.65rem 0.75rem 0.85rem; gap: 0.3rem; }
-    .player-card-avatar { width: 60px; height: 60px; margin-top: -43px; }
+    .player-card-avatar { width: 60px; height: 60px; margin-top: -53px; }
     .player-card-name { font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .player-card-goal { font-size: 0.68rem; -webkit-line-clamp: 1; }
     .player-card-stats { margin-top: 0.25rem; gap: 0.3rem; }
     .player-card-stats span { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
 
     /* ── Profile detail ── */
-    .pd-banner { height: 120px; }
+    .pd-banner { height: 160px; }
     .pd-identity { flex-direction: column; align-items: flex-start; margin-top: -32px; gap: 0.65rem; padding: 0 1rem 1rem; }
     .pd-avatar-wrap { width: 72px; height: 72px; }
     .pd-name { font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -510,8 +511,8 @@
     .pd-progress-track { height: 6px; }
 
     /* ── Skeleton ── */
-    .community-loading .skeleton-banner { height: 90px; }
-    .community-loading .skeleton-avatar { width: 60px; height: 60px; margin-top: -43px; }
+    .community-loading .skeleton-banner { height: 130px; }
+    .community-loading .skeleton-avatar { width: 60px; height: 60px; margin-top: -53px; }
     .community-loading .skeleton-body { padding: 0.65rem 0.75rem 0.85rem; gap: 0.35rem; }
     .community-loading .skeleton-line { height: 9px; }
     .community-loading .skeleton-line.short { width: 50%; }

@@ -47,8 +47,8 @@
 
 .hero-banner {
     width: 100%;
-    height: 180px;
-    background: var(--bg);
+    height: 230px;
+    background-color: var(--bg);
     background-size: cover;
     background-position: center;
     border-bottom: 3px solid var(--stroke);
@@ -58,7 +58,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, transparent 40%, var(--surface));
+    background: linear-gradient(to bottom, transparent 55%, var(--surface));
 }
 
 .hero-identity {
@@ -134,6 +134,7 @@
     display: grid;
     grid-template-columns: repeat(2, 1fr);
     gap: 1.25rem;
+    padding: 4px;
 }
 .hub-card {
     background: var(--surface);
@@ -569,7 +570,7 @@ body.guest-mode .tab-btn[onclick*="tab-security"] {
 }
 
 @media (max-width: 640px) {
-    .hero-banner { height: 140px; }
+    .hero-banner { height: 180px; }
     .hero-identity { flex-direction: column; align-items: flex-start; margin-top: -40px; gap: 0.75rem; padding: 0 1rem 1rem; }
     .hero-avatar-wrap { width: 80px; height: 80px; }
     .hero-name { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

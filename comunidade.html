@@ -27,62 +27,64 @@
             <span>Carregando...</span>
         </div>
 
-        <!-- ===== TOP BAR COMPARTILHADO (sempre visível) ===== -->
-        <div class="top-bar">
-            <div style="display:flex;align-items:center;gap:0.75rem;">
-                <button class="btn-theme" id="pd-back-btn" onclick="closeProfileDetail()" title="Voltar">🌐 Comunidade</button>
-                <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Convidado</span>
-                <div id="auth-panel" class="auth-panel">
-                    <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
-                        <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
-                        <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
-                    </div>
-                    <div id="user-profile" class="user-profile" style="display: none;">
-                        <img id="user-photo" src="" alt="Foto" referrerpolicy="no-referrer">
-                        <span id="user-name">Carregando...</span>
-                        <button class="btn-logout" onclick="logoutGoogle()">Sair</button>
-                    </div>
-                </div>
-            </div>
-            <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
-        </div>
+        <!-- ===== CONTEUDO DA COMUNIDADE (oculto durante carregamento) ===== -->
+        <div id="comunidade-content" style="display:none;">
 
-        <!-- ===== LISTA DA COMUNIDADE ===== -->
-        <div id="community-list" style="display:none;">
-
-            <div class="community-hero">
-                <div class="community-hero-banner">
-                    <span style="font-size:3.5rem;opacity:0.2;user-select:none;">🌐</span>
-                </div>
-                <div class="community-hero-content">
-                    <h1>Comunidade NeuroFlow</h1>
-                    <p>Descubra outros heróis, suas metas épicas e jornadas de evolução.</p>
-                    <div class="community-stats-row">
-                        <span class="community-stat-pill">👥 <strong id="hero-count">—</strong> Heróis</span>
-                        <span class="community-stat-pill">⚡ <strong id="xp-total">—</strong> Total</span>
+            <div class="top-bar">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <button class="btn-theme" id="pd-back-btn" onclick="closeProfileDetail()" title="Voltar">🌐 Comunidade</button>
+                    <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Convidado</span>
+                    <div id="auth-panel" class="auth-panel">
+                        <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+                            <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
+                            <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
+                        </div>
+                        <div id="user-profile" class="user-profile" style="display: none;">
+                            <img id="user-photo" src="" alt="Foto" referrerpolicy="no-referrer">
+                            <span id="user-name">Carregando...</span>
+                            <button class="btn-logout" onclick="logoutGoogle()">Sair</button>
+                        </div>
                     </div>
                 </div>
+                <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
             </div>
 
-            <div id="community-controls-bar" class="community-controls" style="display:none;">
-                <input type="text" id="community-search" class="community-search" placeholder="Buscar herói..." oninput="onCommunitySearch()" autocomplete="off">
-                <select id="community-sort" class="community-sort" onchange="onCommunitySort()">
-                    <option value="xp">🔥 Por XP</option>
-                    <option value="name">🔤 Por Nome</option>
-                </select>
-            </div>
+            <!-- ===== LISTA DA COMUNIDADE ===== -->
+            <div id="community-list" style="display:none;">
 
-            <div id="community-grid" class="community-grid">
-                <div class="community-empty">
-                    <span class="empty-icon">🌐</span>
-                    <strong>Carregando comunidade...</strong>
+                <div class="community-hero">
+                    <div class="community-hero-banner">
+                        <span style="font-size:3.5rem;opacity:0.2;user-select:none;">🌐</span>
+                    </div>
+                    <div class="community-hero-content">
+                        <h1>Comunidade NeuroFlow</h1>
+                        <p>Descubra outros heróis, suas metas épicas e jornadas de evolução.</p>
+                        <div class="community-stats-row">
+                            <span class="community-stat-pill">👥 <strong id="hero-count">—</strong> Heróis</span>
+                            <span class="community-stat-pill">⚡ <strong id="xp-total">—</strong> Total</span>
+                        </div>
+                    </div>
                 </div>
+
+                <div id="community-controls-bar" class="community-controls" style="display:none;">
+                    <input type="text" id="community-search" class="community-search" placeholder="Buscar herói..." oninput="onCommunitySearch()" autocomplete="off">
+                    <select id="community-sort" class="community-sort" onchange="onCommunitySort()">
+                        <option value="xp">🔥 Por XP</option>
+                        <option value="name">🔤 Por Nome</option>
+                    </select>
+                </div>
+
+                <div id="community-grid" class="community-grid">
+                    <div class="community-empty">
+                        <span class="empty-icon">🌐</span>
+                        <strong>Carregando comunidade...</strong>
+                    </div>
+                </div>
+
             </div>
 
-        </div>
-
-        <!-- ===== VISUALIZADOR DE PERFIL (página cheia, idêntica ao Hub) ===== -->
-        <div id="profile-detail" style="display:none;">
+            <!-- ===== VISUALIZADOR DE PERFIL (página cheia, idêntica ao Hub) ===== -->
+            <div id="profile-detail" style="display:none;">
 
             <div class="pd-epic-header">
                 <div id="pd-banner" class="pd-banner"></div>
@@ -127,6 +129,8 @@
             </div>
 
         </div>
+
+        </div> <!-- /comunidade-content -->
 
     </div>
 
@@ -191,7 +195,7 @@
                         <div class="form-group">
                             <label>Arredondamento Geral</label>
                             <div class="range-widget">
-                                <input type="range" id="radiusSlider" min="0" max="42" value="16" oninput="changeRadius(this.value+'px')">
+                                <input type="range" id="radiusSlider" min="0" max="50" value="16" oninput="changeRadius(this.value+'px')">
                                 <span id="radiusValue" class="range-value">16px</span>
                             </div>
                         </div>

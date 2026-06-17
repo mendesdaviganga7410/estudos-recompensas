@@ -4,8 +4,10 @@ let communitySearchTimer = null;
 
 function renderComunidade() {
     const loading = $com("auth-loading");
+    const content = $com("comunidade-content");
     const list = $com("community-list");
     if (loading) loading.style.display = "none";
+    if (content) content.style.display = "block";
     if (list) list.style.display = "flex";
 
     $com("profile-detail").style.display = "none";

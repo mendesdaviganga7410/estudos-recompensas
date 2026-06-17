@@ -916,7 +916,7 @@
                         <div class="form-group">
                             <label>Arredondamento Geral</label>
                             <div class="range-widget">
-                                <input type="range" id="radiusSlider" min="0" max="42" value="16" oninput="changeRadius(this.value+'px')">
+                                <input type="range" id="radiusSlider" min="0" max="50" value="16" oninput="changeRadius(this.value+'px')">
                                 <span id="radiusValue" class="range-value">16px</span>
                             </div>
                         </div>
@@ -2691,7 +2691,6 @@
         if (window.updateGuestUI) window.updateGuestUI();
     }
 
-    document.addEventListener('DOMContentLoaded', renderStudy);
     window.renderStudy = renderStudy;
     </script>
 </body>

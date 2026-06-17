@@ -323,7 +323,6 @@ h2::before { content: '➔'; color: var(--accent); font-size: 0.9rem; }
     border: 2px solid var(--stroke);
     border-radius: 50%;
     margin-top: -7px;
-    box-shadow: 2px 2px 0px var(--shadow-color);
     cursor: pointer;
     transition: transform 0.1s ease;
 }
@@ -340,7 +339,6 @@ h2::before { content: '➔'; color: var(--accent); font-size: 0.9rem; }
     background: var(--surface);
     border: 2px solid var(--stroke);
     border-radius: 50%;
-    box-shadow: 2px 2px 0px var(--shadow-color);
     cursor: pointer;
 }
 .range-widget input[type="range"]:focus {
