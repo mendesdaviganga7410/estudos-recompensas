@@ -2,20 +2,13 @@
    firebase/auth.js — Autenticação Firebase (Google + E-mail)
    Correção: import duplicado de versões diferentes removido.
    ========================================================================== */
-import { auth } from "./config.js";
 import {
-    signInWithPopup,
-    GoogleAuthProvider,
-    signOut,
-    onAuthStateChanged,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    updateProfile,
-    updateEmail,
-    updatePassword,
-    sendEmailVerification,
-    sendPasswordResetEmail
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    auth,
+    signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged,
+    createUserWithEmailAndPassword, signInWithEmailAndPassword,
+    updateProfile, updateEmail, updatePassword,
+    sendEmailVerification, sendPasswordResetEmail
+} from "./init.js";
 
 /* --------------------------------------------------------------------------
    LOGIN / REGISTER / LOGOUT

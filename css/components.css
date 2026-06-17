@@ -306,7 +306,6 @@ h2::before { content: '➔'; color: var(--accent); font-size: 0.9rem; }
     padding: 0.35rem 0.6rem;
     cursor: pointer;
     height: 32px;
-    box-shadow: inset 1px 1px 0px var(--shadow-color);
 }
 .range-widget input[type="range"]::-webkit-slider-runnable-track {
     height: 6px;

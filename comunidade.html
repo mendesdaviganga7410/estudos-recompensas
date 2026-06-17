@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NeuroFlow // Comunidade</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap"
@@ -168,142 +169,6 @@
         </div>
     </div>
 
-    <!-- MODAL: Configurações -->
-    <div id="settings-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content settings-large">
-            <div class="modal-header">
-                <h3>Painel de Controle</h3>
-                <button class="modal-close" onclick="closeSettingsModal()">×</button>
-            </div>
-            <div class="settings-layout">
-                <div class="settings-sidebar">
-                    <button class="tab-btn active" onclick="switchTab('tab-appearance')">🎨 Estilo</button>
-                    <button class="tab-btn" onclick="switchTab('tab-profile')">👤 Perfil</button>
-                    <button class="tab-btn" onclick="switchTab('tab-security')">🔒 Segurança</button>
-                    <button class="tab-btn" onclick="switchTab('tab-advanced')">⚙️ Avançado</button>
-                </div>
-                <div class="settings-content">
-                    <div id="tab-appearance" class="tab-panel active">
-                        <div class="form-group">
-                            <label>Paleta de Cores Temática</label>
-                            <button type="button" class="btn-theme w-full" onclick="openThemeDialog()"
-                                style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
-                                <span>🎨 Customizar Visual de Tela</span>
-                                <span id="current-theme-label" class="theme-pill">Padrão Claro</span>
-                            </button>
-                        </div>
-                        <div class="form-group">
-                            <label>Arredondamento Geral</label>
-                            <div class="range-widget">
-                                <input type="range" id="radiusSlider" min="0" max="50" value="16" oninput="changeRadius(this.value+'px')">
-                                <span id="radiusValue" class="range-value">16px</span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Intensidade do Relevo (Sombras)</label>
-                            <div class="range-widget">
-                                <input type="range" id="shadowSlider" min="2" max="14" value="6" oninput="changeShadow(this.value+'px')">
-                                <span id="shadowValue" class="range-value">6px</span>
-                            </div>
-                        </div>
-                        <div class="form-group" style="margin-top: 0.5rem; border-top: 2px dashed var(--stroke); padding-top: 1.25rem;">
-                            <button class="btn-theme w-full" onclick="resetDefaults()" style="justify-content: center;">🔄 Restaurar Padrões</button>
-                        </div>
-                    </div>
-                    <div id="tab-profile" class="tab-panel">
-                        <div class="tab-lock-notice">🔒 Sincronização Desativada. Faça login para editar seu perfil.</div>
-                        <div class="tab-auth-content" style="display: none; flex-direction: column; gap: 1rem;">
-                            <div class="form-group">
-                                <label>Nome de Exibição</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input type="text" id="settings-name" placeholder="Nome do usuário" autocomplete="nickname">
-                                    <button class="btn-theme" onclick="handleUpdateName()" style="padding: 0.65rem 1rem; width: auto;">Salvar</button>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Meta Épica</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input type="text" id="settings-epic-goal" placeholder='Ex: "Passar na USP"' autocomplete="off">
-                                    <button class="btn-theme" onclick="handleUpdateEpicGoal()" style="padding: 0.65rem 1rem; width: auto;">Salvar</button>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Descrição</label>
-                                <textarea id="settings-description" placeholder="Conte um pouco sobre você..." rows="3" style="width:100%;background:var(--panel);border:3px solid var(--stroke);border-radius:var(--element-radius);padding:0.65rem 1rem;font-size:0.85rem;color:var(--text);font-weight:800;outline:none;font-family:inherit;resize:vertical;"></textarea>
-                                <button class="btn-theme" onclick="handleUpdateDescription()" style="align-self:flex-start;margin-top:0.35rem;">Salvar Descrição</button>
-                            </div>
-                            <div class="form-group">
-                                <label>Foto de Perfil</label>
-                                <div id="photo-drop-zone" class="photo-drop-zone">
-                                    <span class="drop-zone-prompt">🖼️ Clique para enviar uma imagem</span>
-                                    <input type="file" id="photo-file-input" accept="image/*" style="display: none;">
-                                </div>
-                                <div id="crop-container" class="crop-container" style="display: none;">
-                                    <div class="img-crop-wrapper">
-                                        <img id="image-to-crop" src="" alt="Editor de Imagem">
-                                    </div>
-                                    <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
-                                        <button class="btn-theme" onclick="cancelCrop()" style="background: var(--failure); color: white; width: auto;">Cancelar</button>
-                                        <button class="btn-theme" onclick="saveCroppedPhoto()" style="background: var(--success); color: white; width: auto;">Cortar e Salvar</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label>Banner de Capa</label>
-                                <div id="banner-drop-zone" class="banner-drop-zone">
-                                    <span class="drop-zone-prompt">🖼️ Clique para enviar uma imagem</span>
-                                    <input type="file" id="banner-file-input" accept="image/*" style="display: none;">
-                                </div>
-                                <div id="banner-crop-container" class="crop-container" style="display: none;">
-                                    <div class="img-crop-wrapper">
-                                        <img id="banner-image-to-crop" src="" alt="Editor de Banner">
-                                    </div>
-                                    <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
-                                        <button class="btn-theme" onclick="cancelBannerCrop()" style="background: var(--failure); color: white; width: auto;">Cancelar</button>
-                                        <button class="btn-theme" onclick="saveCroppedBanner()" style="background: var(--success); color: white; width: auto;">Cortar e Salvar</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:3px solid var(--stroke);border-radius:var(--element-radius);padding:0.85rem 1rem;box-shadow:3px 3px 0 var(--shadow-color);">
-                                <label for="settings-public-profile" style="margin:0;font-size:0.82rem;font-weight:800;color:var(--text);cursor:pointer;">🌐 Perfil Público (aparecer na comunidade)</label>
-                                <input type="checkbox" id="settings-public-profile" onchange="toggleProfilePrivacy()" style="width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;">
-                            </div>
-                            <div class="form-group" style="border-top: 2px dashed var(--stroke); padding-top: 1rem;">
-                                <label>Customização do Painel</label>
-                                <button class="btn-theme w-full" onclick="reopenCustomization()" style="justify-content:center;">🛠️ Recustomizar Experiência</button>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="tab-security" class="tab-panel">
-                        <div class="tab-lock-notice">🔒 Sincronização Desativada. Faça login para gerenciar credenciais.</div>
-                        <div class="tab-auth-content" style="display: none; flex-direction: column; gap: 1rem;">
-                            <div class="form-group">
-                                <label>Alterar E-mail</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input type="email" id="settings-email" placeholder="novo@email.com" autocomplete="email">
-                                    <button class="btn-theme" onclick="handleUpdateEmail()" style="padding: 0.65rem 1rem; width: auto;">Mudar</button>
-                                </div>
-                                <button class="btn-theme" onclick="handleVerifyEmail()" style="margin-top: 0.35rem; font-size: 0.7rem; padding: 0.35rem 0.75rem; width: max-content;">📧 Solicitar Verificação</button>
-                            </div>
-                            <div class="form-group">
-                                <label>Redefinir Senha</label>
-                                <div style="display: flex; gap: 0.5rem;">
-                                    <input type="password" id="settings-password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="new-password">
-                                    <button class="btn-theme" onclick="handleUpdatePassword()" style="padding: 0.65rem 1rem; width: auto;">Atualizar</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="tab-advanced" class="tab-panel">
-                        <div style="text-align: center; padding: 2rem; color: var(--muted); font-size: 0.85rem; border: 3px dashed var(--stroke); border-radius: var(--card-radius);">
-                            Configurações adicionais estarão disponíveis em breve.
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <div class="toast-box" id="tBox"></div>
 
     <dialog id="theme-dialog" class="theme-bento-dialog">
@@ -344,12 +209,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
     <script src="js/templates.js"></script>
     <script src="js/state.js"></script>
-    <script type="module" src="js/firebase/config.js"></script>
+    <script type="module" src="js/firebase/init.js"></script>
     <script type="module" src="js/firebase/db.js"></script>
     <script type="module" src="js/firebase/auth.js"></script>
     <script src="js/ui/toast.js"></script>
     <script src="js/ui/theme.js"></script>
     <script src="js/ui/modals.js"></script>
+    <script src="js/ui/settings-modal.js"></script>
     <script src="js/ui/media.js"></script>
     <script src="js/router.js"></script>
     <script src="js/pages/comunidade.js"></script>

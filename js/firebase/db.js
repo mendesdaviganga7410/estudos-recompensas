@@ -1,11 +1,11 @@
 /* ==========================================================================
    firebase/db.js — Leitura e gravação no Firestore
    ========================================================================== */
-import { db } from "./config.js";
 import {
+    db,
     doc, getDoc, setDoc,
     collection, query, where, getDocs
-} from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+} from "./init.js";
 
 export async function syncUserData(userId) {
     if (!db) return;
@@ -66,7 +66,7 @@ export async function completeOnboarding(userId, onboardingData) {
     s.slots = onboardingData.slots || s.slots;
     s.onboardingComplete = true;
 
-    await saveStateToFirestore(userId, s);
+    try { await saveStateToFirestore(userId, s); } catch (_) {}
 
     if (window.renderHeroHub) window.renderHeroHub();
     if (window.closeOnboarding) window.closeOnboarding();
