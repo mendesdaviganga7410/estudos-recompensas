@@ -1,0 +1,519 @@
+/* ==========================================================================
+   COMUNIDADE.CSS
+   ========================================================================== */
+
+/* --- Community Hero --- */
+.community-hero {
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
+    overflow: hidden;
+}
+.community-hero-banner {
+    height: 160px;
+    background: var(--bg);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 3px solid var(--stroke);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.community-hero-content {
+    padding: 1.5rem 1.5rem 1.75rem;
+    text-align: center;
+}
+.community-hero-content h1 {
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    margin-bottom: 0.25rem;
+}
+.community-hero-content p {
+    font-size: 0.85rem;
+    color: var(--muted);
+    line-height: 1.5;
+    max-width: 480px;
+    margin: 0 auto;
+}
+.community-stats-row {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 1rem;
+}
+.community-stat-pill {
+    background: var(--panel);
+    border: 2px solid var(--stroke);
+    border-radius: var(--element-radius);
+    padding: 0.4rem 0.85rem;
+    font-size: 0.75rem;
+    font-weight: 800;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+.community-stat-pill strong { color: var(--accent); }
+
+/* --- Controls --- */
+.community-controls {
+    display: flex;
+    gap: 0.75rem;
+    align-items: center;
+}
+.community-search {
+    flex: 1;
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--element-radius);
+    padding: 0.65rem 1rem 0.65rem 2.5rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: 0.75rem center;
+}
+.community-search:focus {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+}
+.community-search::placeholder { color: var(--muted); opacity: 0.6; }
+.community-sort {
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--element-radius);
+    padding: 0.65rem 2.5rem 0.65rem 1rem;
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text);
+    outline: none;
+    font-family: inherit;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: var(--select-arrow);
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+    min-width: 130px;
+}
+.community-sort:focus {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+}
+.community-sort option { background: var(--surface); color: var(--text); font-weight: 700; }
+
+/* --- Guest Notice --- */
+.community-guest-notice {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    border: 3px dashed var(--stroke);
+    border-radius: var(--card-radius);
+    background: var(--panel);
+}
+.community-guest-notice .btn-theme { margin-top: 1rem; }
+
+/* --- Bento Player Cards (grandes) --- */
+.community-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+.player-card {
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+}
+.player-card:hover {
+    transform: translate(-3px, -3px);
+    box-shadow: calc(var(--shadow-depth) + 3px) calc(var(--shadow-depth) + 3px) 0px var(--shadow-color);
+}
+.player-card:active {
+    transform: translate(1px, 1px);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+.player-banner {
+    height: 130px;
+    background: var(--panel);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 2px solid var(--stroke);
+    position: relative;
+}
+.player-banner-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, var(--surface));
+}
+.player-card-body {
+    padding: 1rem 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    position: relative;
+}
+.player-card-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--card-radius);
+    border: 3px solid var(--stroke);
+    object-fit: cover;
+    margin-top: -56px;
+    background: var(--surface);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    position: relative;
+    z-index: 2;
+}
+.player-card-name {
+    font-size: 1.1rem;
+    font-weight: 900;
+    line-height: 1.2;
+    margin-top: 0.2rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+.player-card-goal {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-style: italic;
+    min-height: 1.4em;
+}
+.player-card-stats {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-top: 0.4rem;
+}
+.player-card-stats span {
+    font-size: 0.7rem;
+    font-weight: 800;
+    background: var(--panel);
+    border: 2px solid var(--stroke);
+    border-radius: var(--element-radius);
+    padding: 0.25rem 0.55rem;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+
+/* --- Empty State --- */
+.community-empty {
+    text-align: center;
+    padding: 4rem 1rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.6;
+    border: 3px dashed var(--stroke);
+    border-radius: var(--card-radius);
+    background: var(--panel);
+    grid-column: 1 / -1;
+}
+.community-empty .empty-icon { font-size: 3rem; margin-bottom: 0.75rem; display: block; }
+.community-empty .btn-theme { margin-top: 1rem; }
+
+/* --- Loading Skeleton (atualizado) --- */
+.community-loading {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.25rem;
+}
+.community-loading .skeleton-card {
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+}
+.community-loading .skeleton-banner {
+    height: 130px;
+    background: var(--panel);
+    border-bottom: 2px solid var(--stroke);
+    animation: skeletonPulse 1.2s ease-in-out infinite;
+}
+.community-loading .skeleton-body {
+    padding: 1rem 1rem 1.15rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+.community-loading .skeleton-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: var(--card-radius);
+    background: var(--panel);
+    margin-top: -56px;
+    border: 3px solid var(--stroke);
+    animation: skeletonPulse 1.2s ease-in-out infinite 0.1s;
+}
+.community-loading .skeleton-line {
+    height: 12px;
+    background: var(--panel);
+    border-radius: 4px;
+    border: 2px solid var(--stroke);
+    animation: skeletonPulse 1.2s ease-in-out infinite 0.2s;
+}
+.community-loading .skeleton-line.short { width: 60%; }
+.community-loading .skeleton-line.tiny { width: 40%; height: 8px; }
+@keyframes skeletonPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* =====================================================================
+   Bento cards (replicado de hero.css — comunidade.html não carrega hero.css)
+   ===================================================================== */
+.pd-bento {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.25rem;
+}
+.pd-card {
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    padding: 1.5rem;
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: left;
+    color: var(--text);
+    font-family: inherit;
+}
+.pd-card-icon {
+    font-size: 2rem;
+    line-height: 1;
+}
+.pd-card-title {
+    font-size: 1.1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+}
+.pd-card-desc {
+    font-size: 0.8rem;
+    color: var(--muted);
+    line-height: 1.4;
+}
+.pd-progress-wrap {
+    margin-top: 0.25rem;
+}
+.pd-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+}
+.pd-progress-track {
+    height: 8px;
+    background: var(--bg);
+    border-radius: var(--element-radius);
+    border: 2px solid var(--stroke);
+    overflow: hidden;
+}
+.pd-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-right: 2px solid var(--stroke);
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+@media (max-width: 640px) {
+    .pd-bento { grid-template-columns: 1fr; }
+}
+
+#community-list,
+#profile-detail {
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+/* =====================================================================
+   PROFILE DETAIL (página cheia, estilo Hub)
+   ===================================================================== */
+.pd-epic-header {
+    position: relative;
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
+    background: var(--panel);
+}
+.pd-banner {
+    width: 100%;
+    height: 220px;
+    background: var(--bg);
+    background-size: cover;
+    background-position: center;
+    border-bottom: 3px solid var(--stroke);
+    position: relative;
+}
+.pd-banner::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, var(--surface));
+}
+.pd-identity {
+    display: flex;
+    align-items: flex-end;
+    gap: 1.25rem;
+    padding: 0 1.5rem 1.5rem;
+    margin-top: -48px;
+    position: relative;
+    z-index: 2;
+}
+.pd-avatar-wrap {
+    position: relative;
+    flex-shrink: 0;
+    width: 96px;
+    height: 96px;
+}
+.pd-avatar-inner {
+    width: 100%;
+    height: 100%;
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    overflow: hidden;
+    background: var(--surface);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+}
+.pd-avatar-inner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.pd-meta {
+    flex: 1;
+    padding-bottom: 0.25rem;
+}
+.pd-name {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.25rem;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+.pd-goal {
+    font-size: clamp(1.6rem, 4vw, 2.4rem);
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--text);
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+.pd-stats-row {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    padding: 0 1.5rem 1.25rem;
+}
+.pd-desc {
+    padding: 0 1.5rem 1.5rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1.6;
+    color: var(--text);
+    white-space: pre-wrap;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+#pd-bento {
+    margin-top: 0;
+}
+
+@media (max-width: 640px) {
+    #community-list,
+    #profile-detail { gap: 1rem; }
+
+    /* ── Hero ── */
+    .community-hero-banner { height: 70px; }
+    .community-hero-banner span { font-size: 2.5rem !important; }
+    .community-hero-content { padding: 1rem; }
+    .community-hero-content h1 { font-size: 1.2rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .community-hero-content p { font-size: 0.72rem; }
+    .community-stats-row { gap: 0.5rem; margin-top: 0.5rem; }
+    .community-stat-pill { font-size: 0.62rem; padding: 0.2rem 0.55rem; }
+
+    /* ── Controls ── */
+    .community-controls { flex-direction: column; align-items: stretch; }
+    .community-sort { min-width: unset; }
+    .community-search { font-size: 0.78rem; padding: 0.5rem 1rem 0.5rem 2.2rem; background-position: 0.55rem center; }
+
+    /* ── Grid + Cards ── */
+    .community-grid { grid-template-columns: 1fr; gap: 1rem; }
+    .community-empty { padding: 2rem 1rem; }
+    .community-empty .empty-icon { font-size: 2.5rem; }
+    .community-guest-notice { padding: 2rem 1rem; }
+    .community-guest-notice .btn-theme { font-size: 0.75rem; padding: 0.5rem 0.75rem; }
+
+    .player-banner { height: 90px; }
+    .player-card-body { padding: 0.65rem 0.75rem 0.85rem; gap: 0.3rem; }
+    .player-card-avatar { width: 60px; height: 60px; margin-top: -43px; }
+    .player-card-name { font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .player-card-goal { font-size: 0.68rem; -webkit-line-clamp: 1; }
+    .player-card-stats { margin-top: 0.25rem; gap: 0.3rem; }
+    .player-card-stats span { font-size: 0.6rem; padding: 0.15rem 0.4rem; }
+
+    /* ── Profile detail ── */
+    .pd-banner { height: 120px; }
+    .pd-identity { flex-direction: column; align-items: flex-start; margin-top: -32px; gap: 0.65rem; padding: 0 1rem 1rem; }
+    .pd-avatar-wrap { width: 72px; height: 72px; }
+    .pd-name { font-size: 0.85rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pd-goal { font-size: clamp(1rem, 5vw, 1.4rem); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .pd-stats-row { padding: 0 1rem 0.75rem; gap: 0.5rem; }
+    .pd-stats-row .hero-stat-pill { font-size: 0.62rem; padding: 0.2rem 0.45rem; }
+    .pd-desc { padding: 0 1rem 1rem; font-size: 0.78rem; }
+
+    .pd-bento { grid-template-columns: 1fr; gap: 1rem; }
+    .pd-card { padding: 1rem; gap: 0.35rem; }
+    .pd-card-icon { font-size: 1.5rem; }
+    .pd-card-title { font-size: 0.85rem; }
+    .pd-card-desc { font-size: 0.7rem; }
+    .pd-progress-labels { font-size: 0.62rem; }
+    .pd-progress-track { height: 6px; }
+
+    /* ── Skeleton ── */
+    .community-loading .skeleton-banner { height: 90px; }
+    .community-loading .skeleton-avatar { width: 60px; height: 60px; margin-top: -43px; }
+    .community-loading .skeleton-body { padding: 0.65rem 0.75rem 0.85rem; gap: 0.35rem; }
+    .community-loading .skeleton-line { height: 9px; }
+    .community-loading .skeleton-line.short { width: 50%; }
+    .community-loading .skeleton-line.tiny { width: 35%; height: 6px; }
+}
