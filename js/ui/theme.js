@@ -14,7 +14,9 @@ const THEME_LABELS = {
     "catppuccin":      "Catppuccin Mocha",
     "nord":            "Nordic Ice",
     "dracula":         "Dracula Sync",
-    "github-dark":     "GitHub Premium",
+    "github-dark":       "GitHub Premium",
+    "outerwilds-dark":   "Fogueira Cósmica",
+    "outerwilds-light":  "Lareira Gentil",
 };
 
 function persistPrefs(prefs) {

@@ -149,6 +149,20 @@ body {
     --accent: #f5c2e7; --accent-text: #11111b;
     --muted: #a6adc8; --success: #a6e3a1; --failure: #f38ba8;
 }
+[data-theme="outerwilds-dark"] {
+    --bg: #050914; --surface: #0e1626; --panel: #17233a; --card-bg: #111b2e;
+    --text: #f6f0e2; --stroke: #e67e22; --shadow-color: #02050c;
+    --accent: #f39c12; --accent-text: #050914;
+    --muted: #5c6b83; --success: #2ecc71; --failure: #e74c3c;
+    --select-arrow: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23f6f0e2' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
+[data-theme="outerwilds-light"] {
+    --bg: #f4ebd9; --surface: #fffdf9; --panel: #ebd8c3; --card-bg: #fbf5eb;
+    --text: #162436; --stroke: #a65b24; --shadow-color: #4a3424;
+    --accent: #2a6f97; --accent-text: #fffdf9;
+    --muted: #7f6d55; --success: #2d6a4f; --failure: #9b2226;
+    --select-arrow: url("data:image/svg+xml;charset=UTF-8,<svg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23162436' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+}
 
 @supports not selector(::-webkit-scrollbar) {
     *, *::before, *::after {

@@ -211,6 +211,8 @@
 .theme-preview-nord .sw-bg { background: #2e3440; } .theme-preview-nord .sw-accent { background: #88c0d0; } .theme-preview-nord .sw-card { background: #3b4252; }
 .theme-preview-dracula .sw-bg { background: #1e1f29; } .theme-preview-dracula .sw-accent { background: #ff79c6; } .theme-preview-dracula .sw-card { background: #282a36; }
 .theme-preview-github-dark .sw-bg { background: #070a0e; } .theme-preview-github-dark .sw-accent { background: #58a6ff; } .theme-preview-github-dark .sw-card { background: #0d1117; }
+.theme-preview-outerwilds-dark .sw-bg { background: #050914; } .theme-preview-outerwilds-dark .sw-accent { background: #f39c12; } .theme-preview-outerwilds-dark .sw-card { background: #111b2e; }
+.theme-preview-outerwilds-light .sw-bg { background: #f4ebd9; } .theme-preview-outerwilds-light .sw-accent { background: #2a6f97; } .theme-preview-outerwilds-light .sw-card { background: #fbf5eb; }
 
 .community-modal {
     max-width: 750px !important;
