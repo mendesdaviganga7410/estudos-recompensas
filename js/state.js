@@ -102,6 +102,7 @@ function applyRemoteState(data) {
     state.prefs = data.prefs || {};
     state.profile = data.profile || { epicGoal: '', bannerUrl: '', displayName: '', description: '', public: false };
     if (state.profile.description === undefined) state.profile.description = '';
+    state.diagnostic = data.diagnostic ? { ...data.diagnostic } : undefined;
     state.onboardingComplete = data.onboardingComplete === true
         || (data.onboardingComplete === undefined && (
             (typeof data.xp === 'number' && data.xp > 0)

@@ -102,6 +102,9 @@
     max-height: 85vh;
     overflow: visible;
 }
+#diagnostic-dialog { max-height: 95vh; }
+#diagnostic-dialog .dialog-theme-card { max-height: 92vh; }
+#diagnostic-dialog .dialog-body { max-height: 82vh; }
 .theme-bento-dialog[open] {
     display: flex;
     flex-direction: column;
@@ -322,4 +325,396 @@
     color: var(--muted);
     font-weight: 700;
     margin-top: 0.15rem;
+}
+
+/* ---- NOTIFICAÇÕES ---- */
+
+.notif-btn-wrap {
+    position: relative;
+    display: inline-flex;
+}
+.notif-badge {
+    display: none;
+    position: absolute;
+    top: -6px;
+    right: -6px;
+    min-width: 18px;
+    height: 18px;
+    border-radius: 999px;
+    background: var(--failure);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 900;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+    border: 2px solid var(--surface);
+    z-index: 5;
+    line-height: 1;
+}
+.notif-prompt-dot {
+    display: none;
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--accent);
+    border: 2px solid var(--surface);
+    z-index: 5;
+    animation: notif-pulse 2s ease-in-out infinite;
+}
+@keyframes notif-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+/* ---- PAINEL DROPDOWN ---- */
+
+.notif-panel-wrap {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    opacity: 0;
+    transition: opacity 0.15s;
+    pointer-events: none;
+}
+.notif-panel-wrap.open { opacity: 1; pointer-events: auto; }
+
+.notif-panel-dropdown {
+    position: fixed;
+    width: 420px;
+    max-width: calc(100vw - 1rem);
+    max-height: 70vh;
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    opacity: 0;
+    transform: translateY(-6px);
+    transition: opacity 0.15s, transform 0.15s;
+    pointer-events: none;
+    z-index: 2001;
+}
+.notif-panel-dropdown.open { opacity: 1; transform: translateY(0); pointer-events: auto; }
+
+.notif-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px dashed var(--stroke);
+    background: var(--panel);
+    border-radius: var(--card-radius) var(--card-radius) 0 0;
+}
+.notif-panel-header h3 { margin: 0; font-size: 1.1rem; font-weight: 900; }
+
+.notif-panel-body {
+    overflow-y: auto;
+    padding: 0.5rem;
+    flex: 1;
+    min-height: 0;
+}
+
+/* ---- CONTEÚDO DO PAINEL ---- */
+
+.notif-empty {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: var(--muted);
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.notif-prompt {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--panel);
+    border: 3px solid var(--accent);
+    border-radius: var(--element-radius);
+    cursor: pointer;
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    margin-bottom: 0.5rem;
+}
+.notif-prompt:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+}
+.notif-prompt:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px var(--shadow-color);
+}
+.notif-prompt-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+.notif-prompt-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.notif-prompt-text strong {
+    font-size: 0.85rem;
+    color: var(--text);
+}
+.notif-prompt-text span {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.notif-item {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.85rem 0.75rem;
+    cursor: pointer;
+    transition: background 0.1s;
+    align-items: flex-start;
+    border-bottom: 2px solid var(--panel);
+}
+.notif-item:last-child { border-bottom: none; }
+.notif-item:hover { background: var(--panel); border-radius: 8px; }
+.notif-item-unread {
+    background: color-mix(in srgb, var(--accent) 8%, transparent);
+    border-radius: 8px;
+    margin-bottom: 2px;
+}
+.notif-item-unread:hover {
+    background: color-mix(in srgb, var(--accent) 14%, transparent);
+}
+.notif-avatar {
+    width: 32px; height: 32px;
+    border-radius: 999px;
+    border: 2px solid var(--stroke);
+    flex-shrink: 0;
+    object-fit: cover;
+    background: var(--panel);
+    margin-top: 2px;
+}
+.notif-body {
+    flex: 1;
+    min-width: 0;
+}
+.notif-text {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1.45;
+    word-wrap: break-word;
+}
+.notif-time {
+    font-size: 0.6rem;
+    color: var(--muted);
+    font-weight: 700;
+    margin-top: 0.3rem;
+}
+
+/* ---- DIAGNÓSTICO ---- */
+
+#diagnostic-dialog .dialog-body {
+    min-height: 0;
+    gap: 0;
+}
+
+.diag-step-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    margin-bottom: 1.25rem;
+    padding: 0.75rem 1rem;
+    background: var(--panel);
+    border: 2px solid var(--stroke);
+    border-radius: var(--element-radius);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+.diag-step-icon {
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--surface);
+    border: 2px solid var(--stroke);
+    border-radius: var(--element-radius);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+.diag-step-num {
+    font-size: 0.6rem;
+    font-weight: 900;
+    color: var(--muted);
+    letter-spacing: 0.08em;
+    display: block;
+    margin-bottom: 0.2rem;
+}
+.diag-step-question {
+    font-size: 1rem;
+    font-weight: 900;
+    color: var(--text);
+    line-height: 1.4;
+    display: block;
+}
+.diag-step-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.diag-dot {
+    width: 34px; height: 34px;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 2px solid var(--stroke);
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    box-shadow: 0 0 0 0 var(--shadow-color);
+}
+.diag-dot.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.2);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+.diag-dot.done {
+    background: var(--success);
+    border-color: var(--success);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+.diag-dot:hover {
+    transform: scale(1.15);
+}
+
+.diagnostic-option {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    background: var(--surface);
+    border: 2px solid var(--stroke);
+    border-radius: var(--element-radius);
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.82rem;
+    color: var(--text);
+    transition: all 0.12s;
+    line-height: 1.35;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    position: relative;
+}
+.diagnostic-option:hover {
+    background: var(--panel);
+    border-color: var(--accent);
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+}
+.diagnostic-option:active {
+    transform: translate(1px, 1px);
+    box-shadow: 1px 1px 0px var(--shadow-color);
+}
+.diagnostic-option.selected {
+    background: color-mix(in srgb, var(--accent) 14%, var(--card-bg));
+    border-color: var(--accent);
+    box-shadow: 2px 2px 0px var(--shadow-color);
+}
+.diag-opt-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    width: 1.6rem;
+    text-align: center;
+}
+.diag-opt-label {
+    flex: 1;
+}
+.diag-opt-check {
+    flex-shrink: 0;
+    width: 22px; height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--panel);
+    border: 2px solid var(--stroke);
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: transparent;
+    transition: all 0.12s;
+}
+.diagnostic-option.selected .diag-opt-check {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+}
+
+/* ---- MODAL DE PERFIL (NOTIFICAÇÕES) ---- */
+
+.notif-profile-loading {
+    text-align: center;
+    padding: 2rem;
+    color: var(--muted);
+    font-weight: 700;
+}
+.notif-profile-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.5rem 0;
+}
+.notif-profile-avatar {
+    width: 72px; height: 72px;
+    border-radius: 999px;
+    border: 3px solid var(--stroke);
+    object-fit: cover;
+    background: var(--panel);
+}
+.notif-profile-name {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--text);
+    margin-top: 0.2rem;
+}
+.notif-profile-rank {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--accent);
+}
+.notif-profile-stats {
+    display: flex;
+    gap: 1rem;
+    margin: 0.2rem 0;
+}
+.notif-profile-stats span {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--muted);
+}
+.notif-profile-goal {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    text-align: center;
+    padding: 0.4rem 0.75rem;
+    background: var(--panel);
+    border-radius: var(--element-radius);
+    border: 2px solid var(--stroke);
+    width: 100%;
+}
+.notif-profile-desc {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-align: center;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-top: 0.2rem;
 }

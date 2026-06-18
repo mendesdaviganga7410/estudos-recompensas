@@ -47,7 +47,14 @@
                         </div>
                     </div>
                 </div>
-                <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <div class="notif-btn-wrap">
+                        <button class="btn-theme" id="notif-bell-btn" onclick="openNotificationPanel()">🔔</button>
+                        <span class="notif-badge" id="notif-badge">0</span>
+                        <span class="notif-prompt-dot" id="notif-prompt-dot"></span>
+                    </div>
+                    <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+                </div>
             </div>
 
             <!-- ===== LISTA DA COMUNIDADE ===== -->
@@ -217,6 +224,7 @@
     <script src="js/ui/toast.js"></script>
     <script src="js/ui/theme.js"></script>
     <script src="js/ui/modals.js"></script>
+    <script src="js/notifications.js"></script>
     <script src="js/ui/settings-modal.js"></script>
     <script src="js/ui/media.js"></script>
     <script src="js/router.js"></script>

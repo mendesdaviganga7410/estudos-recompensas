@@ -200,6 +200,7 @@ if (auth) {
             if (userPhoto) userPhoto.src = photoSrc;
 
             if (window.syncUserData) await window.syncUserData(user.uid);
+            if (window.initNotifications) window.initNotifications();
 
             const updatedPhotoSrc = user.photoURL
                 || window.state?.profile?.avatarUrl
