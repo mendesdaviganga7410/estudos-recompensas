@@ -1,0 +1,2354 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFlow // Sessões de Estudo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <style>
+        .study-timer-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            font-variant-numeric: tabular-nums;
+            background: var(--bg);
+            border: 3px solid var(--stroke);
+            border-radius: var(--card-radius);
+            padding: 1rem 2rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            width: 100%;
+            text-align: center;
+            color: var(--accent);
+            transition: color 0.3s;
+        }
+        .timer-display.phase-focus { color: var(--success); }
+        .timer-display.phase-break { color: var(--accent); }
+        .timer-phase-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .timer-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn-timer {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            color: var(--text);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--element-radius);
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            flex: 1;
+        }
+        .btn-timer:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px var(--shadow-color);
+        }
+        .btn-timer:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
+        }
+        .btn-timer:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+        }
+        .btn-timer.start { background: var(--success); color: white; }
+        .btn-timer.pause { background: var(--accent); color: var(--accent-text); }
+        .btn-timer.stop  { background: var(--failure); color: white; }
+        .btn-timer.skip  { background: var(--accent); color: var(--accent-text); }
+
+        .mode-toggle {
+            display: flex;
+            gap: 0;
+        }
+        .mode-btn {
+            padding: 0.55rem 1.2rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            background: var(--panel);
+            color: var(--muted);
+            border: 3px solid var(--stroke);
+            box-shadow: 3px 3px 0 var(--shadow-color);
+            transition: transform 0.1s, box-shadow 0.1s, background 0.1s, color 0.1s, border-color 0.1s;
+            position: relative;
+        }
+        .mode-btn:first-child {
+            border-radius: var(--element-radius) 0 0 var(--element-radius);
+            border-right-width: 2px;
+        }
+        .mode-btn:last-child {
+            border-radius: 0 var(--element-radius) var(--element-radius) 0;
+            border-left-width: 2px;
+        }
+        .mode-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--shadow-color);
+            z-index: 1;
+        }
+        .mode-btn:active {
+            transform: translate(1px, 1px);
+            box-shadow: 2px 2px 0 var(--shadow-color);
+            z-index: 1;
+        }
+        .mode-btn.active {
+            background: var(--surface);
+            color: var(--text);
+            border-color: var(--accent);
+            box-shadow: 3px 3px 0 var(--shadow-color);
+            z-index: 2;
+        }
+
+        .pomo-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 480px;
+        }
+        .pomo-config .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .pomo-config .config-item label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .pomo-config .config-item input {
+            background: var(--panel);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text);
+            outline: none;
+            width: 100%;
+            box-shadow: 3px 3px 0 var(--shadow-color);
+            transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+            font-family: inherit;
+            text-align: center;
+        }
+        .pomo-config .config-item input:focus {
+            border-color: var(--accent);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--shadow-color);
+        }
+
+        .pomo-status {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .pomo-status .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.15rem;
+        }
+        .pomo-status .stat span:first-child {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .pomo-status .stat span:last-child {
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .history-table th {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--muted);
+            text-align: left;
+            padding: 0.5rem 0.6rem;
+            border-bottom: 2px dashed var(--stroke);
+            white-space: nowrap;
+        }
+        .history-table td {
+            padding: 0.6rem 0.6rem;
+            font-weight: 700;
+            border-bottom: 2px solid var(--stroke);
+            white-space: nowrap;
+        }
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+        .history-table tr:hover td {
+            background: var(--panel);
+        }
+        .history-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .history-expand-btn {
+            background: var(--panel);
+            border: 2px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--muted);
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+        .history-expand-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .clear-btn-wrap {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px dashed var(--stroke);
+        }
+        .btn-clear {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--surface);
+            border: 2px solid var(--failure);
+            color: var(--failure);
+            padding: 0.5rem 1rem;
+            border-radius: var(--element-radius);
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-clear:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .btn-clear:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
+        }
+        .session-count {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .tag-modo {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 0.15rem 0.45rem;
+            border-radius: calc(var(--element-radius) * 0.6);
+            border: 2px solid currentColor;
+        }
+        .tag-modo.simples { color: var(--muted); }
+        .tag-modo.pomodoro { color: var(--accent); }
+
+        .btn-sound-settings {
+            background: var(--panel);
+            border: 2px solid var(--stroke);
+            border-radius: var(--element-radius);
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 2px 2px 0 var(--shadow-color);
+            transition: transform 0.1s, box-shadow 0.1s;
+            flex-shrink: 0;
+        }
+        .btn-sound-settings:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 var(--shadow-color);
+        }
+        .btn-sound-settings:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 var(--shadow-color);
+        }
+        .sound-dialog {
+            max-width: 480px !important;
+        }
+        .sound-group {
+            margin-bottom: 1.25rem;
+        }
+        .sound-group:last-child { margin-bottom: 0; }
+        .sound-group-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--muted);
+            margin-bottom: 0.6rem;
+            display: block;
+        }
+        .sound-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.5rem;
+        }
+        .sound-option {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.5rem;
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-align: center;
+            color: var(--text);
+            box-shadow: 2px 2px 0 var(--shadow-color);
+            transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .sound-option:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 var(--shadow-color);
+        }
+        .sound-option.active {
+            border-color: var(--accent);
+            background: var(--panel);
+            box-shadow: 0 0 0 2px var(--accent), 2px 2px 0 var(--shadow-color);
+        }
+        .sound-option .preview-btn {
+            font-size: 0.6rem;
+            background: var(--bg);
+            border: 2px solid var(--stroke);
+            border-radius: calc(var(--element-radius) * 0.5);
+            padding: 0.15rem 0.5rem;
+            cursor: pointer;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 0.15rem;
+            transition: background 0.1s;
+        }
+        .sound-option .preview-btn:hover {
+            background: var(--accent);
+            color: var(--accent-text);
+        }
+
+        .phase-dialog-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-top: 1rem;
+        }
+        .phase-dialog-actions .btn-theme {
+            justify-content: center;
+            width: 100%;
+        }
+        .phase-dialog-actions .btn-theme.skip {
+            background: var(--panel);
+            color: var(--muted);
+        }
+
+        .study-config-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .study-config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.85rem 1rem;
+            box-shadow: 3px 3px 0 var(--shadow-color);
+        }
+        .study-config-item label {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--text);
+            cursor: pointer;
+        }
+        .study-config-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .study-config-item .hint {
+            font-size: 0.68rem;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 0.15rem;
+        }
+        .session-notes {
+            width: 100%;
+            min-height: 80px;
+            border-radius: var(--element-radius);
+            border: 3px solid var(--stroke);
+            background: var(--panel);
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 800;
+            resize: vertical;
+            margin-top: 0.5rem;
+            box-sizing: border-box;
+            outline: none;
+            box-shadow: 4px 4px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .session-notes:focus {
+            border-color: var(--accent);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+        }
+        .btn-notes-toggle {
+            background: var(--panel);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+            font-family: inherit;
+            margin-top: 0.5rem;
+            width: auto;
+            display: inline-block;
+        }
+        .btn-notes-toggle:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+        }
+        .btn-notes-toggle:active {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+        }
+
+        .history-bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+        .history-bento-item {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+            font-family: inherit;
+        }
+        .history-bento-item:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+            border-color: var(--accent);
+        }
+        .history-bento-item .hbi-date {
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .history-bento-item .hbi-subject {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .history-bento-item .hbi-meta {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-bento-item .hbi-meta .hbi-mode {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .history-bento-item .hbi-meta .hbi-total {
+            color: var(--accent);
+            font-weight: 900;
+        }
+        .history-bento-item .hbi-notes-indicator {
+            font-size: 0.7rem;
+            color: var(--accent);
+        }
+
+        .history-sort-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .history-sort-bar label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--muted);
+        }
+        .history-sort-btn {
+            background: var(--panel);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.4rem 0.7rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text);
+            font-family: inherit;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .history-sort-btn:hover {
+            border-color: var(--accent);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+
+        .sort-dialog-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .sort-dialog-grid button {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.75rem 1rem;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--text);
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .sort-dialog-grid button:hover {
+            border-color: var(--accent);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .sort-dialog-grid button.is-active {
+            border-color: var(--accent);
+            background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+        }
+
+        .history-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .history-detail .hd-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .history-detail .hd-header .hd-date {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.03em;
+        }
+        .history-detail .hd-header .hd-subject {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--text);
+        }
+        .history-detail .hd-header .hd-mode-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 0.3rem 0.7rem;
+            border-radius: var(--element-radius);
+            background: var(--surface);
+            border: 2px solid var(--stroke);
+            box-shadow: 2px 2px 0px var(--shadow-color);
+        }
+        .history-detail .hd-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.6rem;
+        }
+        .history-detail .hd-stat {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.75rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .history-detail .hd-stat .hd-stat-label {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .history-detail .hd-stat .hd-stat-value {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-top: 0.15rem;
+        }
+        .history-detail .hd-notes {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 1rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .history-detail .hd-notes h4 {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin: 0 0 0.5rem 0;
+        }
+        .history-detail .hd-notes p {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .history-detail .hd-phases {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 1rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .history-detail .hd-phases h4 {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin: 0 0 0.5rem 0;
+        }
+        .history-detail .hd-phases .hd-phase {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid var(--stroke);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .history-detail .hd-phases .hd-phase:last-child {
+            border-bottom: none;
+        }
+        .history-detail .hd-phases .hd-phase .hd-phase-type {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .history-detail .hd-phases .hd-phase .hd-phase-type .focus-dot {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .history-detail .hd-phases .hd-phase .hd-phase-type .break-dot {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--muted);
+        }
+        .history-detail .hd-phases .hd-phase .hd-phase-dur {
+            color: var(--accent);
+            font-weight: 900;
+        }
+    </style>
+</head>
+
+<body data-theme="light" class="guest-mode">
+
+    <div class="container">
+
+        <!-- AUTH LOADING -->
+        <div id="auth-loading">
+            <div class="pulse"></div>
+            <span>Carregando...</span>
+        </div>
+
+        <div id="study-content" style="display:none">
+
+            <div class="top-bar">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <button class="btn-theme" id="btnBack" onclick="studyTimer.goBack()" title="Voltar">⬅ Voltar</button>
+                    <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Modo Visitante</span>
+                    <div id="auth-panel" class="auth-panel">
+                        <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+                            <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
+                            <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
+                        </div>
+                        <div id="user-profile" class="user-profile" style="display: none;">
+                            <img id="user-photo" src="" alt="Foto" referrerpolicy="no-referrer">
+                            <span id="user-name">Carregando...</span>
+                            <button class="btn-logout" onclick="logoutGoogle()">Sair</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <div class="notif-btn-wrap">
+                        <button class="btn-theme" id="notif-bell-btn" onclick="openNotificationPanel()">🔔</button>
+                        <span class="notif-badge" id="notif-badge">0</span>
+                        <span class="notif-prompt-dot" id="notif-prompt-dot"></span>
+                    </div>
+                    <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+                </div>
+            </div>
+
+            <div class="bento-layout">
+
+                <!-- Timer Card -->
+                <div class="bento-card col-span-3">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                        <h2 style="margin-bottom:0;">Cronômetro de Foco</h2>
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <div class="mode-toggle">
+                                <button class="mode-btn active" id="modeSimple" onclick="studyTimer.switchMode('simple')">⏱ Simples</button>
+                                <button class="mode-btn" id="modePomo" onclick="studyTimer.switchMode('pomodoro')">🍅 Pomodoro</button>
+                            </div>
+                            <button class="btn-sound-settings" onclick="openSoundDialog()" title="Configurar sons">🔔</button>
+                        </div>
+                    </div>
+                    <div class="study-timer-wrap">
+                        <div class="timer-display" id="timerDisplay">00:00</div>
+                        <div id="pomoStatus" class="pomo-status" style="display:none;">
+                            <div class="stat">
+                                <span>Ciclo</span>
+                                <span id="pomoCycle">0/0</span>
+                            </div>
+                            <div class="stat">
+                                <span>Fase</span>
+                                <span id="pomoPhase">—</span>
+                            </div>
+                            <div class="stat">
+                                <span>Foco Total</span>
+                                <span id="pomoFocusTotal">00:00</span>
+                            </div>
+                            <div class="stat">
+                                <span>Descanso Total</span>
+                                <span id="pomoBreakTotal">00:00</span>
+                            </div>
+                        </div>
+                        <div id="pomoConfig" class="pomo-config" style="display:none;">
+                            <div class="config-item">
+                                <label for="pomoFocusMin">Foco (min)</label>
+                                <input type="number" id="pomoFocusMin" value="25" min="1" max="180">
+                            </div>
+                            <div class="config-item">
+                                <label for="pomoBreakMin">Descanso (min)</label>
+                                <input type="number" id="pomoBreakMin" value="5" min="1" max="60">
+                            </div>
+                            <div class="config-item">
+                                <label for="pomoCycles">Ciclos</label>
+                                <input type="number" id="pomoCycles" value="4" min="1" max="50">
+                            </div>
+                        </div>
+                        <div class="form-group" style="width:100%;max-width:320px;">
+                            <label for="subjectInput">Assunto / Matéria</label>
+                            <input type="text" id="subjectInput" placeholder="Ex: Matemática, Compiladores..." autocomplete="off">
+                            <button id="btnToggleNotes" class="btn-notes-toggle" onclick="toggleNotes()" type="button" style="margin-top:0.4rem;">📝 Anotações</button>
+                            <textarea id="sessionNotes" class="session-notes" placeholder="Detalhes sobre esta sessão..." style="display:none;"></textarea>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="btn-timer start" id="btnStart" onclick="studyTimer.start()">▶ Iniciar Foco</button>
+                            <button class="btn-timer pause" id="btnPause" onclick="studyTimer.pause()" disabled>⏸ Pausar</button>
+                            <button class="btn-timer skip" id="btnSkip" onclick="studyTimer.skip()" disabled>⏭ Pular</button>
+                            <button class="btn-timer stop" id="btnStop" onclick="studyTimer.stop()" disabled>⏹ Concluir Sessão</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Card -->
+                <div class="bento-card col-span-3">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+                        <div style="display:flex;align-items:center;gap:0.6rem;">
+                            <h2 style="margin-bottom:0;">Histórico de Sessões</h2>
+                            <button class="history-expand-btn" onclick="openHistoryGrid()">Expandir</button>
+                        </div>
+                        <span class="session-count" id="sessionCount">0 sessões</span>
+                    </div>
+                    <div id="historyBody" style="overflow-x:auto;">
+                        <div class="history-empty">Nenhuma sessão registrada ainda. Complete seu primeiro foco!</div>
+                    </div>
+                    <div class="clear-btn-wrap">
+                        <button class="btn-clear" onclick="studyTimer.clearHistory()">🗑 Limpar Histórico</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div> <!-- /study-content -->
+    </div>
+
+    <!-- MODAL: Autenticação -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Entrar na Conta</h3>
+                <button class="modal-close" onclick="closeAuthModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="auth-form">
+                    <div class="form-group">
+                        <label for="auth-email">E-mail</label>
+                        <input type="email" id="auth-email" placeholder="seu@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group" id="auth-password-group">
+                        <label for="auth-password">Senha</label>
+                        <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" minlength="6"
+                            autocomplete="current-password">
+                        <a href="#" id="btn-forgot-password" onclick="openForgotPassword(event)"
+                            style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 0.35rem; display: inline-block;">Esqueceu
+                            sua senha?</a>
+                    </div>
+                    <button class="btn-theme btn-submit" id="btn-auth-submit" onclick="handleAuthSubmit()"
+                        style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+                </div>
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem;">
+                    <span id="toggle-text" style="color: var(--muted);">Não tem uma conta?</span>
+                    <a href="#" id="btn-toggle-auth-mode" onclick="toggleAuthMode(event)"
+                        style="color: var(--accent); font-weight: 700; text-decoration: none; margin-left: 0.25rem;">Criar
+                        Conta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="tBox"></div>
+
+    <!-- SOUND SETTINGS DIALOG -->
+    <dialog id="sound-dialog" class="theme-bento-dialog sound-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>🔔 Configurar Sons</h3>
+                <button class="dialog-close-btn" onclick="closeSoundDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll" id="soundDialogBody">
+                    <!-- gerado via JS -->
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="theme-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>Galeria de Temas</h3>
+                <button class="dialog-close-btn" onclick="closeThemeDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <h4 class="grid-section-title">☀️ Modos Claros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-light" onclick="selectTheme('light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Padrão Claro</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-brown" onclick="selectTheme('pastel-brown')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Café com Leite</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-pink" onclick="selectTheme('pastel-pink')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Flor de Cerejeira</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-blue" onclick="selectTheme('pastel-blue')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Brisa do Mar</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-purple" onclick="selectTheme('pastel-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lavanda Suave</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-mint" onclick="selectTheme('pastel-mint')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Menta Fresca</span></button>
+                        <button class="theme-bento-item theme-preview-solarized-light" onclick="selectTheme('solarized-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Solarized Light</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-light" onclick="selectTheme('outerwilds-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lareira Gentil</span></button>
+                    </div>
+                    <h4 class="grid-section-title" style="margin-top: 1.5rem;">🌙 Modos Escuros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-dark" onclick="selectTheme('dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dark Industrial</span></button>
+                        <button class="theme-bento-item theme-preview-dark-chocolate" onclick="selectTheme('dark-chocolate')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Cacau Intenso</span></button>
+                        <button class="theme-bento-item theme-preview-dark-forest" onclick="selectTheme('dark-forest')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Floresta Noturna</span></button>
+                        <button class="theme-bento-item theme-preview-dark-amber" onclick="selectTheme('dark-amber')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Âmbar Profundo</span></button>
+                        <button class="theme-bento-item theme-preview-dark-purple" onclick="selectTheme('dark-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Noite de Vampiro</span></button>
+                        <button class="theme-bento-item theme-preview-catppuccin" onclick="selectTheme('catppuccin')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Catppuccin Mocha</span></button>
+                        <button class="theme-bento-item theme-preview-nord" onclick="selectTheme('nord')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Nordic Ice</span></button>
+                        <button class="theme-bento-item theme-preview-dracula" onclick="selectTheme('dracula')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dracula Sync</span></button>
+                        <button class="theme-bento-item theme-preview-github-dark" onclick="selectTheme('github-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">GitHub Premium</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-dark" onclick="selectTheme('outerwilds-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Fogueira Cósmica</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- DIALOG: Transição de fase (Pomodoro) -->
+    <dialog id="phase-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3 id="phaseDialogTitle">🎯 Foco Concluído!</h3>
+                <button class="dialog-close-btn" onclick="closePhaseDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll" style="text-align:center;">
+                    <p style="font-size:0.85rem;font-weight:700;color:var(--muted);">O que deseja fazer?</p>
+                    <div class="phase-dialog-actions">
+                        <button class="btn-theme" id="phaseBtnPrimary">▶ Começar Descanso</button>
+                        <button class="btn-theme" id="phaseBtnWait">⏸ Esperar</button>
+                        <button class="btn-theme skip" id="phaseBtnSkip">⏭ Pular Descanso</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- DIALOG: Ordenar Histórico -->
+    <dialog id="history-sort-dialog" class="theme-bento-dialog" style="max-width:320px;">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>📌 Ordenar</h3>
+                <button class="dialog-close-btn" onclick="closeHistorySortDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <div class="sort-dialog-grid" id="historySortOptions">
+                        <!-- gerado via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- DIALOG: Histórico Bento -->
+    <dialog id="history-bento-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3 id="historyDialogTitle">📋 Histórico de Sessões</h3>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <button class="dialog-close-btn" id="historyDialogBackBtn" style="display:none;" onclick="historyBackToGrid()">←</button>
+                    <button class="dialog-close-btn" onclick="closeHistoryDialog()">×</button>
+                </div>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll" id="historyDialogContent">
+                    <!-- grid ou detalhe gerado via JS -->
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="js/templates.js"></script>
+    <script src="js/state.js"></script>
+    <script type="module" src="js/firebase/init.js"></script>
+    <script type="module" src="js/firebase/db.js"></script>
+    <script type="module" src="js/firebase/auth.js"></script>
+    <script src="js/ui/toast.js"></script>
+    <script src="js/ui/theme.js"></script>
+    <script src="js/ui/modals.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/ui/settings-modal.js"></script>
+    <script src="js/ui/media.js"></script>
+    <script src="js/router.js"></script>
+    <script>
+    // ============================================================
+    //  PAINEL DE CONTROLE DE TEMPO E REGISTRO DE SESSOES
+    //  studyTimer — Objeto unico de gerenciamento
+    //  Modos: 'simple' (cronometro livre) | 'pomodoro' (ciclos foco/descanso)
+    // ============================================================
+    const STORAGE_KEY = 'historico_estudos';
+    const SOUND_KEY = 'estudo_config_som';
+
+    // ============================================================
+    //  SISTEMA DE SONS — PRESETS CONFIGURAVEIS
+    //  Grupos: start, pause, complete, alarm
+    // ============================================================
+    const SOUND_PRESETS = {
+        start: {
+            classico: {
+                name: '🔔 Clássico',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'triangle';
+                    o.frequency.value = 660;
+                    g.gain.value = 0.25;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 0.5);
+                }
+            },
+            sinal: {
+                name: '📯 Sinal',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = 880;
+                    g.gain.value = 0.2;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 0.35);
+                }
+            },
+            suave: {
+                name: '🌊 Suave',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = 528;
+                    g.gain.value = 0.2;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 0.8);
+                }
+            },
+            clique: {
+                name: '👆 Clique',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'square';
+                    o.frequency.value = 440;
+                    g.gain.value = 0.1;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 0.06);
+                }
+            },
+            silence: {
+                name: '🔇 Silêncio',
+                play() {}
+            }
+        },
+        complete: {
+            fanfarra: {
+                name: '🎺 Fanfarra',
+                play(ctx) {
+                    [523, 659, 784, 1047].forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'square';
+                        o.frequency.value = freq;
+                        g.gain.value = 0.2;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15 + i * 0.18);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + i * 0.18);
+                        o.stop(ctx.currentTime + 0.35 + i * 0.18);
+                    });
+                }
+            },
+            triunfo: {
+                name: '🏆 Triunfo',
+                play(ctx) {
+                    const notes = [523, 659, 784, 1047, 784, 1047, 1319];
+                    notes.forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'triangle';
+                        o.frequency.value = freq;
+                        g.gain.value = 0.3;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3 + i * 0.12);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + i * 0.12);
+                        o.stop(ctx.currentTime + 0.45 + i * 0.12);
+                    });
+                }
+            },
+            classico: {
+                name: '🔔 Clássico',
+                play(ctx) {
+                    [660, 880].forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'sine';
+                        o.frequency.value = freq;
+                        g.gain.value = 0.25;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3 + i * 0.32);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + i * 0.32);
+                        o.stop(ctx.currentTime + 0.45 + i * 0.32);
+                    });
+                }
+            },
+            digital: {
+                name: '📟 Digital',
+                play(ctx) {
+                    let count = 0;
+                    for (let i = 0; i < 3; i++) {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'square';
+                        o.frequency.value = i % 2 === 0 ? 1200 : 800;
+                        g.gain.value = 0.15;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08 + count * 0.14);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + count * 0.14);
+                        o.stop(ctx.currentTime + 0.15 + count * 0.14);
+                        count++;
+                    }
+                }
+            },
+            suave: {
+                name: '🌊 Suave',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = 528;
+                    g.gain.value = 0.3;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 1.5);
+                }
+            },
+            despertar: {
+                name: '⏰ Despertar',
+                play(ctx) {
+                    for (let i = 0; i < 20; i++) {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'sawtooth';
+                        const freq = i % 2 === 0 ? 880 : 660;
+                        o.frequency.value = freq;
+                        o.frequency.linearRampToValueAtTime(freq * 1.5, ctx.currentTime + 0.12 + i * 0.28);
+                        g.gain.value = 0.15;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2 + i * 0.28);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + i * 0.28);
+                        o.stop(ctx.currentTime + 0.35 + i * 0.28);
+                    }
+                }
+            }
+        },
+        alarm: {
+            atencao: {
+                name: '⚠️ Atenção',
+                play(ctx) {
+                    [880, 1100].forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'square';
+                        o.frequency.value = freq;
+                        g.gain.value = 0.15;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12 + i * 0.2);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + i * 0.2);
+                        o.stop(ctx.currentTime + 0.2 + i * 0.2);
+                    });
+                }
+            },
+            classico: {
+                name: '🔔 Clássico',
+                play(ctx) {
+                    [880, 1100].forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'sine';
+                        o.frequency.value = freq;
+                        g.gain.value = 0.2;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2 + i * 0.25);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + i * 0.25);
+                        o.stop(ctx.currentTime + 0.3 + i * 0.25);
+                    });
+                }
+            },
+            sinal: {
+                name: '📯 Sinal',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'triangle';
+                    o.frequency.value = 1047;
+                    g.gain.value = 0.25;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 0.6);
+                }
+            },
+            campainha: {
+                name: '🔔 Campainha',
+                play(ctx) {
+                    [660, 880, 660, 880].forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'sine';
+                        o.frequency.value = freq;
+                        g.gain.value = 0.2;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08 + i * 0.25);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + i * 0.25);
+                        o.stop(ctx.currentTime + 0.15 + i * 0.25);
+                    });
+                }
+            },
+            suave: {
+                name: '🌊 Suave',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = 660;
+                    g.gain.value = 0.25;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.0);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 1.0);
+                }
+            }
+        },
+        pause: {
+            clique: {
+                name: '👆 Clique',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'square';
+                    o.frequency.value = 440;
+                    g.gain.value = 0.1;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 0.06);
+                }
+            },
+            sinal: {
+                name: '📯 Sinal',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'triangle';
+                    o.frequency.value = 660;
+                    g.gain.value = 0.2;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 0.3);
+                }
+            },
+            suave: {
+                name: '🌊 Suave',
+                play(ctx) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = 528;
+                    g.gain.value = 0.2;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start();
+                    o.stop(ctx.currentTime + 0.5);
+                }
+            },
+            alerta: {
+                name: '🔊 Alerta',
+                play(ctx) {
+                    [660, 440].forEach((freq, i) => {
+                        const o = ctx.createOscillator();
+                        const g = ctx.createGain();
+                        o.type = 'square';
+                        o.frequency.value = freq;
+                        g.gain.value = 0.12;
+                        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08 + i * 0.12);
+                        o.connect(g);
+                        g.connect(ctx.destination);
+                        o.start(ctx.currentTime + i * 0.12);
+                        o.stop(ctx.currentTime + 0.12 + i * 0.12);
+                    });
+                }
+            },
+            silence: {
+                name: '🔇 Silêncio',
+                play() { /* sem som */ }
+            }
+        }
+    };
+
+    // Configuracao de sons do usuario
+    let soundConfig = { start: 'classico', pause: 'silence', complete: 'classico', alarm: 'classico' };
+
+    function loadSoundConfig() {
+        try {
+            const raw = localStorage.getItem(SOUND_KEY);
+            if (raw) {
+                const saved = JSON.parse(raw);
+                const validKeys = { start: true, pause: true, complete: true, alarm: true };
+                Object.keys(saved).forEach(k => {
+                    if (validKeys[k] && SOUND_PRESETS[k] && SOUND_PRESETS[k][saved[k]]) {
+                        soundConfig[k] = saved[k];
+                    }
+                });
+            }
+        } catch (_) { /* fallback */ }
+    }
+    function saveSoundConfig() {
+        try { localStorage.setItem(SOUND_KEY, JSON.stringify(soundConfig)); }
+        catch (_) {}
+    }
+
+    let _phasePending = null; // 'start' | 'wait' | 'skip'
+
+    function showPhaseDialog(type) {
+        const isFocusEnd = type === 'focus-end';
+        const title = isFocusEnd ? '🎯 Foco Concluído!' : '☕ Descanso Concluído!';
+        const actionLabel = isFocusEnd ? 'Descanso' : 'Foco';
+        const skipLabel = isFocusEnd ? 'Pular Descanso' : 'Pular Foco';
+
+        document.getElementById('phaseDialogTitle').textContent = title;
+        document.getElementById('phaseBtnPrimary').innerHTML = `▶ Começar ${actionLabel}`;
+        document.getElementById('phaseBtnPrimary').onclick = () => {
+            document.getElementById('phase-dialog').close();
+            _resolvePhase('start');
+        };
+        document.getElementById('phaseBtnWait').onclick = () => {
+            document.getElementById('phase-dialog').close();
+            _resolvePhase('wait');
+        };
+        document.getElementById('phaseBtnSkip').innerHTML = `⏭ ${skipLabel}`;
+        document.getElementById('phaseBtnSkip').onclick = () => {
+            document.getElementById('phase-dialog').close();
+            _resolvePhase('skip');
+        };
+        document.getElementById('phase-dialog').showModal();
+    }
+
+    function closePhaseDialog() {
+        document.getElementById('phase-dialog').close();
+        _resolvePhase('wait');
+    }
+
+    function _resolvePhase(action) {
+        _phasePending = action;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof applyTimerSize === 'function') applyTimerSize();
+    });
+
+    function getAudioContext() {
+        return new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    function playSound(group, presetId) {
+        const preset = SOUND_PRESETS[group] && SOUND_PRESETS[group][presetId];
+        if (!preset) return;
+        try {
+            const ctx = getAudioContext();
+            preset.play(ctx);
+        } catch (_) { /* fallback */ }
+    }
+
+    function playConfiguredSound(group) {
+        const presetId = soundConfig[group] || 'classico';
+        playSound(group, presetId);
+    }
+
+    // ============================================================
+    //  DIALOG DE SOM
+    // ============================================================
+    function openSoundDialog() {
+        renderSoundDialog();
+        document.getElementById('sound-dialog').showModal();
+    }
+    function closeSoundDialog() {
+        document.getElementById('sound-dialog').close();
+    }
+    function renderSoundDialog() {
+        const body = document.getElementById('soundDialogBody');
+        const groups = [
+            { key: 'start',    label: '▶ Iniciar' },
+            { key: 'pause',    label: '⏸ Pausar' },
+            { key: 'complete', label: '🎉 Concluir' },
+            { key: 'alarm',    label: '🔊 Alarme' }
+        ];
+        body.innerHTML = groups.map(g => {
+            const presets = SOUND_PRESETS[g.key];
+            const active = soundConfig[g.key];
+            return `
+                <div class="sound-group">
+                    <span class="sound-group-title">${g.label}</span>
+                    <div class="sound-grid">
+                        ${Object.entries(presets).map(([id, p]) => `
+                            <div class="sound-option ${id === active ? 'active' : ''}" data-group="${g.key}" data-id="${id}">
+                                <span>${p.name}</span>
+                                <button class="preview-btn" onclick="event.stopPropagation(); playSound('${g.key}','${id}')">▶ Prévia</button>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }).join('');
+        // Clique para selecionar
+        body.querySelectorAll('.sound-option').forEach(el => {
+            el.addEventListener('click', function() {
+                const group = this.dataset.group;
+                const id = this.dataset.id;
+                soundConfig[group] = id;
+                saveSoundConfig();
+                // Atualiza visual
+                this.parentElement.querySelectorAll('.sound-option').forEach(o => o.classList.remove('active'));
+                this.classList.add('active');
+                // Toca preview
+                playSound(group, id);
+            });
+        });
+    }
+    loadSoundConfig();
+
+    function toggleNotes() {
+        const ta = document.getElementById('sessionNotes');
+        ta.style.display = ta.style.display === 'none' ? 'block' : 'none';
+    }
+
+    const studyTimer = {
+        // ---- Modo atual ----
+        mode: 'simple',
+
+        // ---- Simple Timer ----
+        elapsed: 0,
+        running: false,
+        intervalId: null,
+        startTime: null,
+
+        // ---- Pomodoro Timer ----
+        pomo: {
+            config: { focusMin: 25, breakMin: 5, cycles: 4 },
+            phase: 'idle',       // 'idle' | 'focus' | 'break' | 'done'
+            currentCycle: 0,
+            phaseElapsed: 0,     // segundos decorridos na fase atual
+            phaseTotal: 0,       // segundos totais da fase atual
+            phaseStartTime: null,
+            running: false,
+            intervalId: null,
+            phasesCompleted: [], // { tipo, duracao }
+            focusTotal: 0,
+            breakTotal: 0,
+            nextPhase: null      // 'focus' | 'break' | null (pendente após "Esperar")
+        },
+
+        // ===========================================================
+        //  FEEDBACK SONORO (delega ao sistema de presets)
+        // ===========================================================
+        _playStartSound()    { playConfiguredSound('start'); },
+        _playPauseSound()    { playConfiguredSound('pause'); },
+        _playCompleteSound() { playConfiguredSound('complete'); },
+        _alarmTimer: null,
+        _autoTimeout: null,
+        _playAlarmSound() {
+            this._stopAlarm();
+            const play = () => playConfiguredSound('alarm');
+            play();
+            this._alarmTimer = setInterval(play, 1500);
+        },
+        _stopAlarm() {
+            if (this._alarmTimer) {
+                clearInterval(this._alarmTimer);
+                this._alarmTimer = null;
+            }
+        },
+        _clearAutoTimeout() {
+            if (this._autoTimeout) {
+                clearTimeout(this._autoTimeout);
+                this._autoTimeout = null;
+            }
+        },
+
+        // ===========================================================
+        //  UTILITARIOS
+        // ===========================================================
+        formatTime(sec) {
+            const m = String(Math.floor(sec / 60)).padStart(2, '0');
+            const s = String(sec % 60).padStart(2, '0');
+            return `${m}:${s}`;
+        },
+
+        _formatDuration(sec) {
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            if (h > 0) return `${h}h${m > 0 ? m : ''}`;
+            return `${m}min${s > 0 ? s : ''}`;
+        },
+
+        // ===========================================================
+        //  SWITCH MODE
+        // ===========================================================
+        switchMode(mode) {
+            if (this.running || this.pomo.running) {
+                window.toast?.('Finalize a sessão atual antes de trocar de modo.', true);
+                return;
+            }
+            this.mode = mode;
+            document.getElementById('modeSimple').classList.toggle('active', mode === 'simple');
+            document.getElementById('modePomo').classList.toggle('active', mode === 'pomodoro');
+            document.getElementById('btnStart').textContent = mode === 'pomodoro' ? '▶ Iniciar Pomodoro' : '▶ Iniciar Foco';
+            document.getElementById('pomoConfig').style.display = mode === 'pomodoro' ? 'grid' : 'none';
+            document.getElementById('pomoStatus').style.display = mode === 'pomodoro' ? 'flex' : 'none';
+            document.getElementById('btnSkip').style.display = mode === 'pomodoro' ? '' : 'none';
+            this._resetState();
+        },
+
+        _resetState() {
+            this.elapsed = 0;
+            this.running = false;
+            if (this.intervalId) { clearInterval(this.intervalId); this.intervalId = null; }
+            this.startTime = null;
+            this._resetPomo();
+            this._updateDisplay();
+            document.getElementById('btnStart').disabled = false;
+            document.getElementById('btnPause').disabled = true;
+            document.getElementById('btnStop').disabled = true;
+            document.getElementById('btnSkip').disabled = true;
+            document.getElementById('timerDisplay').className = 'timer-display';
+        },
+
+        _resetPomo() {
+            this._stopAlarm();
+            this._clearAutoTimeout();
+            const p = this.pomo;
+            if (p.intervalId) { clearInterval(p.intervalId); p.intervalId = null; }
+            p.phase = 'idle';
+            p.currentCycle = 0;
+            p.phaseElapsed = 0;
+            p.phaseTotal = 0;
+            p.phaseStartTime = null;
+            p.running = false;
+            p.phasesCompleted = [];
+            p.focusTotal = 0;
+            p.breakTotal = 0;
+            p.nextPhase = null;
+            this._updatePomoUI();
+        },
+
+        _updateDisplay() {
+            document.getElementById('timerDisplay').textContent = this.formatTime(this.elapsed);
+        },
+
+        // ===========================================================
+        //  LOGICA PRINCIPAL
+        // ===========================================================
+        start() {
+            if (this.mode === 'pomodoro') return this._startPomo();
+
+            if (this.running) return;
+            const subject = document.getElementById('subjectInput').value.trim();
+            if (!subject) {
+                window.toast?.('Digite o nome da matéria antes de iniciar.', true);
+                return;
+            }
+            this.running = true;
+            this.startTime = Date.now() - this.elapsed * 1000;
+            this.intervalId = setInterval(() => {
+                this.elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+                this._updateDisplay();
+            }, 200);
+            this._setButtons(true, false, false);
+            this._playStartSound();
+            window.toast?.('⏱ Foco iniciado!');
+        },
+
+        pause() {
+            if (this.mode === 'pomodoro') return this._pausePomo();
+
+            if (!this.running) return;
+            this.running = false;
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+            this._setButtons(false, true, false);
+            this._playPauseSound();
+            window.toast?.('⏸ Foco pausado.');
+        },
+
+        stop() {
+            if (this.mode === 'pomodoro') return this._stopPomo();
+
+            this.running = false;
+            clearInterval(this.intervalId);
+            this.intervalId = null;
+
+            const session = this._buildSimpleSession();
+            this._saveSession(session);
+            this._playCompleteSound();
+            this._resetState();
+            window.toast?.('✅ Sessão concluída e salva!');
+        },
+
+        skip() {
+            if (this.mode === 'pomodoro') return this._skipPhase();
+            window.toast?.('⏭ Pular não disponível no modo Simples.', true);
+        },
+
+        _skipPhase() {
+            this._stopAlarm();
+            this._clearAutoTimeout();
+            const p = this.pomo;
+            if (!p.running || (p.phase !== 'focus' && p.phase !== 'break')) return;
+
+            clearInterval(p.intervalId);
+            p.intervalId = null;
+            p.running = false;
+
+            const elapsed = p.phaseTotal;
+            p.phasesCompleted.push({ tipo: p.phase, duracao: elapsed });
+            if (p.phase === 'focus') p.focusTotal += elapsed;
+            else p.breakTotal += elapsed;
+
+            this._playAlarmSound();
+            this._updatePomoUI();
+            this._handlePhaseComplete(p.phase);
+        },
+
+        // ===========================================================
+        //  POMODORO — START
+        // ===========================================================
+        _startPomo() {
+            const subject = document.getElementById('subjectInput').value.trim();
+            if (!subject) {
+                window.toast?.('Digite o nome da matéria antes de iniciar.', true);
+                return;
+            }
+            const p = this.pomo;
+            // Le configuracoes
+            p.config.focusMin = Math.max(1, parseInt(document.getElementById('pomoFocusMin').value) || 25);
+            p.config.breakMin = Math.max(1, parseInt(document.getElementById('pomoBreakMin').value) || 5);
+            p.config.cycles = Math.max(1, parseInt(document.getElementById('pomoCycles').value) || 4);
+
+            if (p.nextPhase) {
+                // Usuario clicou "Esperar" antes — avança para proxima fase
+                const next = p.nextPhase;
+                p.nextPhase = null;
+                if (next === 'break') {
+                    this._beginBreak();
+                } else if (next === 'focus') {
+                    if (p.currentCycle < p.config.cycles) {
+                        this._beginFocus();
+                    } else {
+                        this._finishPomo();
+                    }
+                }
+                return;
+            }
+
+            if (p.phase === 'idle' || p.phase === 'done') {
+                p.phasesCompleted = [];
+                p.focusTotal = 0;
+                p.breakTotal = 0;
+                p.currentCycle = 0;
+                this._beginFocus();
+                this._playStartSound();
+            } else {
+                // Resume da pausa
+                p.running = true;
+                p.phaseStartTime = Date.now() - p.phaseElapsed * 1000;
+                p.intervalId = setInterval(() => this._tickPomo(), 200);
+                this._setButtons(true, false, false, false);
+            }
+        },
+
+        _beginFocus() {
+            this._stopAlarm();
+            const p = this.pomo;
+            p.currentCycle++;
+            p.phase = 'focus';
+            p.phaseTotal = p.config.focusMin * 60;
+            p.phaseElapsed = 0;
+            p.running = true;
+            p.phaseStartTime = Date.now();
+            p.intervalId = setInterval(() => this._tickPomo(), 200);
+            document.getElementById('timerDisplay').className = 'timer-display phase-focus';
+            this._setButtons(true, false, false, false);
+            this._updatePomoUI();
+            window.toast?.(`🍅 Foco ${p.currentCycle}/${p.config.cycles} iniciado!`);
+        },
+
+        _beginBreak() {
+            this._stopAlarm();
+            const p = this.pomo;
+            const isLongBreak = studyConfig.longBreakEvery > 0
+                && p.currentCycle > 0
+                && p.currentCycle % studyConfig.longBreakEvery === 0;
+            p.phase = 'break';
+            p.phaseTotal = isLongBreak ? studyConfig.longBreakMin * 60 : p.config.breakMin * 60;
+            p.phaseElapsed = 0;
+            p.running = true;
+            p.phaseStartTime = Date.now();
+            p.intervalId = setInterval(() => this._tickPomo(), 200);
+            document.getElementById('timerDisplay').className = 'timer-display phase-break';
+            this._setButtons(true, false, false, false);
+            this._updatePomoUI();
+            const breakMin = Math.round(p.phaseTotal / 60);
+            const label = isLongBreak ? '☕ Pausa Longa' : '☕ Descanso';
+            window.toast?.(`${label} ${p.currentCycle}/${p.config.cycles} — ${breakMin} min`);
+        },
+
+        _tickPomo() {
+            const p = this.pomo;
+            const now = Date.now();
+            p.phaseElapsed = Math.floor((now - p.phaseStartTime) / 1000);
+            const remaining = Math.max(0, p.phaseTotal - p.phaseElapsed);
+            document.getElementById('timerDisplay').textContent = this.formatTime(remaining);
+
+            // Atualiza totais parciais
+            if (p.phase === 'focus') {
+                p.focusTotal = p.phasesCompleted
+                    .filter(ph => ph.tipo === 'focus')
+                    .reduce((sum, ph) => sum + ph.duracao, 0) + p.phaseElapsed;
+            } else if (p.phase === 'break') {
+                p.breakTotal = p.phasesCompleted
+                    .filter(ph => ph.tipo === 'break')
+                    .reduce((sum, ph) => sum + ph.duracao, 0) + p.phaseElapsed;
+            }
+            this._updatePomoStats();
+
+            // Fase terminou
+            if (remaining <= 0) {
+                clearInterval(p.intervalId);
+                p.intervalId = null;
+                p.running = false;
+
+                const elapsed = p.phaseTotal;
+                p.phasesCompleted.push({ tipo: p.phase, duracao: elapsed });
+                if (p.phase === 'focus') p.focusTotal += elapsed;
+                else p.breakTotal += elapsed;
+
+                this._playAlarmSound();
+                this._updatePomoUI();
+                this._handlePhaseComplete(p.phase);
+            }
+        },
+
+        _finishPomo() {
+            this._stopAlarm();
+            const p = this.pomo;
+            p.phase = 'done';
+            p.running = false;
+            p.nextPhase = null;
+
+            const session = this._buildPomoSession();
+            this._saveSession(session);
+            this._playCompleteSound();
+            this._resetPomo();
+            this._resetState();
+            document.getElementById('timerDisplay').className = 'timer-display';
+            window.toast?.('🎉 Pomodoro completo! Todas as sessões salvas!');
+        },
+
+        _handlePhaseComplete(completedPhase) {
+            const p = this.pomo;
+            const isFocus = completedPhase === 'focus';
+
+            // Se auto-transição está ligada, espera o alarme tocar algumas vezes
+            if (isFocus && !studyConfig.askBreak) {
+                this._setButtons(true, false, false, false);
+                this._autoTimeout = setTimeout(() => {
+                    this._autoTimeout = null;
+                    this._beginBreak();
+                }, 3500);
+                return;
+            }
+            if (!isFocus && !studyConfig.askFocus) {
+                this._setButtons(true, false, false, false);
+                this._autoTimeout = setTimeout(() => {
+                    this._autoTimeout = null;
+                    if (p.currentCycle < p.config.cycles) {
+                        this._beginFocus();
+                    } else {
+                        this._finishPomo();
+                    }
+                }, 3500);
+                return;
+            }
+
+            // Mostra diálogo
+            const dialogType = isFocus ? 'focus-end' : 'break-end';
+            const nextLabel = isFocus ? 'Descanso' : 'Foco';
+            const skipLabel = isFocus ? 'Pular Descanso' : 'Pular Foco';
+
+            document.getElementById('phaseDialogTitle').textContent = isFocus ? '🎯 Foco Concluído!' : '☕ Descanso Concluído!';
+            document.getElementById('phaseBtnPrimary').innerHTML = `▶ Começar ${nextLabel}`;
+            document.getElementById('phaseBtnPrimary').onclick = () => {
+                document.getElementById('phase-dialog').close();
+                this._afterPhaseDialog(isFocus, 'start');
+            };
+            document.getElementById('phaseBtnWait').onclick = () => {
+                document.getElementById('phase-dialog').close();
+                this._afterPhaseDialog(isFocus, 'wait');
+            };
+            document.getElementById('phaseBtnSkip').innerHTML = `⏭ ${skipLabel}`;
+            document.getElementById('phaseBtnSkip').onclick = () => {
+                document.getElementById('phase-dialog').close();
+                this._afterPhaseDialog(isFocus, 'skip');
+            };
+            document.getElementById('phase-dialog').showModal();
+        },
+
+        _afterPhaseDialog(isFocus, action) {
+            this._stopAlarm();
+            const p = this.pomo;
+            if (action === 'start') {
+                if (isFocus) {
+                    this._beginBreak();
+                } else {
+                    if (p.currentCycle < p.config.cycles) {
+                        this._beginFocus();
+                    } else {
+                        this._finishPomo();
+                    }
+                }
+            } else if (action === 'wait') {
+                p.nextPhase = isFocus ? 'break' : 'focus';
+                this._setButtons(false, true, true);
+                document.getElementById('timerDisplay').className = 'timer-display';
+                window.toast?.('⏸ Pronto para continuar. Clique em ▶ quando quiser.');
+            } else if (action === 'skip') {
+                // Loga a fase pulada com a duração configurada
+                const skippedDuration = isFocus ? p.config.breakMin * 60 : p.config.focusMin * 60;
+                p.phasesCompleted.push({ tipo: isFocus ? 'break' : 'focus', duracao: skippedDuration });
+                if (isFocus) {
+                    p.breakTotal += skippedDuration;
+                    if (p.currentCycle < p.config.cycles) {
+                        this._beginFocus();
+                    } else {
+                        this._finishPomo();
+                    }
+                } else {
+                    p.focusTotal += skippedDuration;
+                    p.currentCycle++;
+                    if (p.currentCycle < p.config.cycles) {
+                        p.phase = 'idle';
+                        this._beginBreak();
+                    } else {
+                        this._finishPomo();
+                    }
+                }
+            }
+        },
+
+        // ===========================================================
+        //  POMODORO — PAUSE / STOP
+        // ===========================================================
+        _pausePomo() {
+            const p = this.pomo;
+            if (!p.running) return;
+            p.running = false;
+            clearInterval(p.intervalId);
+            p.intervalId = null;
+            this._setButtons(false, true, false);
+            this._playPauseSound();
+            window.toast?.('⏸ Pomodoro pausado.');
+        },
+
+        _stopPomo() {
+            this._stopAlarm();
+            this._clearAutoTimeout();
+            const p = this.pomo;
+            p.running = false;
+            if (p.intervalId) { clearInterval(p.intervalId); p.intervalId = null; }
+
+            // Registra o tempo parcial da fase atual
+            if (p.phase === 'focus' || p.phase === 'break') {
+                const tipo = p.phase === 'focus' ? 'focus' : 'break';
+                const duracao = Math.min(p.phaseElapsed, p.phaseTotal);
+                if (duracao > 0) {
+                    p.phasesCompleted.push({ tipo, duracao });
+                    if (tipo === 'focus') p.focusTotal += duracao;
+                    else p.breakTotal += duracao;
+                }
+            }
+
+            const session = this._buildPomoSession();
+            this._saveSession(session);
+            this._playCompleteSound();
+            this._resetPomo();
+            this._resetState();
+            document.getElementById('timerDisplay').className = 'timer-display';
+            window.toast?.('✅ Sessão registrada no histórico!');
+        },
+
+        // ===========================================================
+        //  BUILD SESSION OBJECTS
+        // ===========================================================
+        _buildSimpleSession() {
+            const elapsed = this.elapsed;
+            const subject = document.getElementById('subjectInput').value.trim() || 'Sem assunto';
+            const notes = document.getElementById('sessionNotes').value.trim();
+            const now = new Date();
+            return {
+                id: Date.now(),
+                modo: 'simples',
+                materia: subject,
+                notas: notes || '',
+                tempo: this.formatTime(elapsed),
+                totalSeconds: elapsed,
+                data: now.toLocaleDateString('pt-BR'),
+                hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: now.toISOString()
+            };
+        },
+
+        _buildPomoSession() {
+            const p = this.pomo;
+            const subject = document.getElementById('subjectInput').value.trim() || 'Sem assunto';
+            const notes = document.getElementById('sessionNotes').value.trim();
+            const now = new Date();
+            const focusTotal = p.focusTotal;
+            const breakTotal = p.breakTotal;
+            const totalTime = focusTotal + breakTotal;
+
+            return {
+                id: Date.now(),
+                modo: 'pomodoro',
+                materia: subject,
+                notas: notes || '',
+                tempo: this.formatTime(totalTime),
+                totalSeconds: totalTime,
+                data: now.toLocaleDateString('pt-BR'),
+                hora: now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }),
+                timestamp: now.toISOString(),
+                ciclosPrevistos: p.config.cycles,
+                ciclosCompletados: p.phasesCompleted.filter(ph => ph.tipo === 'focus').length,
+                focoTotal: focusTotal,
+                descansoTotal: breakTotal,
+                fases: p.phasesCompleted.slice()
+            };
+        },
+
+        // ===========================================================
+        //  INTEGRACAO DE EVENTOS
+        //  Chamado a cada conclusao de sessao (ambos os modos):
+        //
+        //    session.modo          — 'simples' | 'pomodoro'
+        //    session.materia       — nome da materia
+        //    session.totalSeconds  — duracao total
+        //
+        //  Se session.modo === 'pomodoro':
+        //    session.ciclosCompletados — ciclos de foco concluidos
+        //    session.ciclosPrevistos   — total configurado
+        //    session.focoTotal         — segundos de foco
+        //    session.descansoTotal     — segundos de descanso
+        //
+        //  Exemplo de uso:
+        //    if (typeof window.grantStudyRewards === 'function') {
+        //        window.grantStudyRewards(session);
+        //    }
+        // ===========================================================
+        // >> onSessionComplete(session) <<
+
+        // ===========================================================
+        //  UI HELPERS
+        // ===========================================================
+        _setButtons(startDisabled, pauseDisabled, stopDisabled, skipDisabled) {
+            document.getElementById('btnStart').disabled = startDisabled;
+            document.getElementById('btnPause').disabled = pauseDisabled;
+            document.getElementById('btnStop').disabled = stopDisabled;
+            document.getElementById('btnSkip').disabled = skipDisabled ?? true;
+        },
+
+        _updatePomoUI() {
+            const p = this.pomo;
+            const phaseLabels = { idle: '—', focus: '🎯 Foco', break: '☕ Descanso', done: '✅ Concluído' };
+            document.getElementById('pomoCycle').textContent =
+                p.phase === 'idle' || p.phase === 'done'
+                    ? `${p.config.cycles}/${p.config.cycles}`
+                    : `${p.currentCycle}/${p.config.cycles}`;
+            document.getElementById('pomoPhase').textContent = phaseLabels[p.phase] || '—';
+            this._updatePomoStats();
+        },
+
+        _updatePomoStats() {
+            const p = this.pomo;
+            document.getElementById('pomoFocusTotal').textContent = this.formatTime(p.focusTotal);
+            document.getElementById('pomoBreakTotal').textContent = this.formatTime(p.breakTotal);
+        },
+
+        // ===========================================================
+        //  PERSISTENCIA
+        // ===========================================================
+        _saveSession(session) {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                const list = raw ? JSON.parse(raw) : [];
+                list.unshift(session);
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+                this._renderHistory();
+            } catch (e) {
+                console.warn('Erro ao salvar historico:', e);
+            }
+        },
+
+        _renderHistory() {
+            const container = document.getElementById('historyBody');
+            const countEl = document.getElementById('sessionCount');
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                const list = raw ? JSON.parse(raw) : [];
+                if (!Array.isArray(list) || list.length === 0) {
+                    container.innerHTML = '<div class="history-empty">Nenhuma sessão registrada ainda. Complete seu primeiro foco!</div>';
+                    if (countEl) countEl.textContent = '0 sessões';
+                    return;
+                }
+                if (countEl) countEl.textContent = `${list.length} sessão${list.length !== 1 ? 'es' : ''}`;
+                container.innerHTML = `
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th>Data</th>
+                                <th>Hora</th>
+                                <th>Matéria</th>
+                                <th>Modo</th>
+                                <th>Ciclos</th>
+                                <th>Foco</th>
+                                <th>Descanso</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${list.map(s => {
+                                const isPomo = s.modo === 'pomodoro';
+                                const ciclos = isPomo ? `${s.ciclosCompletados || 0}/${s.ciclosPrevistos || '-'}` : '—';
+                                const foco = isPomo ? this.formatTime(s.focoTotal || 0) : '—';
+                                const desc = isPomo ? this.formatTime(s.descansoTotal || 0) : '—';
+                                return `
+                                    <tr>
+                                        <td>${s.data || '-'}</td>
+                                        <td>${s.hora || '-'}</td>
+                                        <td style="font-weight:800;">${s.materia || '—'}</td>
+                                        <td><span class="tag-modo ${s.modo || 'simples'}">${s.modo === 'pomodoro' ? '🍅' : '⏱'} ${s.modo || 'simples'}</span></td>
+                                        <td style="text-align:center;">${ciclos}</td>
+                                        <td>${foco}</td>
+                                        <td>${desc}</td>
+                                        <td style="font-weight:800;color:var(--accent);">${s.tempo || '—'}</td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (_) {
+                container.innerHTML = '<div class="history-empty">Erro ao carregar histórico.</div>';
+                if (countEl) countEl.textContent = '0 sessões';
+            }
+        },
+
+        clearHistory() {
+            if (!confirm('Tem certeza? Todo o histórico de sessões será apagado permanentemente.')) return;
+            localStorage.removeItem(STORAGE_KEY);
+            this._renderHistory();
+            window.toast?.('🗑 Histórico limpo.');
+        },
+
+        // ===========================================================
+        //  HISTÓRICO — BENTO GRID / DETALHE
+        // ===========================================================
+
+        _loadHistoryList() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            return raw ? JSON.parse(raw) : [];
+        },
+
+        _historySortOptions: [
+            { val: 'date-desc', label: 'Data (recente → antigo)', fn: (a, b) => new Date(b.timestamp) - new Date(a.timestamp) },
+            { val: 'date-asc', label: 'Data (antigo → recente)', fn: (a, b) => new Date(a.timestamp) - new Date(b.timestamp) },
+            { val: 'subject-asc', label: 'Matéria (A → Z)', fn: (a, b) => (a.materia || '').localeCompare(b.materia || '') },
+            { val: 'subject-desc', label: 'Matéria (Z → A)', fn: (a, b) => (b.materia || '').localeCompare(a.materia || '') },
+            { val: 'dur-desc', label: 'Duração (maior → menor)', fn: (a, b) => (b.totalSeconds || 0) - (a.totalSeconds || 0) },
+            { val: 'dur-asc', label: 'Duração (menor → maior)', fn: (a, b) => (a.totalSeconds || 0) - (b.totalSeconds || 0) },
+        ],
+
+        openHistoryGrid() {
+            const list = this._loadHistoryList();
+            if (!list.length) {
+                window.toast?.('Nenhuma sessão no histórico.');
+                return;
+            }
+            this._historyList = list;
+            this._renderHistoryGrid('date-desc');
+            document.getElementById('history-bento-dialog').showModal();
+        },
+
+        _renderHistoryGrid(sortVal) {
+            const list = this._historyList;
+            const sortOpt = this._historySortOptions.find(o => o.val === sortVal) || this._historySortOptions[0];
+            const sorted = [...list].sort(sortOpt.fn);
+
+            this._currentSortVal = sortVal;
+            const currentLabel = sortOpt.label;
+
+            document.getElementById('historyDialogTitle').textContent = '📋 Histórico de Sessões';
+            document.getElementById('historyDialogBackBtn').style.display = 'none';
+
+            const content = document.getElementById('historyDialogContent');
+            content.innerHTML = `
+                <div class="history-sort-bar">
+                    <label>Ordenar:</label>
+                    <button class="history-sort-btn" onclick="showHistorySortDialog()">${currentLabel}</button>
+                </div>
+                <div class="history-bento-grid">
+                    ${sorted.map(s => {
+                        const hasNotes = s.notas && s.notas.trim();
+                        const isPomo = s.modo === 'pomodoro';
+                        const modeIcon = isPomo ? '🍅' : '⏱';
+                        return `
+                            <button class="history-bento-item" onclick="openHistoryDetail(${s.id})">
+                                <div class="hbi-date">${s.data || '-'} · ${s.hora || '-'}</div>
+                                <div class="hbi-subject">${s.materia || '—'}</div>
+                                <div class="hbi-meta">
+                                    <span class="hbi-mode">${modeIcon} ${s.modo || 'simples'}</span>
+                                    <span class="hbi-total">${s.tempo || '—'}</span>
+                                </div>
+                                ${hasNotes ? '<div class="hbi-notes-indicator">📝 Anotações</div>' : ''}
+                            </button>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        },
+
+        openHistoryDetail(id) {
+            const s = this._historyList.find(e => e.id === id);
+            if (!s) return;
+
+            document.getElementById('historyDialogTitle').textContent = '🔍 Detalhes da Sessão';
+            document.getElementById('historyDialogBackBtn').style.display = 'flex';
+
+            const isPomo = s.modo === 'pomodoro';
+            const modeIcon = isPomo ? '🍅' : '⏱';
+            const hasNotes = s.notas && s.notas.trim();
+
+            let phasesHtml = '';
+            if (isPomo && s.fases && s.fases.length) {
+                phasesHtml = `
+                    <div class="hd-phases">
+                        <h4>Fases</h4>
+                        ${s.fases.map(f => `
+                            <div class="hd-phase">
+                                <span class="hd-phase-type">
+                                    <span class="${f.tipo === 'focus' ? 'focus-dot' : 'break-dot'}"></span>
+                                    ${f.tipo === 'focus' ? 'Foco' : 'Descanso'}
+                                </span>
+                                <span class="hd-phase-dur">${this.formatTime(f.duracao)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+
+            const content = document.getElementById('historyDialogContent');
+            content.innerHTML = `
+                <div class="history-detail">
+                    <div class="hd-header">
+                        <div>
+                            <div class="hd-date">${s.data || '-'} · ${s.hora || '-'}</div>
+                            <div class="hd-subject">${s.materia || '—'}</div>
+                        </div>
+                        <span class="hd-mode-tag">${modeIcon} ${s.modo || 'simples'}</span>
+                    </div>
+                    <div class="hd-stats">
+                        <div class="hd-stat">
+                            <div class="hd-stat-label">Duração</div>
+                            <div class="hd-stat-value">${s.tempo || '—'}</div>
+                        </div>
+                        ${isPomo ? `
+                        <div class="hd-stat">
+                            <div class="hd-stat-label">Ciclos</div>
+                            <div class="hd-stat-value">${s.ciclosCompletados || 0}/${s.ciclosPrevistos || '-'}</div>
+                        </div>
+                        <div class="hd-stat">
+                            <div class="hd-stat-label">Foco Total</div>
+                            <div class="hd-stat-value">${this.formatTime(s.focoTotal || 0)}</div>
+                        </div>
+                        <div class="hd-stat">
+                            <div class="hd-stat-label">Descanso</div>
+                            <div class="hd-stat-value">${this.formatTime(s.descansoTotal || 0)}</div>
+                        </div>
+                        ` : ''}
+                    </div>
+                    ${hasNotes ? `
+                    <div class="hd-notes">
+                        <h4>📝 Anotações</h4>
+                        <p>${s.notas}</p>
+                    </div>
+                    ` : ''}
+                    ${phasesHtml}
+                </div>
+            `;
+        },
+
+        closeHistoryDialog() {
+            document.getElementById('history-bento-dialog').close();
+        },
+
+        historyBackToGrid() {
+            this._renderHistoryGrid(this._lastSortVal || 'date-desc');
+        },
+
+        changeHistorySort(val) {
+            this._lastSortVal = val;
+            this._renderHistoryGrid(val);
+        },
+
+        showHistorySortDialog() {
+            const container = document.getElementById('historySortOptions');
+            const current = this._currentSortVal || 'date-desc';
+            const currentLabel = this._historySortOptions.find(o => o.val === current)?.label || '';
+            container.innerHTML = this._historySortOptions.map(o => `
+                <button class="${o.val === current ? 'is-active' : ''}" onclick="selectHistorySort('${o.val}')">
+                    ${o.val === current ? '✓ ' : ''}${o.label}
+                </button>
+            `).join('');
+            document.getElementById('history-sort-dialog').showModal();
+        },
+
+        selectHistorySort(val) {
+            document.getElementById('history-sort-dialog').close();
+            this.changeHistorySort(val);
+        },
+
+        closeHistorySortDialog() {
+            document.getElementById('history-sort-dialog').close();
+        },
+
+        // ===========================================================
+        //  NAVEGACAO INTELIGENTE
+        // ===========================================================
+        goBack() {
+            const params = new URLSearchParams(window.location.search);
+            const from = params.get('from');
+            if (from === 'hub') navigateTo('index.html');
+            else if (from === 'painel') navigateTo('panel.html');
+            else navigateTo('panel.html'); // fallback padrao
+        }
+    };
+
+    // ============================================================
+    //  HISTÓRICO — WRAPPERS GLOBAIS
+    // ============================================================
+    function openHistoryGrid() { studyTimer.openHistoryGrid(); }
+    function closeHistoryDialog() { studyTimer.closeHistoryDialog(); }
+    function historyBackToGrid() { studyTimer.historyBackToGrid(); }
+    function changeHistorySort(val) { studyTimer.changeHistorySort(val); }
+    function openHistoryDetail(id) { studyTimer.openHistoryDetail(id); }
+    function showHistorySortDialog() { studyTimer.showHistorySortDialog(); }
+    function selectHistorySort(val) { studyTimer.selectHistorySort(val); }
+    function closeHistorySortDialog() { studyTimer.closeHistorySortDialog(); }
+
+    // Inicializa ao carregar o conteudo
+    function renderStudy() {
+        const loading = document.getElementById('auth-loading');
+        const content = document.getElementById('study-content');
+        if (loading) loading.style.display = 'none';
+        if (content) content.style.display = 'block';
+
+        document.getElementById('btnSkip').style.display = 'none';
+
+        // Botao voltar inteligente
+        const params = new URLSearchParams(window.location.search);
+        const from = params.get('from');
+        const btn = document.getElementById('btnBack');
+        if (from === 'hub') { btn.innerHTML = '🏠 Hub'; btn.title = 'Voltar ao Hub'; }
+        else if (from === 'painel') { btn.innerHTML = '⚔️ Painel'; btn.title = 'Voltar ao Painel'; }
+        else { btn.innerHTML = '⬅ Voltar'; btn.title = 'Voltar'; }
+
+        studyTimer._renderHistory();
+        studyTimer._updatePomoUI();
+        if (window.updateGuestUI) window.updateGuestUI();
+    }
+
+    window.renderStudy = renderStudy;
+    </script>
+</body>
+
+</html>

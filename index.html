@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFlow // Hero Hub</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/hero.css">
+</head>
+
+<body data-theme="light" class="guest-mode">
+
+    <div class="container">
+
+        <!-- AUTH LOADING -->
+        <div id="auth-loading">
+            <div class="pulse"></div>
+            <span>Carregando...</span>
+        </div>
+
+        <!-- GUEST LANDING -->
+        <div id="guest-landing" class="guest-landing">
+            <h1>NeuroFlow<br>Hero Hub</h1>
+            <p>Gerenciador de tarefas gamificado. Entre na sua conta para desbloquear o Hub do Herói ou continue como visitante no Painel de Controle.</p>
+            <div class="guest-actions">
+                <button class="btn-theme" onclick="loginGoogle()">🔑 Entrar com Google</button>
+                <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
+                <button class="btn-theme" onclick="enterGuestMode()" style="background:var(--panel);">👤 Modo Visitante</button>
+            </div>
+        </div>
+
+        <!-- HERO HUB (usuário logado + onboarding completo) -->
+        <div id="hero-content" class="hero-content auth-only">
+
+            <div class="top-bar">
+                <div id="auth-panel" class="auth-panel">
+                    <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+                        <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
+                        <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
+                    </div>
+                    <div id="user-profile" class="user-profile" style="display: none;">
+                        <img id="user-photo" src="" alt="Foto" referrerpolicy="no-referrer">
+                        <span id="user-name">Carregando...</span>
+                        <button class="btn-logout" onclick="logoutGoogle()">Sair</button>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <div class="notif-btn-wrap">
+                        <button class="btn-theme" id="notif-bell-btn" onclick="openNotificationPanel()">🔔</button>
+                        <span class="notif-badge" id="notif-badge">0</span>
+                        <span class="notif-prompt-dot" id="notif-prompt-dot"></span>
+                    </div>
+                    <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+                </div>
+            </div>
+
+            <div class="epic-header">
+                <div id="hero-banner" class="hero-banner"></div>
+                <div class="hero-identity">
+                    <div id="hero-avatar-wrap" class="hero-avatar-wrap">
+                        <div class="hero-avatar-inner">
+                            <img id="hero-avatar" src="" alt="Avatar">
+                        </div>
+                    </div>
+                    <div class="hero-meta">
+                        <div id="hero-name" class="hero-name">Herói</div>
+                        <div id="hero-epic-goal" class="hero-epic-goal">Meta Épica</div>
+                    </div>
+                </div>
+                <div class="hero-stats-row">
+                    <span id="hero-rank" class="hero-stat-pill">🥉 Bronze</span>
+                    <span id="hero-xp" class="hero-stat-pill">0 XP</span>
+                    <span id="hero-pts" class="hero-stat-pill">0 Pts</span>
+                </div>
+                <div id="hero-description" class="hero-description"></div>
+            </div>
+
+            <div class="hub-bento">
+                <button class="hub-card primary" onclick="enterPanel()">
+                    <span class="hub-card-icon">⚔️</span>
+                    <span class="hub-card-title">Painel de Controle</span>
+                    <span class="hub-card-desc">Missões diárias, loja de recompensas e marcos épicos.</span>
+                </button>
+                <button class="hub-card" onclick="navigateTo('comunidade.html')">
+                    <span class="hub-card-icon">🌐</span>
+                    <span class="hub-card-title">Comunidade</span>
+                    <span class="hub-card-desc">Descubra perfis de outros jogadores e suas jornadas.</span>
+                </button>
+                <button class="hub-card" onclick="navigateTo('study.html?from=hub')">
+                    <span class="hub-card-icon">📚</span>
+                    <span class="hub-card-title">Sessões de Estudo</span>
+                    <span class="hub-card-desc">Cronômetro de foco, registro e histórico de sessões.</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONBOARDING WIZARD -->
+    <div id="onboarding-overlay" class="onboarding-overlay">
+        <div class="onboarding-shell">
+            <div class="ob-header">
+                <h2>Assistente de Iniciação</h2>
+                <span id="ob-progress" class="ob-progress">Etapa 1/3 — Identidade</span>
+            </div>
+
+            <!-- ETAPA 1: Identidade -->
+            <div id="ob-step-1" class="ob-step active">
+                <div class="form-group">
+                    <label for="ob-epic-goal">Meta Épica</label>
+                    <input type="text" id="ob-epic-goal" placeholder='Ex: "Passar na USP"' autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="ob-display-name">Nome de Exibição</label>
+                    <input type="text" id="ob-display-name" placeholder="Como quer ser chamado?" autocomplete="nickname">
+                </div>
+                <div class="ob-media-row">
+                    <div id="ob-avatar-zone" class="ob-media-zone">
+                        <img id="ob-avatar-preview" class="ob-avatar-preview" src="" alt="">
+                        <span>📷 Foto de Perfil</span>
+                        <input type="file" id="ob-avatar-input" accept="image/*" style="display:none;">
+                    </div>
+                    <div id="ob-banner-zone" class="ob-media-zone ob-banner-zone">
+                        <span>🖼️ Banner de Capa</span>
+                        <input type="file" id="ob-banner-input" accept="image/*" style="display:none;">
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:3px solid var(--stroke);border-radius:var(--element-radius);padding:0.75rem 1rem;box-shadow:3px 3px 0 var(--shadow-color);">
+                    <label for="ob-public-profile" style="margin:0;font-size:0.82rem;font-weight:800;color:var(--text);cursor:pointer;">🌐 Perfil Público (aparecer na comunidade)</label>
+                    <input type="checkbox" id="ob-public-profile" checked style="width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;">
+                </div>
+                <button class="btn-theme w-full" style="justify-content:center;" onclick="goToStep2()">Continuar →</button>
+            </div>
+
+            <!-- ETAPA 2: Bifurcação -->
+            <div id="ob-step-2" class="ob-step">
+                <p style="font-size:0.85rem;color:var(--muted);line-height:1.5;">Escolha um pacote inicial temático ou personalize cada missão manualmente.</p>
+                <div id="ob-packages" class="ob-packages"></div>
+                <div class="ob-bifurcation">
+                    <div class="ob-divider">OU</div>
+                    <button class="btn-theme w-full" style="justify-content:center;" onclick="startAdvancedWizard()">🛠️ Personalização Avançada</button>
+                    <button class="btn-theme w-full" style="justify-content:center;background:var(--panel);" onclick="goToStep1()">← Voltar</button>
+                </div>
+            </div>
+
+            <!-- ETAPA 3: Wizard de Slots -->
+            <div id="ob-step-3" class="ob-step">
+                <div id="wizard-stage" class="wizard-stage">
+                    <span id="wizard-counter" class="wizard-counter">1 / 16</span>
+                    <div id="wizard-card" class="wizard-card"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crop overlay (onboarding) -->
+    <div id="ob-crop-container" class="ob-crop-container">
+        <div class="img-crop-wrapper">
+            <img id="ob-crop-image" src="" alt="Editor">
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+            <button class="btn-theme" onclick="cancelOnboardingCrop()" style="background:var(--failure);color:white;width:auto;">Cancelar</button>
+            <button class="btn-theme" onclick="saveOnboardingCrop()" style="background:var(--success);color:white;width:auto;">Salvar Corte</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Autenticação -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Entrar na Conta</h3>
+                <button class="modal-close" onclick="closeAuthModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="auth-form">
+                    <div class="form-group">
+                        <label for="auth-email">E-mail</label>
+                        <input type="email" id="auth-email" placeholder="seu@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group" id="auth-password-group">
+                        <label for="auth-password">Senha</label>
+                        <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" minlength="6"
+                            autocomplete="current-password">
+                        <a href="#" id="btn-forgot-password" onclick="openForgotPassword(event)"
+                            style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 0.35rem; display: inline-block;">Esqueceu
+                            sua senha?</a>
+                    </div>
+                    <button class="btn-theme btn-submit" id="btn-auth-submit" onclick="handleAuthSubmit()"
+                        style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+                </div>
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem;">
+                    <span id="toggle-text" style="color: var(--muted);">Não tem uma conta?</span>
+                    <a href="#" id="btn-toggle-auth-mode" onclick="toggleAuthMode(event)"
+                        style="color: var(--accent); font-weight: 700; text-decoration: none; margin-left: 0.25rem;">Criar
+                        Conta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG: Edição Rápida do Nome -->
+    <div id="quick-name-dialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header">
+                <h3>✏️ Editar Nome</h3>
+                <button class="modal-close" onclick="closeQuickDialog('quick-name-dialog')">×</button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;">
+                <div class="form-group">
+                    <label for="quick-name-input">Nome de Exibição</label>
+                    <input type="text" id="quick-name-input" placeholder="Nome do usuário" autocomplete="nickname">
+                </div>
+                <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                    <button class="btn-theme" onclick="closeQuickDialog('quick-name-dialog')" style="background:var(--panel);width:auto;">Cancelar</button>
+                    <button class="btn-theme" onclick="saveQuickName()" style="width:auto;">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG: Edição Rápida da Meta Épica -->
+    <div id="quick-goal-dialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header">
+                <h3>🎯 Editar Meta Épica</h3>
+                <button class="modal-close" onclick="closeQuickDialog('quick-goal-dialog')">×</button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;">
+                <div class="form-group">
+                    <label for="quick-goal-input">Meta Épica</label>
+                    <input type="text" id="quick-goal-input" placeholder='Ex: "Passar na USP"' autocomplete="off">
+                </div>
+                <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                    <button class="btn-theme" onclick="closeQuickDialog('quick-goal-dialog')" style="background:var(--panel);width:auto;">Cancelar</button>
+                    <button class="btn-theme" onclick="saveQuickGoal()" style="width:auto;">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG: Edição Rápida da Descrição -->
+    <div id="quick-desc-dialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width:400px;">
+            <div class="modal-header">
+                <h3>📝 Editar Descrição</h3>
+                <button class="modal-close" onclick="closeQuickDialog('quick-desc-dialog')">×</button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;">
+                <div class="form-group">
+                    <label for="quick-desc-input">Descrição</label>
+                    <textarea id="quick-desc-input" placeholder="Conte um pouco sobre você..." rows="4" style="width:100%;background:var(--panel);border:3px solid var(--stroke);border-radius:var(--element-radius);padding:0.65rem 1rem;font-size:0.85rem;color:var(--text);font-weight:800;outline:none;font-family:inherit;resize:vertical;"></textarea>
+                </div>
+                <div style="display:flex;gap:0.5rem;justify-content:flex-end;">
+                    <button class="btn-theme" onclick="closeQuickDialog('quick-desc-dialog')" style="background:var(--panel);width:auto;">Cancelar</button>
+                    <button class="btn-theme" onclick="saveQuickDescription()" style="width:auto;">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG: Edição Rápida do Avatar -->
+    <div id="quick-avatar-dialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width:420px;">
+            <div class="modal-header">
+                <h3>📷 Trocar Foto</h3>
+                <button class="modal-close" onclick="closeQuickAvatarDialog()">×</button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;">
+                <div id="quick-avatar-drop-zone" class="photo-drop-zone" style="cursor:pointer;text-align:center;padding:2rem 1rem;">
+                    <span class="drop-zone-prompt">🖼️ Clique para selecionar uma imagem</span>
+                    <input type="file" id="quick-avatar-input" accept="image/*" style="display: none;">
+                </div>
+                <div id="quick-avatar-crop" class="crop-container" style="display: none;">
+                    <div class="img-crop-wrapper">
+                        <img id="quick-avatar-image" src="" alt="Editor">
+                    </div>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:flex-end;">
+                        <button class="btn-theme" onclick="cancelQuickAvatarCrop()" style="background:var(--failure);color:white;width:auto;">Cancelar</button>
+                        <button class="btn-theme" onclick="saveQuickAvatar()" style="background:var(--success);color:white;width:auto;">Cortar e Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- DIALOG: Edição Rápida do Banner -->
+    <div id="quick-banner-dialog" class="modal-overlay" style="display: none;">
+        <div class="modal-content" style="max-width:520px;">
+            <div class="modal-header">
+                <h3>🖼️ Trocar Banner</h3>
+                <button class="modal-close" onclick="closeQuickBannerDialog()">×</button>
+            </div>
+            <div class="modal-body" style="display:flex;flex-direction:column;gap:1rem;">
+                <div id="quick-banner-drop-zone" class="banner-drop-zone" style="cursor:pointer;text-align:center;padding:2rem 1rem;min-height:100px;display:flex;align-items:center;justify-content:center;">
+                    <span class="drop-zone-prompt">🖼️ Clique para selecionar uma imagem</span>
+                    <input type="file" id="quick-banner-input" accept="image/*" style="display: none;">
+                </div>
+                <div id="quick-banner-crop" class="crop-container" style="display: none;">
+                    <div class="img-crop-wrapper">
+                        <img id="quick-banner-image" src="" alt="Editor Banner">
+                    </div>
+                    <div style="display:flex;gap:0.5rem;margin-top:0.75rem;justify-content:flex-end;">
+                        <button class="btn-theme" onclick="cancelQuickBannerCrop()" style="background:var(--failure);color:white;width:auto;">Cancelar</button>
+                        <button class="btn-theme" onclick="saveQuickBanner()" style="background:var(--success);color:white;width:auto;">Cortar e Salvar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="tBox"></div>
+
+    <dialog id="theme-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>Galeria de Temas</h3>
+                <button class="dialog-close-btn" onclick="closeThemeDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <h4 class="grid-section-title">☀️ Modos Claros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-light" onclick="selectTheme('light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Padrão Claro</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-brown" onclick="selectTheme('pastel-brown')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Café com Leite</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-pink" onclick="selectTheme('pastel-pink')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Flor de Cerejeira</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-blue" onclick="selectTheme('pastel-blue')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Brisa do Mar</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-purple" onclick="selectTheme('pastel-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lavanda Suave</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-mint" onclick="selectTheme('pastel-mint')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Menta Fresca</span></button>
+                        <button class="theme-bento-item theme-preview-solarized-light" onclick="selectTheme('solarized-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Solarized Light</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-light" onclick="selectTheme('outerwilds-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lareira Gentil</span></button>
+                    </div>
+                    <h4 class="grid-section-title" style="margin-top: 1.5rem;">🌙 Modos Escuros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-dark" onclick="selectTheme('dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dark Industrial</span></button>
+                        <button class="theme-bento-item theme-preview-dark-chocolate" onclick="selectTheme('dark-chocolate')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Cacau Intenso</span></button>
+                        <button class="theme-bento-item theme-preview-dark-forest" onclick="selectTheme('dark-forest')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Floresta Noturna</span></button>
+                        <button class="theme-bento-item theme-preview-dark-amber" onclick="selectTheme('dark-amber')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Âmbar Profundo</span></button>
+                        <button class="theme-bento-item theme-preview-dark-purple" onclick="selectTheme('dark-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Noite de Vampiro</span></button>
+                        <button class="theme-bento-item theme-preview-catppuccin" onclick="selectTheme('catppuccin')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Catppuccin Mocha</span></button>
+                        <button class="theme-bento-item theme-preview-nord" onclick="selectTheme('nord')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Nordic Ice</span></button>
+                        <button class="theme-bento-item theme-preview-dracula" onclick="selectTheme('dracula')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dracula Sync</span></button>
+                        <button class="theme-bento-item theme-preview-github-dark" onclick="selectTheme('github-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">GitHub Premium</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-dark" onclick="selectTheme('outerwilds-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Fogueira Cósmica</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/state.js"></script>
+    <script type="module" src="js/firebase/init.js"></script>
+    <script type="module" src="js/firebase/db.js"></script>
+    <script type="module" src="js/firebase/auth.js"></script>
+    <script src="js/ui/toast.js"></script>
+    <script src="js/ui/theme.js"></script>
+    <script src="js/ui/modals.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/ui/settings-modal.js"></script>
+    <script src="js/ui/media.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/pages/hub.js"></script>
+    <script src="js/onboarding.js"></script>
+</body>
+
+</html>

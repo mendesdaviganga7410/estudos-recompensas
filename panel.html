@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFlow // Painel de Controle</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/hero.css">
+</head>
+
+<body data-theme="light" class="guest-mode">
+
+    <div class="container">
+
+        <!-- AUTH LOADING -->
+        <div id="auth-loading">
+            <div class="pulse"></div>
+            <span>Carregando...</span>
+        </div>
+
+        <div id="panel-content" style="display:none">
+
+        <div class="top-bar">
+            <div style="display:flex;align-items:center;gap:0.75rem;">
+                <button class="btn-theme auth-only" onclick="navigateTo('index.html')" title="Voltar ao Hub">🏠 Hub</button>
+                <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Modo Visitante</span>
+                <div id="auth-panel" class="auth-panel">
+                    <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+                        <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
+                        <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
+                    </div>
+                    <div id="user-profile" class="user-profile" style="display: none;">
+                        <img id="user-photo" src="" alt="Foto" referrerpolicy="no-referrer">
+                        <span id="user-name">Carregando...</span>
+                        <button class="btn-logout" onclick="logoutGoogle()">Sair</button>
+                    </div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div class="notif-btn-wrap">
+                    <button class="btn-theme" id="notif-bell-btn" onclick="openNotificationPanel()">🔔</button>
+                    <span class="notif-badge" id="notif-badge">0</span>
+                    <span class="notif-prompt-dot" id="notif-prompt-dot"></span>
+                </div>
+                <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+            </div>
+        </div>
+
+        <div class="bento-layout">
+            <div class="bento-card col-span-3">
+                <div class="status-header-block">
+                    <div>
+                        <span class="bento-label">Ranking</span>
+                        <span class="bento-title" id="rRank" style="color: var(--accent)">🥉 Bronze</span>
+                    </div>
+                    <div>
+                        <span class="bento-label">Evolução Geral</span>
+                        <div class="xp-container">
+                            <div class="xp-header">
+                                <span id="rXp">0 XP</span>
+                                <span id="rNext" style="color: var(--muted)">Próximo: 500 XP</span>
+                            </div>
+                            <div class="track">
+                                <div class="fill" id="rBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="status-footer-block">
+                    <span class="bento-label">Dopamina Líquida</span>
+                    <span class="bento-title" id="rPts">0</span>
+                </div>
+            </div>
+
+            <div class="bento-card col-span-2 row-span-2">
+                <h2>Rotinas Diárias</h2>
+                <div class="task-stack" id="rDailies"></div>
+            </div>
+
+            <div class="bento-card row-span-2">
+                <h2>Loja de Recompensas</h2>
+                <div class="bento-shop-grid" id="rShop"></div>
+            </div>
+
+            <div class="bento-card col-span-3">
+                <h2>Marcos Épicos de Rendimento</h2>
+                <div class="task-stack" id="rEpics"></div>
+            </div>
+
+            <div class="bento-card col-span-3" style="cursor:pointer;flex-direction:row;align-items:center;justify-content:space-between;" onclick="navigateTo('study.html?from=painel')">
+                <div>
+                    <span class="bento-label">Ferramenta</span>
+                    <span class="bento-title" style="font-size:1.2rem;">📚 Sessões de Estudo</span>
+                    <span style="display:block;font-size:0.8rem;color:var(--muted);margin-top:0.25rem;">Cronômetro de foco com registro e histórico</span>
+                </div>
+                <span style="font-size:1.5rem;color:var(--accent);">→</span>
+            </div>
+        </div>
+    </div>  <!-- /panel-content -->
+    </div>
+
+    <!-- MODAL: Autenticação -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Entrar na Conta</h3>
+                <button class="modal-close" onclick="closeAuthModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="auth-form">
+                    <div class="form-group">
+                        <label for="auth-email">E-mail</label>
+                        <input type="email" id="auth-email" placeholder="seu@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group" id="auth-password-group">
+                        <label for="auth-password">Senha</label>
+                        <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" minlength="6"
+                            autocomplete="current-password">
+                        <a href="#" id="btn-forgot-password" onclick="openForgotPassword(event)"
+                            style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 0.35rem; display: inline-block;">Esqueceu
+                            sua senha?</a>
+                    </div>
+                    <button class="btn-theme btn-submit" id="btn-auth-submit" onclick="handleAuthSubmit()"
+                        style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+                </div>
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem;">
+                    <span id="toggle-text" style="color: var(--muted);">Não tem uma conta?</span>
+                    <a href="#" id="btn-toggle-auth-mode" onclick="toggleAuthMode(event)"
+                        style="color: var(--accent); font-weight: 700; text-decoration: none; margin-left: 0.25rem;">Criar
+                        Conta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ONBOARDING WIZARD -->
+    <div id="onboarding-overlay" class="onboarding-overlay">
+        <div class="onboarding-shell">
+            <div class="ob-header">
+                <h2>Assistente de Iniciação</h2>
+                <span id="ob-progress" class="ob-progress">Etapa 1/3 — Identidade</span>
+            </div>
+
+            <!-- ETAPA 1: Identidade -->
+            <div id="ob-step-1" class="ob-step active">
+                <div class="form-group">
+                    <label for="ob-epic-goal">Meta Épica</label>
+                    <input type="text" id="ob-epic-goal" placeholder='Ex: "Passar na USP"' autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="ob-display-name">Nome de Exibição</label>
+                    <input type="text" id="ob-display-name" placeholder="Como quer ser chamado?" autocomplete="nickname">
+                </div>
+                <div class="ob-media-row">
+                    <div id="ob-avatar-zone" class="ob-media-zone">
+                        <img id="ob-avatar-preview" class="ob-avatar-preview" src="" alt="">
+                        <span>📷 Foto de Perfil</span>
+                        <input type="file" id="ob-avatar-input" accept="image/*" style="display:none;">
+                    </div>
+                    <div id="ob-banner-zone" class="ob-media-zone ob-banner-zone">
+                        <span>🖼️ Banner de Capa</span>
+                        <input type="file" id="ob-banner-input" accept="image/*" style="display:none;">
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:space-between;background:var(--surface);border:3px solid var(--stroke);border-radius:var(--element-radius);padding:0.75rem 1rem;box-shadow:3px 3px 0 var(--shadow-color);">
+                    <label for="ob-public-profile" style="margin:0;font-size:0.82rem;font-weight:800;color:var(--text);cursor:pointer;">🌐 Perfil Público (aparecer na comunidade)</label>
+                    <input type="checkbox" id="ob-public-profile" checked style="width:20px;height:20px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;">
+                </div>
+                <button class="btn-theme w-full" style="justify-content:center;" onclick="goToStep2()">Continuar →</button>
+            </div>
+
+            <!-- ETAPA 2: Bifurcação -->
+            <div id="ob-step-2" class="ob-step">
+                <p style="font-size:0.85rem;color:var(--muted);line-height:1.5;">Escolha um pacote inicial temático ou personalize cada missão manualmente.</p>
+                <div id="ob-packages" class="ob-packages"></div>
+                <div class="ob-bifurcation">
+                    <div class="ob-divider">OU</div>
+                    <button class="btn-theme w-full" style="justify-content:center;" onclick="startAdvancedWizard()">🛠️ Personalização Avançada</button>
+                    <button class="btn-theme w-full" style="justify-content:center;background:var(--panel);" onclick="goToStep1()">← Voltar</button>
+                </div>
+            </div>
+
+            <!-- ETAPA 3: Wizard de Slots -->
+            <div id="ob-step-3" class="ob-step">
+                <div id="wizard-stage" class="wizard-stage">
+                    <span id="wizard-counter" class="wizard-counter">1 / 16</span>
+                    <div id="wizard-card" class="wizard-card"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Crop overlay (onboarding) -->
+    <div id="ob-crop-container" class="ob-crop-container">
+        <div class="img-crop-wrapper">
+            <img id="ob-crop-image" src="" alt="Editor">
+        </div>
+        <div style="display:flex;gap:0.5rem;">
+            <button class="btn-theme" onclick="cancelOnboardingCrop()" style="background:var(--failure);color:white;width:auto;">Cancelar</button>
+            <button class="btn-theme" onclick="saveOnboardingCrop()" style="background:var(--success);color:white;width:auto;">Salvar Corte</button>
+        </div>
+    </div>
+
+    <div class="toast-box" id="tBox"></div>
+
+    <dialog id="theme-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>Galeria de Temas</h3>
+                <button class="dialog-close-btn" onclick="closeThemeDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <h4 class="grid-section-title">☀️ Modos Claros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-light" onclick="selectTheme('light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Padrão Claro</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-brown" onclick="selectTheme('pastel-brown')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Café com Leite</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-pink" onclick="selectTheme('pastel-pink')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Flor de Cerejeira</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-blue" onclick="selectTheme('pastel-blue')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Brisa do Mar</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-purple" onclick="selectTheme('pastel-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lavanda Suave</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-mint" onclick="selectTheme('pastel-mint')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Menta Fresca</span></button>
+                        <button class="theme-bento-item theme-preview-solarized-light" onclick="selectTheme('solarized-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Solarized Light</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-light" onclick="selectTheme('outerwilds-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lareira Gentil</span></button>
+                    </div>
+                    <h4 class="grid-section-title" style="margin-top: 1.5rem;">🌙 Modos Escuros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-dark" onclick="selectTheme('dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dark Industrial</span></button>
+                        <button class="theme-bento-item theme-preview-dark-chocolate" onclick="selectTheme('dark-chocolate')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Cacau Intenso</span></button>
+                        <button class="theme-bento-item theme-preview-dark-forest" onclick="selectTheme('dark-forest')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Floresta Noturna</span></button>
+                        <button class="theme-bento-item theme-preview-dark-amber" onclick="selectTheme('dark-amber')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Âmbar Profundo</span></button>
+                        <button class="theme-bento-item theme-preview-dark-purple" onclick="selectTheme('dark-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Noite de Vampiro</span></button>
+                        <button class="theme-bento-item theme-preview-catppuccin" onclick="selectTheme('catppuccin')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Catppuccin Mocha</span></button>
+                        <button class="theme-bento-item theme-preview-nord" onclick="selectTheme('nord')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Nordic Ice</span></button>
+                        <button class="theme-bento-item theme-preview-dracula" onclick="selectTheme('dracula')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dracula Sync</span></button>
+                        <button class="theme-bento-item theme-preview-github-dark" onclick="selectTheme('github-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">GitHub Premium</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-dark" onclick="selectTheme('outerwilds-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Fogueira Cósmica</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/state.js"></script>
+    <script type="module" src="js/firebase/init.js"></script>
+    <script type="module" src="js/firebase/db.js"></script>
+    <script type="module" src="js/firebase/auth.js"></script>
+    <script src="js/ui/toast.js"></script>
+    <script src="js/ui/theme.js"></script>
+    <script src="js/ui/modals.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/ui/settings-modal.js"></script>
+    <script src="js/ui/media.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/pages/panel.js"></script>
+    <script src="js/onboarding.js"></script>
+</body>
+
+</html>

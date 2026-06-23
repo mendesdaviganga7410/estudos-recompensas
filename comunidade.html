@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFlow // Comunidade</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/modals.css">
+    <link rel="stylesheet" href="css/comunidade.css">
+</head>
+
+<body data-theme="light" class="guest-mode">
+
+    <div class="container">
+
+        <!-- AUTH LOADING -->
+        <div id="auth-loading">
+            <div class="pulse"></div>
+            <span>Carregando...</span>
+        </div>
+
+        <!-- ===== CONTEUDO DA COMUNIDADE (oculto durante carregamento) ===== -->
+        <div id="comunidade-content" style="display:none;">
+
+            <div class="top-bar">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <button class="btn-theme" id="pd-back-btn" onclick="closeProfileDetail()" title="Voltar">🌐 Comunidade</button>
+                    <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Convidado</span>
+                    <div id="auth-panel" class="auth-panel">
+                        <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+                            <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
+                            <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
+                        </div>
+                        <div id="user-profile" class="user-profile" style="display: none;">
+                            <img id="user-photo" src="" alt="Foto" referrerpolicy="no-referrer">
+                            <span id="user-name">Carregando...</span>
+                            <button class="btn-logout" onclick="logoutGoogle()">Sair</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <div class="notif-btn-wrap">
+                        <button class="btn-theme" id="notif-bell-btn" onclick="openNotificationPanel()">🔔</button>
+                        <span class="notif-badge" id="notif-badge">0</span>
+                        <span class="notif-prompt-dot" id="notif-prompt-dot"></span>
+                    </div>
+                    <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+                </div>
+            </div>
+
+            <!-- ===== LISTA DA COMUNIDADE ===== -->
+            <div id="community-list" style="display:none;">
+
+                <div class="community-hero">
+                    <div class="community-hero-banner">
+                        <span style="font-size:3.5rem;opacity:0.2;user-select:none;">🌐</span>
+                    </div>
+                    <div class="community-hero-content">
+                        <h1>Comunidade NeuroFlow</h1>
+                        <p>Descubra outros heróis, suas metas épicas e jornadas de evolução.</p>
+                        <div class="community-stats-row">
+                            <span class="community-stat-pill">👥 <strong id="hero-count">—</strong> Heróis</span>
+                            <span class="community-stat-pill">⚡ <strong id="xp-total">—</strong> Total</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="community-controls-bar" class="community-controls" style="display:none;">
+                    <input type="text" id="community-search" class="community-search" placeholder="Buscar herói..." oninput="onCommunitySearch()" autocomplete="off">
+                    <select id="community-sort" class="community-sort" onchange="onCommunitySort()">
+                        <option value="xp">🔥 Por XP</option>
+                        <option value="name">🔤 Por Nome</option>
+                    </select>
+                </div>
+
+                <div id="community-grid" class="community-grid">
+                    <div class="community-empty">
+                        <span class="empty-icon">🌐</span>
+                        <strong>Carregando comunidade...</strong>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ===== VISUALIZADOR DE PERFIL (página cheia, idêntica ao Hub) ===== -->
+            <div id="profile-detail" style="display:none;">
+
+            <div class="pd-epic-header">
+                <div id="pd-banner" class="pd-banner"></div>
+                <div class="pd-identity">
+                    <div id="pd-avatar-wrap" class="pd-avatar-wrap">
+                        <div class="pd-avatar-inner">
+                            <img id="pd-avatar" src="" alt="Avatar">
+                        </div>
+                    </div>
+                    <div class="pd-meta">
+                        <div id="pd-name" class="pd-name">Herói</div>
+                        <div id="pd-goal" class="pd-goal">Meta Épica</div>
+                    </div>
+                </div>
+                <div class="pd-stats-row">
+                    <span id="pd-rank" class="hero-stat-pill">🥉 Bronze</span>
+                    <span id="pd-xp" class="hero-stat-pill">0 XP</span>
+                    <span id="pd-pts" class="hero-stat-pill">0 Pts</span>
+                </div>
+                <div id="pd-desc" class="pd-desc"></div>
+            </div>
+
+            <div id="pd-bento" class="pd-bento">
+                <div class="pd-card">
+                    <span class="pd-card-icon">📊</span>
+                    <span class="pd-card-title">Progresso</span>
+                    <div class="pd-progress-wrap">
+                        <div class="pd-progress-labels">
+                            <span id="pd-tier-label">🥉 Bronze</span>
+                            <span id="pd-next-tier-label">🥈 Prata</span>
+                        </div>
+                        <div class="pd-progress-track">
+                            <div id="pd-tier-fill" class="pd-progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="pd-card">
+                    <span class="pd-card-icon">🏆</span>
+                    <span class="pd-card-title">Ranking</span>
+                    <span class="pd-card-desc" id="pd-rank-desc">Posição —</span>
+                </div>
+            </div>
+
+        </div>
+
+        </div> <!-- /comunidade-content -->
+
+    </div>
+
+    <!-- MODAL: Autenticação -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Entrar na Conta</h3>
+                <button class="modal-close" onclick="closeAuthModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="auth-form">
+                    <div class="form-group">
+                        <label for="auth-email">E-mail</label>
+                        <input type="email" id="auth-email" placeholder="seu@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group" id="auth-password-group">
+                        <label for="auth-password">Senha</label>
+                        <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" minlength="6"
+                            autocomplete="current-password">
+                        <a href="#" id="btn-forgot-password" onclick="openForgotPassword(event)"
+                            style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 0.35rem; display: inline-block;">Esqueceu
+                            sua senha?</a>
+                    </div>
+                    <button class="btn-theme btn-submit" id="btn-auth-submit" onclick="handleAuthSubmit()"
+                        style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+                </div>
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem;">
+                    <span id="toggle-text" style="color: var(--muted);">Não tem uma conta?</span>
+                    <a href="#" id="btn-toggle-auth-mode" onclick="toggleAuthMode(event)"
+                        style="color: var(--accent); font-weight: 700; text-decoration: none; margin-left: 0.25rem;">Criar
+                        Conta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="tBox"></div>
+
+    <dialog id="theme-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>Galeria de Temas</h3>
+                <button class="dialog-close-btn" onclick="closeThemeDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <h4 class="grid-section-title">☀️ Modos Claros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-light" onclick="selectTheme('light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Padrão Claro</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-brown" onclick="selectTheme('pastel-brown')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Café com Leite</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-pink" onclick="selectTheme('pastel-pink')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Flor de Cerejeira</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-blue" onclick="selectTheme('pastel-blue')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Brisa do Mar</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-purple" onclick="selectTheme('pastel-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lavanda Suave</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-mint" onclick="selectTheme('pastel-mint')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Menta Fresca</span></button>
+                        <button class="theme-bento-item theme-preview-solarized-light" onclick="selectTheme('solarized-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Solarized Light</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-light" onclick="selectTheme('outerwilds-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lareira Gentil</span></button>
+                    </div>
+                    <h4 class="grid-section-title" style="margin-top: 1.5rem;">🌙 Modos Escuros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-dark" onclick="selectTheme('dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dark Industrial</span></button>
+                        <button class="theme-bento-item theme-preview-dark-chocolate" onclick="selectTheme('dark-chocolate')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Cacau Intenso</span></button>
+                        <button class="theme-bento-item theme-preview-dark-forest" onclick="selectTheme('dark-forest')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Floresta Noturna</span></button>
+                        <button class="theme-bento-item theme-preview-dark-amber" onclick="selectTheme('dark-amber')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Âmbar Profundo</span></button>
+                        <button class="theme-bento-item theme-preview-dark-purple" onclick="selectTheme('dark-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Noite de Vampiro</span></button>
+                        <button class="theme-bento-item theme-preview-catppuccin" onclick="selectTheme('catppuccin')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Catppuccin Mocha</span></button>
+                        <button class="theme-bento-item theme-preview-nord" onclick="selectTheme('nord')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Nordic Ice</span></button>
+                        <button class="theme-bento-item theme-preview-dracula" onclick="selectTheme('dracula')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dracula Sync</span></button>
+                        <button class="theme-bento-item theme-preview-github-dark" onclick="selectTheme('github-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">GitHub Premium</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-dark" onclick="selectTheme('outerwilds-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Fogueira Cósmica</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script src="js/templates.js"></script>
+    <script src="js/state.js"></script>
+    <script type="module" src="js/firebase/init.js"></script>
+    <script type="module" src="js/firebase/db.js"></script>
+    <script type="module" src="js/firebase/auth.js"></script>
+    <script src="js/ui/toast.js"></script>
+    <script src="js/ui/theme.js"></script>
+    <script src="js/ui/modals.js"></script>
+    <script src="js/notifications.js"></script>
+    <script src="js/ui/settings-modal.js"></script>
+    <script src="js/ui/media.js"></script>
+    <script src="js/router.js"></script>
+    <script src="js/pages/comunidade.js"></script>
+</body>
+
+</html>
