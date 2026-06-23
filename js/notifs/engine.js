@@ -3,6 +3,8 @@ let __unreadCount = 0;
 let __panelOpen = false;
 let __refreshTimer = null;
 let __diagnosticAnswered = false;
+let __persistentDiagNotif = null;
+let __cachedMatches = [];
 
 function calcAgeGroup(birthYear) {
     if (!birthYear) return -1;
@@ -165,8 +167,7 @@ async function refreshNotifications() {
 
     const myD = window.state && window.state.diagnostic;
     if (!myD) {
-        __notifications = [];
-        renderNotificationBadge();
+        __cachedMatches = [];
         return;
     }
 
@@ -192,11 +193,9 @@ async function refreshNotifications() {
                 const overtake = diff > 0 && diff < 500;
                 const approach = diff > -200 && diff <= 0 && diff > -500;
                 const consistent = proximity >= 30 && Math.random() > 0.5;
-                const xp100 = xp > 0 && xp % 100 === 0;
                 const ptsDiff = Math.abs(pts - myPts);
                 const ptsAhead = pts > myPts && ptsDiff > 0;
                 const ptsBehind = myPts > pts && ptsDiff > 0;
-                const recent = true;
                 const sameTier = myTier >= 0 && (() => {
                     const ot = (window.TIERS || []).findIndex(t => xp >= t.min && xp <= t.max);
                     return ot === myTier;
@@ -213,76 +212,99 @@ async function refreshNotifications() {
                     user: p, name: displayName(profile, "Jogador"),
                     xp, pts, avatar: avatarUrl(p.uid, profile),
                     proximity, diff,
-                    overtake, approach, consistent, xp100,
+                    overtake, approach, consistent,
                     ptsAhead, ptsBehind, ptsDiff,
-                    recent, sameTier, higherTier, lowerTier, tierLbl,
-                    sameCourse: false,
+                    sameTier, higherTier, lowerTier, tierLbl,
                     course: courses[0] || "",
                     slots,
                     profile
                 });
             })
-            .filter(m => {
-                const hasMatchCond = m.focusMatch || m.sameCourse || m.sameCourseArea || m.sameUniType ||
-                    m.sameExamStatus || m.sameContestLevel || m.sameContestArea || m.sameCivilStatus ||
-                    m.sameWorkSector || m.sameProfession || m.sameCareerGoal ||
-                    m.sameBodyGoal || m.sameTrainingFreq || m.sameInterest ||
-                    m.sameChallenge || m.sameStudyHours || m.samePeriod || m.sameMethod || m.sameEduLevel;
-                const hasContext = m.overtake || m.approach || m.consistent || m.ptsAhead || m.ptsBehind;
-                return hasMatchCond || hasContext || m.proximity > 0;
-            })
-            .sort((a, b) => b.proximity - a.proximity)
-            .slice(0, 20);
+            .sort((a, b) => b.proximity - a.proximity);
 
-        const messages = [];
-        const usedTemplateIndices = new Set();
-
-        for (const match of matches) {
-            const order = Array.from({ length: MESSAGE_GENERATORS.length }, (_, i) => i);
-            for (let i = order.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [order[i], order[j]] = [order[j], order[i]];
-            }
-
-            for (const ti of order) {
-                if (usedTemplateIndices.has(ti)) continue;
-                const gen = MESSAGE_GENERATORS[ti];
-                const text = gen(match, match);
-                if (text) {
-                    messages.push({
-                        id: `n_${Date.now()}_${messages.length}`,
-                        uid: match.user.uid,
-                        userName: match.name,
-                        avatar: match.avatar,
-                        text,
-                        time: Date.now(),
-                        seen: false
-                    });
-                    usedTemplateIndices.add(ti);
-                    break;
-                }
-            }
-        }
-
-        while (messages.length < 5 && matches.length > 0) {
-            const fallbackIdx = Math.floor(Math.random() * matches.length);
-            const m = matches[fallbackIdx];
-            messages.push({
-                id: `n_${Date.now()}_fallback_${messages.length}`,
-                uid: m.user.uid,
-                userName: m.name,
-                avatar: m.avatar,
-                text: `${m.name} está na comunidade e tem interesses parecidos com os seus!`,
-                time: Date.now(),
-                seen: false
-            });
-        }
-
-        __notifications = messages;
-        __unreadCount = messages.length;
-        renderNotificationBadge();
-        if (__panelOpen && $n("notif-panel")) { $n("notif-panel").remove(); openNotificationPanel(); }
+        __cachedMatches = matches;
     } catch (err) {
         console.warn("Notif refresh error:", err);
+    }
+}
+
+function generateOneNotification() {
+    if (!window.currentUser || !hasDiagnostic()) return;
+
+    let pool = __cachedMatches;
+
+    if (pool.length === 0) return;
+
+    const match = pool[Math.floor(Math.random() * pool.length)];
+    const shuffled = Array.from({ length: MESSAGE_GENERATORS.length }, (_, i) => i)
+        .sort(() => Math.random() - 0.5);
+
+    let text = null;
+    for (const ti of shuffled) {
+        const gen = MESSAGE_GENERATORS[ti];
+        const result = gen(match, match);
+        if (result) {
+            text = result;
+            break;
+        }
+    }
+
+    if (!text) {
+        text = `${match.name} está na comunidade focado em seus objetivos. Inspire-se!`;
+    }
+
+    __notifications.unshift({
+        id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+        type: 'general',
+        uid: match.user.uid,
+        userName: match.name,
+        avatar: match.avatar,
+        text,
+        time: Date.now(),
+        seen: false,
+        persistent: false
+    });
+    __unreadCount = __notifications.filter(n => !n.seen).length;
+    renderNotificationBadge();
+    if (__panelOpen && $n("notif-panel")) { $n("notif-panel").remove(); openNotificationPanel(); }
+}
+
+/* ---- PERSISTENT DIAGNOSTIC NOTIFICATION ---- */
+
+function initPersistentDiagNotif() {
+    if (!hasDiagnostic() || !window.currentUser) {
+        __persistentDiagNotif = null;
+        return;
+    }
+    if (__persistentDiagNotif) return;
+    __persistentDiagNotif = {
+        id: 'diag-persistent',
+        type: 'diagnosis',
+        avatar: '',
+        text: '📋 Meu Diagnóstico de Perfil — clique para ver ou editar seus dados',
+        time: Date.now(),
+        seen: true,
+        persistent: true
+    };
+}
+
+function getPersistentDiagNotif() {
+    return __persistentDiagNotif;
+}
+
+function markPersistentDiagSeen() {
+    if (__persistentDiagNotif) {
+        __persistentDiagNotif.seen = true;
+        renderNotificationBadge();
+    }
+}
+
+function clearAllNotifications() {
+    __notifications = [];
+    __unreadCount = 0;
+    renderNotificationBadge();
+    if (__panelOpen && $n("notif-panel")) {
+        $n("notif-panel").remove();
+        openNotificationPanel();
     }
 }

@@ -1,140 +1,126 @@
 const MESSAGE_GENERATORS = [
-    /* === MESMO CURSO (vest) === */
-    (u, m) => m.sameCourse ? `${u.name} também quer ${m.courseLbl}! Concorrência pesada 🔥` : null,
-    (u, m) => m.sameCourse ? `Você e ${u.name} disputam a mesma vaga em ${m.courseLbl}. Quem vai mais longe?` : null,
-    (u, m) => m.sameCourse ? `${u.name} está na mesma jornada que você rumo a ${m.courseLbl}!` : null,
-    (u, m) => m.sameCourse ? `Sabia que ${u.name} também sonha com ${m.courseLbl}? Hora de mostrar serviço!` : null,
-    (u, m) => m.sameCourse ? `${u.name} quer ${m.courseLbl} igual a você. Talvez vocês estudem na mesma faculdade um dia!` : null,
-    (u, m) => m.sameCourse ? `Mais um concorrente de peso: ${u.name} também busca ${m.courseLbl}.` : null,
-    (u, m) => m.sameCourse ? `${u.name} também está de olho em ${m.courseLbl}. Bora ver quem chega primeiro?` : null,
+  /* === MESMO CURSO === */
+  (u, m) => m.sameCourse ? `${u.name} também está de olho em ${m.courseLbl}. A jornada é desafiadora, mas vocês podem ir longe juntos!` : null,
+  (u, m) => m.sameCourse ? `${u.name} quer ${m.courseLbl} assim como você. Sabia que estudar em grupo pode acelerar o aprendizado?` : null,
+  (u, m) => m.sameCourse ? `Você e ${u.name} compartilham o mesmo objetivo: ${m.courseLbl}. Cada hora de estudo conta!` : null,
+  (u, m) => m.sameCourse ? `${u.name} também sonha com ${m.courseLbl}. Quem persiste sempre alcança!` : null,
 
-    /* === MESMA ÁREA (vest) === */
-    (u, m) => m.sameCourseArea ? `${u.name} também é da área de ${m.courseAreaLbl}! Cérebros afiados por aqui 🧠` : null,
-    (u, m) => m.sameCourseArea ? `Você e ${u.name} têm interesses na mesma área: ${m.courseAreaLbl}.` : null,
-    (u, m) => m.sameCourseArea ? `${u.name} também curte ${m.courseAreaLbl}! Que tal trocar uma ideia?` : null,
+  /* === MESMA PROFISSÃO === */
+  (u, m) => m.sameProfession ? `${u.name} também atua como ${m.professionLbl}. Grandes mentes pensam igual!` : null,
+  (u, m) => m.sameProfession ? `Você e ${u.name} compartilham a mesma profissão: ${m.professionLbl}. O mercado valoriza profissionais como vocês!` : null,
 
-    /* === MESMO TIPO DE UNIVERSIDADE === */
-    (u, m) => m.sameUniType ? `${u.name} também mira uma universidade ${m.uniTypeLbl.toLowerCase()}! Sonho grande 🎯` : null,
-    (u, m) => m.sameUniType ? `Você e ${u.name} têm o mesmo tipo de universidade como alvo: ${m.uniTypeLbl}.` : null,
-    (u, m) => m.sameUniType ? `${u.name} também quer ${m.uniTypeLbl === "Federal" ? "uma federal" : m.uniTypeLbl === "Privada" ? "uma particular" : m.uniTypeLbl === "Militar" ? "carreira militar" : m.uniTypeLbl === "Exterior" ? "estudar fora" : m.uniTypeLbl.toLowerCase()}.` : null,
+  /* === MESMO DESAFIO === */
+  (u, m) => m.sameChallenge ? `${u.name} também enfrenta ${m.challengeLbl}. Você não está sozinho nessa batalha!` : null,
+  (u, m) => m.sameChallenge ? `Sabia que ${u.name} também lida com ${m.challengeLbl}? Compartilhar estratégias pode ajudar ambos.` : null,
+  (u, m) => m.sameChallenge ? `${u.name} sabe como é lidar com ${m.challengeLbl} e não desistiu. Você também consegue!` : null,
 
-    /* === MESMA SITUAÇÃO DE VESTIBULAR === */
-    (u, m) => m.sameExamStatus && m.examStatusLbl === "Nunca prestou" ? `${u.name} também nunca prestou vestibular! Calouros unidos 🤝` : null,
-    (u, m) => m.sameExamStatus && m.examStatusLbl === "Já tentou antes" ? `${u.name} também já tentou vestibular antes. Persistência é tudo!` : null,
-    (u, m) => m.sameExamStatus && m.examStatusLbl === "Já passou" ? `${u.name} também já passou! Veterano como você.` : null,
+  /* === MESMA META DE SHAPE === */
+  (u, m) => m.sameBodyGoal ? `${u.name} também busca ${m.bodyGoalLbl}. Corpo são, mente sã — o segredo do sucesso!` : null,
+  (u, m) => m.sameBodyGoal ? `${u.name} está na mesma vibe fitness que você: ${m.bodyGoalLbl}. Que tal treinar junto (mesmo que longe)?` : null,
 
-    /* === MESMO NÍVEL DE CONCURSO === */
-    (u, m) => m.sameContestLevel ? `${u.name} também busca concurso ${m.contestLevelLbl.toLowerCase()}. Concorrência de elite!` : null,
-    (u, m) => m.sameContestLevel ? `Você e ${u.name} estão no mesmo nível de concurso: ${m.contestLevelLbl}.` : null,
+  /* === MESMO INTERESSE === */
+  (u, m) => m.sameInterest ? `${u.name} também ama ${m.interestLbl}. Interesses em comum fortalecem conexões!` : null,
+  (u, m) => m.sameInterest ? `Que coincidência! ${u.name} também curte ${m.interestLbl}.` : null,
 
-    /* === MESMA ÁREA DE CONCURSO === */
-    (u, m) => m.sameContestArea ? `${u.name} também está na área ${m.contestAreaLbl.toLowerCase()} de concursos. Foco total!` : null,
-    (u, m) => m.sameContestArea ? `Sabia que ${u.name} também quer concurso na área ${m.contestAreaLbl.toLowerCase()}?` : null,
+  /* === MESMO FOCO === */
+  (u, m) => m.focusMatch && m.focusMatches ? `${u.name} tem os mesmos focos que você! Conexão poderosa para crescer junto.` : null,
 
-    /* === MESMA PROFISSÃO === */
-    (u, m) => m.sameProfession ? `${u.name} também é ${m.professionLbl}! Cérebro de elite 💻` : null,
-    (u, m) => m.sameProfession ? `Outro ${m.professionLbl} por aqui! ${u.name} também atua na mesma área que você.` : null,
-    (u, m) => m.sameProfession ? `${u.name} também trabalha como ${m.professionLbl}. Bora trocar experiências?` : null,
+  /* === MESMA UNIVERSIDADE === */
+  (u, m) => m.sameUniType ? `${u.name} também mira ${m.uniTypeLbl}. Sonhos grandes precisam de planejamento e disciplina!` : null,
 
-    /* === MESMO RAMO PROFISSIONAL === */
-    (u, m) => m.sameWorkSector ? `${u.name} também é da área de ${m.workSectorLbl}! Conexão profissional 🤝` : null,
-    (u, m) => m.sameWorkSector ? `Você e ${u.name} atuam no mesmo ramo: ${m.workSectorLbl}.` : null,
+  /* === MESMA CARGA HORÁRIA === */
+  (u, m) => m.sameStudyHours ? `${u.name} também estuda ${m.studyHoursLbl}. Mesma disciplina, mesmo propósito!` : null,
 
-    /* === MESMA META DE CARREIRA === */
-    (u, m) => m.sameCareerGoal && m.careerGoalLbl === "Primeiro emprego" ? `${u.name} também busca o primeiro emprego! Bora se apoiar 💪` : null,
-    (u, m) => m.sameCareerGoal && m.careerGoalLbl === "Promoção" ? `${u.name} também quer crescer na carreira. Ambos merecem aquela promoção!` : null,
-    (u, m) => m.sameCareerGoal && m.careerGoalLbl === "Transição de carreira" ? `${u.name} também está em transição de carreira. Coragem! 🔄` : null,
-    (u, m) => m.sameCareerGoal && m.careerGoalLbl === "Empreender" ? `${u.name} também quer empreender. Futuros donos do próprio negócio!` : null,
+  /* === MESMO PERÍODO === */
+  (u, m) => m.samePeriod ? `${u.name} também rende mais ${m.periodLbl}. Ritmo sincronizado!` : null,
 
-    /* === MESMA META DE SHAPE === */
-    (u, m) => m.sameBodyGoal ? `${u.name} também busca o shape ${m.bodyGoalLbl.toLowerCase()}! Treino e estudos em dia 💪` : null,
-    (u, m) => m.sameBodyGoal ? `Mente sã, corpo são! ${u.name} também treina pra ${m.bodyGoalLbl.toLowerCase()}.` : null,
-    (u, m) => m.sameBodyGoal ? `${u.name} também quer chegar no ${m.bodyGoalLbl.toLowerCase()}. Bora treinar junto?` : null,
-    (u, m) => m.sameBodyGoal ? `Shape de ${m.bodyGoalLbl.toLowerCase()} é o foco de ${u.name} também.` : null,
+  /* === MESMO MÉTODO === */
+  (u, m) => m.sameMethod ? `${u.name} também usa ${m.methodLbl}. Estratégias que funcionam!` : null,
 
-    /* === MESMA FREQUÊNCIA DE TREINO === */
-    (u, m) => m.sameTrainingFreq && m.trainingFreqLbl === "Não treina" ? `${u.name} também não treina ainda. Hora de começar juntos? 🔥` : null,
-    (u, m) => m.sameTrainingFreq && m.trainingFreqLbl !== "Não treina" ? `${u.name} também treina ${m.trainingFreqLbl.toLowerCase()}. Disciplina é tudo!` : null,
+  /* === MESMA ÁREA DE CONCURSO === */
+  (u, m) => m.sameContestArea ? `${u.name} também foca em concursos na área ${m.contestAreaLbl}. Foco total!` : null,
 
-    /* === MESMO INTERESSE PESSOAL === */
-    (u, m) => m.sameInterest ? `${u.name} também curte ${m.interestLbl.toLowerCase()}! Alma gêmea intelectual 📚` : null,
-    (u, m) => m.sameInterest ? `Que coincidência! ${u.name} também ama ${m.interestLbl.toLowerCase()}.` : null,
+  /* === MESMA META DE CARREIRA === */
+  (u, m) => m.sameCareerGoal ? `${u.name} também busca ${m.careerGoalLbl}. Vocês podem se apoiar nessa jornada!` : null,
 
-    /* === MESMO DESAFIO === */
-    (u, m) => m.sameChallenge ? `${u.name} também sofre com ${m.challengeLbl}. Vocês podem se apoiar! 🤝` : null,
-    (u, m) => m.sameChallenge ? `Não está sozinho! ${u.name} também enfrenta ${m.challengeLbl}.` : null,
-    (u, m) => m.sameChallenge ? `${u.name} sabe bem como é lidar com ${m.challengeLbl}. Bora trocar dicas?` : null,
-    (u, m) => m.sameChallenge ? `Enquanto isso, ${u.name} também luta contra ${m.challengeLbl} e não desistiu!` : null,
+  /* === MESMA ÁREA DE CURSO === */
+  (u, m) => m.sameCourseArea ? `${u.name} também é da área de ${m.courseAreaLbl}. Cérebros afiados por aqui!` : null,
+  (u, m) => m.sameCourseArea ? `Você e ${u.name} têm interesses na mesma área: ${m.courseAreaLbl}. Que tal trocar uma ideia?` : null,
 
-    /* === MESMA CARGA HORÁRIA === */
-    (u, m) => m.sameStudyHours ? `${u.name} também estuda ${m.studyHoursLbl}. Mesma disciplina! ⏰` : null,
-    (u, m) => m.sameStudyHours ? `Você e ${u.name} têm a mesma meta de ${m.studyHoursLbl} de estudo. Quem rende mais?` : null,
+  /* === MESMO NÍVEL ESCOLAR === */
+  (u, m) => m.sameEduLevel ? `${u.name} também está ${m.eduLevelLbl}. Fase parecida, jornada compartilhada!` : null,
 
-    /* === MESMO PERÍODO === */
-    (u, m) => m.samePeriod ? `${u.name} também rende mais ${m.periodLbl === "Manhã" ? "de manhã" : m.periodLbl === "Tarde" ? "à tarde" : m.periodLbl === "Noite" ? "à noite" : m.periodLbl === "Madrugada" ? "de madrugada" : "em qualquer horário"}! Ritmo sincronizado 🌙` : null,
+  /* === USUÁRIO TEM CURSO (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.targetCourse ? `${u.name} está lutando firme para conquistar uma vaga em ${COURSE_LABELS[m.user.diagnostic.targetCourse] || m.user.diagnostic.targetCourse}. A persistência é o combustível do sucesso!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.targetCourse ? `${u.name} vem se dedicando aos estudos de ${COURSE_LABELS[m.user.diagnostic.targetCourse] || m.user.diagnostic.targetCourse}. Cada minuto de foco faz diferença!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.targetCourse ? `${u.name} está focado em ${COURSE_LABELS[m.user.diagnostic.targetCourse] || m.user.diagnostic.targetCourse}. A aprovação é questão de tempo!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.targetCourse ? `${u.name} não abre mão do sonho de passar em ${COURSE_LABELS[m.user.diagnostic.targetCourse] || m.user.diagnostic.targetCourse}. E você, como está?` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.targetCourse ? `${u.name} está construindo o futuro em ${COURSE_LABELS[m.user.diagnostic.targetCourse] || m.user.diagnostic.targetCourse}. Inspiração pura!` : null,
 
-    /* === MESMO MÉTODO === */
-    (u, m) => m.sameMethod ? `${u.name} também usa ${m.methodLbl.toLowerCase()} como método. Estratégia poderosa!` : null,
-    (u, m) => m.sameMethod ? `${u.name} confia em ${m.methodLbl.toLowerCase()} assim como você.` : null,
+  /* === USUÁRIO TEM PROFISSÃO (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.targetProfession ? `${u.name} está construindo uma carreira sólida em ${PROFESSION_LABELS[m.user.diagnostic.targetProfession] || m.user.diagnostic.targetProfession}. O mercado reconhece quem se dedica!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.targetProfession ? `Sabia que ${u.name} atua como ${PROFESSION_LABELS[m.user.diagnostic.targetProfession] || m.user.diagnostic.targetProfession}? Cada jornada tem lições valiosas.` : null,
 
-    /* === MESMO NÍVEL ESCOLAR === */
-    (u, m) => m.sameEduLevel ? `${u.name} também está ${m.eduLevelLbl.toLowerCase()}! Fase parecida 📖` : null,
-    (u, m) => m.sameEduLevel && m.eduLevelLbl === "Cursinho" ? `${u.name} também está no cursinho! Bora gabaritar juntos?` : null,
-    (u, m) => m.sameEduLevel && m.eduLevelLbl === "Ensino Médio (cursando)" ? `${u.name} também está no Ensino Médio. Hora de construir o futuro!` : null,
+  /* === USUÁRIO TEM CONCURSO (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.contestArea ? `${u.name} está focado em concursos na área ${CONTEST_AREA_LABELS[m.user.diagnostic.contestArea] || m.user.diagnostic.contestArea}. Disciplina é o caminho para a aprovação!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.contestArea ? `${u.name} está se preparando para concursos de ${CONTEST_AREA_LABELS[m.user.diagnostic.contestArea] || m.user.diagnostic.contestArea}. Área promissora e cheia de oportunidades!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.contestLevel ? `${u.name} está de olho em concursos de nível ${CONTEST_LEVEL_LABELS[m.user.diagnostic.contestLevel] || m.user.diagnostic.contestLevel}. Coragem e preparação!` : null,
 
-    /* === FOCUS MATCH (mesma combinação de tracks) === */
-    (u, m) => m.focusMatch ? `${u.name} tem os mesmos focos que você! Almas gêmeas da produtividade 🎯` : null,
-    (u, m) => m.focusMatch ? `${u.name} está na mesma vibe que você!` : null,
+  /* === USUÁRIO TEM META FITNESS (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.bodyGoal ? `${u.name} está buscando ${BODY_GOAL_LABELS[m.user.diagnostic.bodyGoal] || m.user.diagnostic.bodyGoal}. Mente sã, corpo são — o equilíbrio dos campeões!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.trainingFreq ? `${u.name} treina ${TRAINING_FREQ_LABELS[m.user.diagnostic.trainingFreq] || m.user.diagnostic.trainingFreq} para chegar ao shape ideal. Que determinação!` : null,
 
-    /* === OVERTAKING === */
-    (u, m) => m.overtake ? `${u.name} te passou nos ratings e tem trilhas semelhantes às suas!` : null,
-    (u, m) => m.overtake ? `${u.name} acabou de ultrapassar você — que tal acelerar o ritmo?` : null,
-    (u, m) => m.overtake ? `${u.name} está voando e já te deixou para trás esta semana!` : null,
-    (u, m) => m.overtake ? `Enquanto você descansava, ${u.name} passou na sua frente no ranking.` : null,
+  /* === USUÁRIO TEM DESAFIO (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.mainChallenge ? `${u.name} enfrenta ${CHALLENGE_LABELS[m.user.diagnostic.mainChallenge] || m.user.diagnostic.mainChallenge} com coragem. Você também pode superar seus desafios!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.mainChallenge ? `${u.name} sabe que ${CHALLENGE_LABELS[m.user.diagnostic.mainChallenge] || m.user.diagnostic.mainChallenge} não é fácil, mas segue firme. Persistência sempre!` : null,
 
-    /* === APPROACHING === */
-    (u, m) => m.approach ? `${u.name} está quase te alcançando no ranking — ligue o turbo!` : null,
-    (u, m) => m.approach ? `Cuidado! ${u.name} vem subindo forte e está logo atrás de você.` : null,
-    (u, m) => m.approach ? `${u.name} está colando em você! Mais algumas horas e ele te alcança.` : null,
-    (u, m) => m.approach ? `Só mais alguns XP e ${u.name} empata com você. Hora de estudar!` : null,
+  /* === USUÁRIO TEM CARGA HORÁRIA (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.studyHours ? `${u.name} mantém ${STUDY_HOURS_LABELS[m.user.diagnostic.studyHours] || m.user.diagnostic.studyHours} de estudo diário. Pequenos passos levam a grandes conquistas.` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.studyHours ? `${u.name} estuda ${STUDY_HOURS_LABELS[m.user.diagnostic.studyHours] || m.user.diagnostic.studyHours} por dia. A consistência é o verdadeiro segredo dos campeões!` : null,
 
-    /* === CONSISTÊNCIA SEMANAL === */
-    (u, m) => m.consistent ? `${u.name} estudou a semana inteira sem perder um dia!` : null,
-    (u, m) => m.consistent ? `${u.name} manteve a consistência por 7 dias seguidos. Que inspiração!` : null,
-    (u, m) => m.consistent ? `Enquanto isso, ${u.name} fechou mais uma semana de estudos sem falhas.` : null,
-    (u, m) => m.consistent ? `${u.name} está com muitos pontos acumulados este fim de semana de tanto estudar!` : null,
+  /* === USUÁRIO TEM PERÍODO (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.studyPeriod ? `${u.name} rende melhor ${STUDY_PERIOD_LABELS[m.user.diagnostic.studyPeriod] || m.user.diagnostic.studyPeriod.toLowerCase()}. Conhecer seu melhor horário é estratégia de campeão!` : null,
 
-    /* === XP MILESTONE === */
-    (u, m) => m.xp100 ? `${u.name} acabou de bater ${m.xp} XP — que marco!` : null,
-    (u, m) => m.xp100 ? `${u.name} atingiu ${m.xp} XP. Você já está de olho na próxima meta?` : null,
-    (u, m) => m.xp100 ? `Enquanto isso, ${u.name} comemorou ${m.xp} XP conquistados.` : null,
+  /* === USUÁRIO TEM MÉTODO (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.studyMethod ? `${u.name} usa ${STUDY_METHOD_LABELS[m.user.diagnostic.studyMethod] || m.user.diagnostic.studyMethod} como método de estudo. Cada um encontra seu caminho!` : null,
 
-    /* === PONTOS AHEAD/BEHIND === */
-    (u, m) => m.ptsAhead ? `${u.name} tem ${m.ptsDiff} pontos a mais que você. Dá para alcançar!` : null,
-    (u, m) => m.ptsAhead ? `${u.name} está ${m.ptsDiff} pontos na frente. Uma sessão de foco e você empata!` : null,
-    (u, m) => m.ptsBehind ? `Você está ${m.ptsDiff} pontos na frente de ${u.name}. Não deixe ele te alcançar!` : null,
-    (u, m) => m.ptsBehind ? `Líder! Você tem ${m.ptsDiff} pontos de vantagem sobre ${u.name}.` : null,
+  /* === USUÁRIO TEM NÍVEL ESCOLAR (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.eduLevel ? `${u.name} está ${EDU_LEVEL_LABELS[m.user.diagnostic.eduLevel] || m.user.diagnostic.eduLevel}. Cada etapa é um degrau para o sucesso!` : null,
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.eduLevel ? `${u.name} está na fase ${EDU_LEVEL_LABELS[m.user.diagnostic.eduLevel] || m.user.diagnostic.eduLevel}. Aproveite cada momento dessa jornada!` : null,
 
-    /* === TIER / RANK === */
-    (u, m) => m.sameTier ? `Você e ${u.name} estão no mesmo ${m.tierLbl}. Quem chega ao próximo primeiro?` : null,
-    (u, m) => m.higherTier ? `${u.name} está no ${m.tierLbl} — um rank acima de você. Bora subir?` : null,
-    (u, m) => m.lowerTier ? `${u.name} está no ${m.tierLbl}, mas vem forte!` : null,
+  /* === USUÁRIO TRABALHA (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.workSector ? `${u.name} atua na área de ${WORK_SECTOR_LABELS[m.user.diagnostic.workSector] || m.user.diagnostic.workSector}. Mercado de trabalho pede evolução constante!` : null,
 
-    /* === MESMO CURSO (slots) === */
-    (u, m) => m.sameCourse ? `${u.name} também estuda ${m.course} — vocês podem trocar dicas!` : null,
+  /* === USUÁRIO TEM CARREIRA (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.careerGoal ? `${u.name} busca ${CAREER_GOAL_LABELS[m.user.diagnostic.careerGoal] || m.user.diagnostic.careerGoal} na carreira. Cada passo conta para chegar lá!` : null,
 
-    /* === INSPIRACIONAIS === */
-    (u, m) => `${u.name} está online agora. Que tal estudar junto (mesmo que longe)?`,
-    (u, m) => `Dizem por aí que ${u.name} está com uma sequência de estudos impressionante.`,
-    (u, m) => `${u.name} prova que consistência vence talento. Veja o perfil dele!`,
-    (u, m) => `Enquanto você lê isso, ${u.name} já está estudando. Bora?`,
-    (u, m) => `${u.name} está na comunidade há um tempão e continua firme. Inspirador!`,
-    (u, m) => `O segredo? ${u.name} estuda um pouco todo dia. E você?`,
-    (u, m) => `${u.name} é a prova viva de que pequenas sessões diárias geram grandes resultados.`,
-    (u, m) => `${u.name} está entre os mais ativos da comunidade esta semana.`,
-    (u, m) => `Você já conferiu o progresso de ${u.name} hoje?`,
-    (u, m) => `${u.name} está construindo uma jornada incrível. Dê uma olhada!`,
-    (u, m) => `${u.name} está colhendo os frutos da disciplina. E você, vai ficar de fora?`,
-    (u, m) => `${u.name} transformou hábitos em resultados. Conheça a história dele!`,
-    (u, m) => `Mente, corpo e carreira — ${u.name} está cuidando dos três. Inspiração pura!`,
+  /* === USUÁRIO TEM INTERESSE (distante) === */
+  (u, m) => m.user && m.user.diagnostic && m.user.diagnostic.personalInterest ? `${u.name} também curte ${PERSONAL_INTEREST_LABELS[m.user.diagnostic.personalInterest] || m.user.diagnostic.personalInterest}. Interesses diversos enriquecem a jornada!` : null,
+
+  /* === XP E CONSISTÊNCIA === */
+  (u, m) => m.xp > 0 && m.xp < 500 ? `${u.name} está começando agora e já está na ativa. Todo mestre já foi iniciante!` : null,
+  (u, m) => m.xp > 1000 ? `${u.name} já acumulou ${m.xp} XP de experiência. A consistência realmente faz a diferença!` : null,
+  (u, m) => m.xp > 5000 ? `${u.name} é um veterano com ${m.xp} XP. Inspiração para quem está começando!` : null,
+  (u, m) => m.consistent ? `${u.name} manteve a consistência por dias seguidos. É assim que os resultados aparecem!` : null,
+
+  /* === RANKING === */
+  (u, m) => m.sameTier ? `Você e ${u.name} estão no mesmo ${m.tierLbl}. Quem chega ao próximo nível primeiro?` : null,
+  (u, m) => m.higherTier ? `${u.name} está no ${m.tierLbl} — um rank acima. Use isso como motivação para subir!` : null,
+  (u, m) => m.lowerTier ? `${u.name} está no ${m.tierLbl} mas vem forte. Nunca subestime quem está escalando!` : null,
+
+  /* === GERAIS MOTIVACIONAIS === */
+  (u, m) => `${u.name} está na comunidade focado em seus objetivos. Inspire-se e continue firme!`,
+  (u, m) => `Dizem por aí que ${u.name} está com uma sequência de estudos impressionante.`,
+  (u, m) => `${u.name} prova que consistência vence talento. Conheça o perfil dele!`,
+  (u, m) => `${u.name} está entre os mais dedicados da comunidade esta semana.`,
+  (u, m) => `${u.name} está construindo uma jornada incrível. Que tal dar uma olhada?`,
+  (u, m) => `${u.name} transformou hábitos em resultados. A disciplina sempre vence!`,
+  (u, m) => `Enquanto você lê isso, ${u.name} já está estudando. Bora?`,
+  (u, m) => `${u.name} está colhendo os frutos da disciplina. E você, vai ficar de fora?`,
+  (u, m) => `${u.name} está online agora. Que tal estudar junto (mesmo que longe)?`,
+  (u, m) => `${u.name} está na comunidade há um tempão e continua firme. Inspirador!`,
+  (u, m) => `O segredo? ${u.name} estuda um pouco todo dia. E você?`,
+  (u, m) => `${u.name} é a prova viva de que pequenas sessões diárias geram grandes resultados.`,
+  (u, m) => `Você já conferiu o progresso de ${u.name} hoje?`,
+  (u, m) => `Mente, corpo e carreira — ${u.name} está cuidando dos três. Equilíbrio é tudo!`,
 ];

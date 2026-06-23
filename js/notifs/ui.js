@@ -25,9 +25,10 @@ function renderNotificationBadge() {
 
     if (prompt) prompt.style.display = "none";
 
-    const count = __unreadCount > 0 ? __unreadCount : 0;
-    if (count > 0) {
-        badge.textContent = count > 99 ? "99+" : count;
+    let totalUnread = __unreadCount || 0;
+
+    if (totalUnread > 0) {
+        badge.textContent = totalUnread > 99 ? "99+" : totalUnread;
         badge.style.display = "flex";
     } else {
         badge.style.display = "none";
@@ -43,13 +44,20 @@ function formatNotifTime(ts) {
 }
 
 function renderNotifItem(n) {
-    return `<div class="notif-item ${n.seen ? "" : "notif-item-unread"}" onclick="onNotifClick('${n.uid}','${n.id}')">
-        <img class="notif-avatar" src="${n.avatar}" alt="" loading="lazy" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23ccc%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2230%22>🧑</text></svg>'">
+    const clickHandler = n.type === 'diagnosis' ? "onNotifDiagClick()" : `onNotifClick('${n.uid || ''}','${n.id || ''}')`;
+    return `<div class="notif-item ${n.seen ? "" : "notif-item-unread"}" onclick="${clickHandler}">
+        <img class="notif-avatar" src="${n.avatar || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23ccc%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2230%22>🔔</text></svg>'}" alt="" loading="lazy">
         <div class="notif-body">
             <div class="notif-text">${n.text}</div>
             <div class="notif-time">${formatNotifTime(n.time)}</div>
         </div>
     </div>`;
+}
+
+function onNotifDiagClick() {
+    markPersistentDiagSeen();
+    closeNotificationPanel();
+    setTimeout(openDiagnosticDialog, 150);
 }
 
 function onNotifClick(uid, nid) {
@@ -82,7 +90,10 @@ function openNotificationPanel() {
 
     let content = `<div class="notif-panel-header">
         <h3>🔔 Notificações</h3>
-        <button class="dialog-close-btn" onclick="closeNotificationPanel()">×</button>
+        <div class="notif-header-actions">
+            ${hasDiagnostic() && __notifications.length > 0 ? '<button class="notif-delete-all-btn" onclick="event.stopPropagation();deleteAllNotifications()" title="Limpar notificações">🗑️</button>' : ''}
+            <button class="dialog-close-btn" onclick="closeNotificationPanel()">×</button>
+        </div>
     </div>
     <div class="notif-panel-body" id="notif-list">`;
 
@@ -96,12 +107,16 @@ function openNotificationPanel() {
                 <span>8 perguntas para conectar você a estudantes compatíveis</span>
             </div>
         </div>`;
-    } else if (__notifications.length === 0) {
-        content += `<div class="notif-empty">Nenhuma notificação no momento. Volte mais tarde!</div>`;
     } else {
-        __notifications.forEach(n => {
-            content += renderNotifItem(n);
-        });
+        if (__notifications.length > 0) {
+            __notifications.forEach(n => {
+                content += renderNotifItem(n);
+            });
+        }
+
+        if (__notifications.length === 0) {
+            content += `<div class="notif-empty">Nenhuma notificação no momento. Volte mais tarde!</div>`;
+        }
     }
 
     content += `</div>`;
@@ -112,10 +127,14 @@ function openNotificationPanel() {
     requestAnimationFrame(() => { wrap.classList.add("open"); panel.classList.add("open"); });
     __panelOpen = true;
 
-    if (__notifications.length > 0) {
-        __unreadCount = 0;
-        renderNotificationBadge();
-    }
+    __notifications.forEach(n => n.seen = true);
+    __unreadCount = 0;
+    renderNotificationBadge();
+}
+
+function deleteAllNotifications() {
+    clearAllNotifications();
+    window.toast("🗑️ Notificações limpas!", false, 3000);
 }
 
 function closeNotificationPanel() {

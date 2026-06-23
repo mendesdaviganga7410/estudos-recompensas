@@ -47,8 +47,9 @@ function getMergedLists() {
 function loadGuestState() {
     try {
         const raw = localStorage.getItem(GUEST_STORAGE_KEY);
+        let saved = null;
         if (raw) {
-            const saved = JSON.parse(raw);
+            saved = JSON.parse(raw);
             Object.assign(state, createDefaultState(), saved);
             if (!state.slots || !state.slots.dailies) {
                 state.slots = window.cloneDefaultSlotText();
@@ -56,7 +57,8 @@ function loadGuestState() {
             if (!state.profile) state.profile = { epicGoal: '', bannerUrl: '', displayName: '', description: '', public: false };
             if (state.profile.description === undefined) state.profile.description = '';
         }
-        state.prefs = {};
+        state.prefs = (saved && saved.prefs) || {};
+        window.isAdmin = state.prefs.isAdmin === true;
     } catch (err) {
         console.warn('Guest state load failed:', err);
         state.prefs = {};
@@ -72,6 +74,7 @@ function saveGuestState() {
             cd: state.cd,
             slots: state.slots,
             profile: state.profile,
+            prefs: state.prefs,
             onboardingComplete: state.onboardingComplete
         };
         localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(payload));
@@ -116,6 +119,10 @@ function applyRemoteState(data) {
     } else {
         state.slots = window.cloneDefaultSlotText();
     }
+    /* Admin mode */
+    window.isAdmin = state.prefs.isAdmin === true;
+    const adminBtn = document.getElementById('admin-btn');
+    if (adminBtn) adminBtn.style.display = window.isAdmin ? '' : 'none';
 }
 
 Object.defineProperty(window, 'DAILIES', {
@@ -130,6 +137,31 @@ Object.defineProperty(window, 'SHOP', {
 
 loadGuestState();
 
+/* Admin mode - activate/deactivate via console */
+function ativarAdmin() {
+    if (!window.state) return;
+    window.state.prefs.isAdmin = true;
+    window.isAdmin = true;
+    window.saveState();
+    const btn = document.getElementById('admin-btn');
+    if (btn) btn.style.display = '';
+    console.log('🛠️ Modo ADMIN ativado!');
+    window.toast?.('🛠️ Modo ADMIN ativado!', false, 4000);
+}
+
+function desativarAdmin() {
+    if (!window.state) return;
+    window.state.prefs.isAdmin = false;
+    window.isAdmin = false;
+    window.saveState();
+    console.log('🔌 Modo ADMIN desativado.');
+    window.toast?.('🔌 Modo ADMIN desativado.', false, 4000);
+    const btn = document.getElementById('admin-btn');
+    if (btn) btn.style.display = 'none';
+    const panel = document.getElementById('admin-panel-modal');
+    if (panel) panel.style.display = 'none';
+}
+
 window.TIERS              = TIERS;
 window.GUEST_STORAGE_KEY  = GUEST_STORAGE_KEY;
 window.createDefaultState = createDefaultState;
@@ -138,3 +170,5 @@ window.loadGuestState     = loadGuestState;
 window.saveGuestState     = saveGuestState;
 window.saveState          = saveState;
 window.applyRemoteState   = applyRemoteState;
+window.ativarAdmin        = ativarAdmin;
+window.desativarAdmin     = desativarAdmin;

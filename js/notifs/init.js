@@ -1,11 +1,32 @@
 let __initTimer = null;
+let __diagReminderTimer = null;
+
+function getDiagInterval() {
+    return 12 * 60 * 60 * 1000;
+}
+
+function scheduleDiagReminder() {
+    if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
+    if (!window.currentUser || !hasDiagnostic()) return;
+
+    const delay = getDiagInterval();
+    __diagReminderTimer = setTimeout(() => {
+        if (window.currentUser && hasDiagnostic()) {
+            generateOneNotification();
+            scheduleDiagReminder();
+        }
+    }, delay);
+}
 
 async function initNotifications() {
     if (__initTimer) clearTimeout(__initTimer);
 
     if (!window.currentUser) {
         __diagnosticAnswered = false;
+        __persistentDiagNotif = null;
+        __cachedMatches = [];
         renderNotificationBadge();
+        if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
         return;
     }
 
@@ -13,8 +34,10 @@ async function initNotifications() {
     if (oldDiag && oldDiag.diagnosticVersion !== DIAGNOSTIC_VERSION) {
         window.state.diagnostic = undefined;
         __diagnosticAnswered = false;
+        __persistentDiagNotif = null;
         __notifications = [];
         __unreadCount = 0;
+        __cachedMatches = [];
         __diagAnswers = {};
         renderNotificationBadge();
         setTimeout(showDiagnosticPrompt, 1500);
@@ -25,9 +48,12 @@ async function initNotifications() {
     __diagnosticAnswered = hasDiagnostic();
 
     if (hasDiagnostic()) {
+        initPersistentDiagNotif();
         renderNotificationBadge();
         await refreshNotifications();
+        scheduleDiagReminder();
     } else {
+        __persistentDiagNotif = null;
         renderNotificationBadge();
         setTimeout(showDiagnosticPrompt, 3000);
     }
@@ -56,9 +82,12 @@ async function resetAllDiagnostics() {
 
     window.state.diagnostic = undefined;
     __diagnosticAnswered = false;
+    __persistentDiagNotif = null;
     __notifications = [];
     __unreadCount = 0;
+    __cachedMatches = [];
     __diagAnswers = {};
+    if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
 
     try {
         await window.saveStateToFirestore(window.currentUser.uid, window.state, {
@@ -93,6 +122,13 @@ window.refreshNotifications     = refreshNotifications;
 window.initNotifications        = initNotifications;
 window.renderNotifItem          = renderNotifItem;
 window.resetAllDiagnostics      = resetAllDiagnostics;
+window.onNotifDiagClick         = onNotifDiagClick;
+window.deleteAllNotifications   = deleteAllNotifications;
+window.getPersistentDiagNotif   = getPersistentDiagNotif;
+window.markPersistentDiagSeen   = markPersistentDiagSeen;
+window.clearAllNotifications    = clearAllNotifications;
+window.scheduleDiagReminder     = scheduleDiagReminder;
+window.generateOneNotification  = generateOneNotification;
 
 /* Monitora mudanças de currentUser para (re)inicializar */
 (function watchUser() {
@@ -104,8 +140,11 @@ window.resetAllDiagnostics      = resetAllDiagnostics;
             if (uid) initNotifications();
             else {
                 __diagnosticAnswered = false;
+                __persistentDiagNotif = null;
+                __cachedMatches = [];
                 __notifications = [];
                 __unreadCount = 0;
+                if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
                 renderNotificationBadge();
             }
         }

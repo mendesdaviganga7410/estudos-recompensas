@@ -261,7 +261,7 @@ function closeDiagnosticDialog() {
     if (d) d.close();
 }
 
-function submitDiagnostic() {
+async function submitDiagnostic() {
     const q = _visibleQuestions[__diagStep];
     if (!q) return;
 
@@ -289,6 +289,7 @@ function submitDiagnostic() {
     __diagAnswers.diagnosticVersion = DIAGNOSTIC_VERSION;
     saveDiagnosticLocally(__diagAnswers);
     __diagnosticAnswered = true;
+    __persistentDiagNotif = null;
     closeDiagnosticDialog();
     window.toast("✅ Dados salvos com sucesso!");
 
@@ -300,6 +301,9 @@ function submitDiagnostic() {
         }).catch(() => {});
     }
 
+    initPersistentDiagNotif();
+    markPersistentDiagSeen();
     renderNotificationBadge();
-    refreshNotifications();
+    await refreshNotifications();
+    scheduleDiagReminder();
 }

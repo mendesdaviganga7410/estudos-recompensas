@@ -53,6 +53,7 @@
                     <span class="notif-prompt-dot" id="notif-prompt-dot"></span>
                 </div>
                 <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+                <button class="btn-theme admin-btn" id="admin-btn" onclick="openAdminPanel()" style="display:none;">🛠️</button>
             </div>
         </div>
 
@@ -270,6 +271,7 @@
     <script src="js/router.js"></script>
     <script src="js/pages/panel.js"></script>
     <script src="js/onboarding.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('admin-btn');if(b&&window.isAdmin)b.style.display='';});</script>
 </body>
 
 </html>

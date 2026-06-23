@@ -535,6 +535,231 @@ function saveQuickBanner() {
     }, "image/jpeg", 0.85);
 }
 
+/* =====================================================================
+   ADMIN PANEL
+   ===================================================================== */
+
+function openAdminPanel() {
+    const existing = document.getElementById('admin-panel-modal');
+    if (existing) { existing.style.display = 'flex'; return; }
+
+    const d = document.createElement('div');
+    d.id = 'admin-panel-modal';
+    d.className = 'admin-modal-wrap';
+    d.onclick = (e) => { if (e.target === d) closeAdminPanel(); };
+
+    d.innerHTML = `
+    <div class="admin-modal" onclick="event.stopPropagation()">
+        <div class="admin-header">
+            <h3>🛠️ Painel de Administração</h3>
+            <button class="dialog-close-btn" onclick="closeAdminPanel()">×</button>
+        </div>
+        <div class="admin-body">
+            ${renderAdminSections()}
+        </div>
+        <div class="admin-footer">
+            <button class="btn-theme" style="background:var(--failure);border-color:var(--failure);color:#fff;" onclick="desativarAdmin();closeAdminPanel()">🔌 Desativar Modo Admin</button>
+        </div>
+    </div>`;
+
+    document.body.appendChild(d);
+    requestAnimationFrame(() => d.style.opacity = '1');
+}
+
+function closeAdminPanel() {
+    const el = document.getElementById('admin-panel-modal');
+    if (el) el.remove();
+}
+
+function renderAdminSections() {
+    const sections = [
+        { title: '💰 Pontos & XP', btns: [
+            { label: '+100 pts', action: 'adminAddPts(100)' },
+            { label: '+1000 pts', action: 'adminAddPts(1000)' },
+            { label: '+100 XP', action: 'adminAddXp(100)' },
+            { label: '+1000 XP', action: 'adminAddXp(1000)' },
+            { label: 'Zerar pts', action: 'adminSetPts(0)' },
+            { label: 'Zerar XP', action: 'adminSetXp(0)' },
+        ]},
+        { title: '⏳ Cooldowns', btns: [
+            { label: 'Resetar todos', action: 'adminResetAllCd()' },
+            { label: 'Resetar diários', action: 'adminResetCdType("day")' },
+            { label: 'Resetar semanais', action: 'adminResetCdType("wk")' },
+            { label: 'Resetar mensais', action: 'adminResetCdType("mo")' },
+        ]},
+        { title: '📋 Tarefas', btns: [
+            { label: 'Completar todas dailies', action: 'adminCompleteAllDailies()' },
+            { label: 'Falhar todas dailies', action: 'adminFailAllDailies()' },
+            { label: 'Completar todos epics', action: 'adminCompleteAllEpics()' },
+        ]},
+        { title: '🏪 Shop', btns: [
+            { label: 'Comprar item grátis (loja)', action: 'adminFreeItem()' },
+            { label: 'Liberar todos cooldowns', action: 'adminUnlockAllItems()' },
+        ]},
+        { title: '📖 Estudo', btns: [
+            { label: 'Limpar histórico', action: 'adminClearStudyHistory()' },
+            { label: 'Adicionar sessão fake', action: 'adminAddFakeSession()' },
+        ]},
+        { title: '📋 Diagnóstico', btns: [
+            { label: 'Resetar diagnóstico', action: 'adminResetDiag()' },
+            { label: 'Abrir diagnóstico', action: 'adminOpenDiag()' },
+            { label: 'Marcar como lido', action: 'adminMarkDiagSeen()' },
+        ]},
+        { title: '🔔 Notificações', btns: [
+            { label: 'Gerar notificação', action: 'adminGenNotif()' },
+            { label: 'Limpar notificações', action: 'adminClearNotifs()' },
+            { label: 'Refresh cache', action: 'adminRefreshNotifs()' },
+        ]},
+        { title: '👤 Usuário', btns: [
+            { label: 'Ver dados (console)', action: 'adminLogState()' },
+            { label: 'Forçar salvamento', action: 'adminForceSave()' },
+            { label: 'Recarregar estado', action: 'adminForceReload()' },
+            { label: 'Resetar estado completo', action: 'adminResetState()' },
+            { label: 'Sair da conta', action: 'adminLogout()' },
+        ]},
+        { title: '🎨 Tema & Onboarding', btns: [
+            { label: 'Resetar tema padrão', action: 'adminResetTheme()' },
+            { label: 'Tema aleatório', action: 'adminRandomTheme()' },
+            { label: 'Reabrir onboarding', action: 'adminReopenOnboarding()' },
+        ]},
+        { title: '🌐 Comunidade', btns: [
+            { label: 'Alternar perfil público', action: 'adminTogglePublic()' },
+            { label: 'Buscar perfis (console)', action: 'adminFetchProfiles()' },
+        ]},
+    ];
+
+    return sections.map(s => `
+        <div class="admin-section">
+            <div class="admin-section-title">${s.title}</div>
+            <div class="admin-grid">${s.btns.map(b => `
+                <button class="admin-btn" onclick="${b.action}">${b.label}</button>
+            `).join('')}</div>
+        </div>
+    `).join('');
+}
+
+/* ---- ADMIN ACTIONS ---- */
+
+function adminAddPts(n) { if (!window.state) return; window.state.pts += n; window.saveState?.(); window.render?.(); window.updateStatsUI?.(); window.toast?.('💰 ' + n + ' pts adicionados!'); }
+function adminAddXp(n) { if (!window.state) return; window.state.xp += n; window.saveState?.(); window.render?.(); window.updateStatsUI?.(); window.toast?.('⚡ ' + n + ' XP adicionados!'); }
+function adminSetPts(n) { if (!window.state) return; window.state.pts = n; window.saveState?.(); window.render?.(); window.updateStatsUI?.(); window.toast?.('💰 pts definidos para ' + n); }
+function adminSetXp(n) { if (!window.state) return; window.state.xp = n; window.saveState?.(); window.render?.(); window.updateStatsUI?.(); window.toast?.('⚡ XP definido para ' + n); }
+
+function adminResetAllCd() { if (!window.state) return; window.state.cd = {}; window.saveState?.(); window.renderShop?.(); window.toast?.('⏳ Todos os cooldowns resetados!'); }
+function adminResetCdType(type) {
+    if (!window.state || !window.SLOT_ECONOMICS) return;
+    const items = window.SLOT_ECONOMICS.shop.filter(i => i.type === type);
+    items.forEach(i => delete window.state.cd[i.id]);
+    window.saveState?.(); window.renderShop?.();
+    const names = { day: 'diários', wk: 'semanais', mo: 'mensais' };
+    window.toast?.('⏳ Cooldowns ' + (names[type] || type) + ' resetados!');
+}
+
+function adminCompleteAllDailies() {
+    const dailies = window.DAILIES || [];
+    dailies.forEach(t => { if (window.task) window.task(t.id, 'd', true); });
+    window.toast?.('✅ Todas as dailies concluídas!');
+}
+function adminFailAllDailies() {
+    const dailies = window.DAILIES || [];
+    dailies.forEach(t => { if (window.task) window.task(t.id, 'd', false); });
+    window.toast?.('❌ Todas as dailies falharam.');
+}
+function adminCompleteAllEpics() {
+    const epics = window.EPICS || [];
+    epics.forEach(t => { if (window.task) window.task(t.id, 'e', true); });
+    window.toast?.('✅ Todos os epics concluídos!');
+}
+
+function adminFreeItem() {
+    if (!window.state) return;
+    const merged = window.getMergedLists ? window.getMergedLists() : window.SLOT_ECONOMICS;
+    const shop = merged?.shop || [];
+    if (!shop.length) { window.toast?.('Nenhum item na loja.', true); return; }
+    const item = shop[0];
+    window.state.cd[item.id] = Date.now();
+    window.saveState?.(); window.renderShop?.();
+    window.toast?.('🏪 Item "' + item.name + '" adquirido (sem custo)!');
+}
+function adminUnlockAllItems() {
+    if (!window.state) return;
+    const shop = window.SHOP || [];
+    shop.forEach(i => delete window.state.cd[i.id]);
+    window.saveState?.(); window.renderShop?.();
+    window.toast?.('🔓 Todos os itens liberados!');
+}
+
+function adminClearStudyHistory() { if (window.clearStudyHistory) window.clearStudyHistory(); else window.toast?.('Função não disponível nesta página.', true); }
+function adminAddFakeSession() {
+    try {
+        const history = JSON.parse(localStorage.getItem('neuroflow_study_history') || '[]');
+        const now = Date.now();
+        const duration = Math.floor(Math.random() * 3600) + 600;
+        history.push({
+            id: 'admin_' + now,
+            mode: Math.random() > 0.5 ? 'simple' : 'pomodoro',
+            duration: duration,
+            formatted: Math.floor(duration / 60) + ':' + (duration % 60).toString().padStart(2, '0'),
+            timestamp: now,
+            note: 'Sessão administrativa'
+        });
+        localStorage.setItem('neuroflow_study_history', JSON.stringify(history));
+        if (window.studyTimer && typeof window.studyTimer._renderHistory === 'function') window.studyTimer._renderHistory();
+        window.toast?.('📖 Sessão falsa adicionada ao histórico!');
+    } catch(e) { window.toast?.('Erro: ' + e.message, true); }
+}
+
+function adminResetDiag() { if (window.resetAllDiagnostics) window.resetAllDiagnostics(); else window.toast?.('Função não disponível.', true); }
+function adminOpenDiag() { closeAdminPanel(); setTimeout(() => { if (window.openDiagnosticDialog) window.openDiagnosticDialog(); }, 200); }
+function adminMarkDiagSeen() { if (window.markPersistentDiagSeen) window.markPersistentDiagSeen(); window.toast?.('📋 Diagnóstico marcado como lido.'); }
+
+function adminGenNotif() { if (window.generateOneNotification) window.generateOneNotification(); else window.toast?.('Função não disponível.', true); }
+function adminClearNotifs() { if (window.clearAllNotifications) window.clearAllNotifications(); else window.toast?.('Função não disponível.', true); }
+function adminRefreshNotifs() {
+    (async () => {
+        if (window.refreshNotifications) await window.refreshNotifications();
+        window.toast?.('🔄 Cache de notificações atualizado!');
+    })();
+}
+
+function adminLogState() { console.log('📊 STATE:', JSON.parse(JSON.stringify(window.state))); console.log('👤 User:', window.currentUser); window.toast?.('📊 Estado logado no console.'); }
+function adminForceSave() { if (window.saveState) window.saveState().then(() => window.toast?.('💾 Estado salvo!')).catch(() => window.toast?.('Erro ao salvar.', true)); }
+function adminForceReload() { if (window.currentUser && window.syncUserData) window.syncUserData(window.currentUser.uid).then(() => window.toast?.('🔄 Estado recarregado!')); else window.toast?.('Faça login para recarregar.', true); }
+function adminResetState() {
+    if (!confirm('Tem certeza? Isso vai zerar pts, XP e cooldowns.')) return;
+    if (!window.state) return;
+    window.state.pts = 0;
+    window.state.xp = 0;
+    window.state.cd = {};
+    window.saveState?.(); window.render?.(); window.updateStatsUI?.();
+    window.toast?.('🔄 Estado resetado!');
+}
+function adminLogout() { if (window.logoutGoogle) window.logoutGoogle(); else window.toast?.('Função não disponível.', true); }
+
+function adminResetTheme() { if (window.resetDefaults) window.resetDefaults(); else window.toast?.('Função não disponível.', true); }
+function adminRandomTheme() {
+    if (window.changeTheme) {
+        const total = 18;
+        const r = Math.floor(Math.random() * total);
+        window.changeTheme(r);
+        window.toast?.('🎨 Tema aleatório aplicado!');
+    }
+}
+function adminReopenOnboarding() { if (window.reopenCustomization) { closeAdminPanel(); setTimeout(() => window.reopenCustomization(), 200); } else window.toast?.('Função não disponível.', true); }
+
+function adminTogglePublic() { if (window.toggleProfilePrivacy) window.toggleProfilePrivacy(); else window.toast?.('Função não disponível.', true); }
+function adminFetchProfiles() {
+    (async () => {
+        if (window.fetchPublicProfiles) {
+            const p = await window.fetchPublicProfiles(200);
+            console.log('🌐 Perfis públicos:', p);
+            window.toast?.('🌐 ' + p.length + ' perfis encontrados. Ver console.');
+        }
+    })();
+}
+
+window.openAdminPanel          = openAdminPanel;
+window.closeAdminPanel         = closeAdminPanel;
 window.openAuthModal            = openAuthModal;
 window.closeAuthModal           = closeAuthModal;
 window.toggleAuthMode           = toggleAuthMode;
