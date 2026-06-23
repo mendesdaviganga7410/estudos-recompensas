@@ -390,7 +390,7 @@
     background: var(--surface);
     border: 3px solid var(--stroke);
     border-radius: var(--card-radius);
-    box-shadow: 6px 6px 0px var(--shadow-color);
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
     display: flex;
     flex-direction: column;
     opacity: 0;
@@ -469,6 +469,30 @@
     font-weight: 700;
 }
 
+.diag-number-input {
+    width: 100%; max-width: 200px;
+    padding: 0.85rem 1rem;
+    font-size: 1.2rem; font-weight: 800;
+    text-align: center;
+    background: var(--bg);
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+}
+.diag-number-input:focus {
+    border-color: var(--accent);
+}
+.diag-input-hint {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-align: center;
+    margin-top: 0.35rem;
+    font-weight: 700;
+}
+
 .notif-item {
     display: flex;
     gap: 0.75rem;
@@ -476,17 +500,23 @@
     cursor: pointer;
     transition: background 0.1s;
     align-items: flex-start;
-    border-bottom: 2px solid var(--panel);
+    border: 2px solid transparent;
+    border-bottom-color: var(--panel);
+    clip-path: inset(0 round var(--element-radius));
+    background: var(--bg);
+    margin-bottom: 0.4rem;
 }
-.notif-item:last-child { border-bottom: none; }
-.notif-item:hover { background: var(--panel); border-radius: 8px; }
+.notif-item:last-child { border-bottom: none; margin-bottom: 0; }
+.notif-item:hover {
+    background: var(--panel);
+    border-bottom-color: color-mix(in srgb, black 15%, var(--panel));
+}
 .notif-item-unread {
-    background: color-mix(in srgb, var(--accent) 8%, transparent);
-    border-radius: 8px;
-    margin-bottom: 2px;
+    background: color-mix(in srgb, var(--accent) 35%, var(--bg));
 }
 .notif-item-unread:hover {
-    background: color-mix(in srgb, var(--accent) 14%, transparent);
+    background: color-mix(in srgb, var(--accent) 50%, var(--panel));
+    border-bottom-color: color-mix(in srgb, black 15%, var(--panel));
 }
 .notif-avatar {
     width: 32px; height: 32px;
