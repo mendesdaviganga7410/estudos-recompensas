@@ -252,6 +252,12 @@ function openProfileDetail(data) {
         $com("pd-rank-desc").textContent = pos > 0 ? `#${pos} de ${sorted.length} heróis` : "—";
     }
 
+    // Stats card
+    const stats = data.stats || {};
+    if ($com("pd-stat-dailies")) $com("pd-stat-dailies").textContent = stats.dailiesDone ?? 0;
+    if ($com("pd-stat-epics")) $com("pd-stat-epics").textContent = stats.epicsDone ?? 0;
+    if ($com("pd-stat-purchases")) $com("pd-stat-purchases").textContent = stats.purchases ?? 0;
+
     const backBtn = $com("pd-back-btn");
     if (backBtn) {
         backBtn.textContent = "🌐 Comunidade";

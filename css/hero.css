@@ -586,3 +586,69 @@ body.guest-mode .tab-btn[onclick*="tab-security"] {
     .hub-card-desc { font-size: 0.72rem; }
     .ob-media-row { grid-template-columns: 1fr; }
 }
+
+/* --- Hub Stats Card --- */
+.hub-stats {
+    display: flex;
+    flex-direction: column;
+}
+.hub-stats-card {
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--card-radius);
+    padding: 1.25rem 1.5rem;
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
+}
+.hub-stats-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+.hub-stats-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+}
+.hub-stats-title {
+    font-size: 0.85rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+}
+.hub-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+}
+.hub-stat-item {
+    background: var(--panel);
+    border: 2px solid var(--stroke);
+    border-radius: var(--element-radius);
+    padding: 0.75rem;
+    text-align: center;
+    box-shadow: 2px 2px 0px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+.hub-stat-value {
+    font-size: 1.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    color: var(--text);
+}
+.hub-stat-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+@media (max-width: 640px) {
+    .hub-stats-card { padding: 1rem; }
+    .hub-stats-grid { gap: 0.5rem; }
+    .hub-stat-value { font-size: 1.2rem; }
+    .hub-stat-label { font-size: 0.55rem; }
+}

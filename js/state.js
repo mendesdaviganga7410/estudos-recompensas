@@ -29,6 +29,11 @@ function createDefaultState() {
             description: '',
             public: false
         },
+        stats: {
+            dailiesDone: 0,
+            epicsDone: 0,
+            purchases: 0
+        },
         onboardingComplete: false
     };
 }
@@ -74,6 +79,7 @@ function saveGuestState() {
             cd: state.cd,
             slots: state.slots,
             profile: state.profile,
+            stats: state.stats,
             prefs: state.prefs,
             onboardingComplete: state.onboardingComplete
         };
@@ -105,6 +111,7 @@ function applyRemoteState(data) {
     state.prefs = data.prefs || {};
     state.profile = data.profile || { epicGoal: '', bannerUrl: '', displayName: '', description: '', public: false };
     if (state.profile.description === undefined) state.profile.description = '';
+    state.stats = data.stats || { dailiesDone: 0, epicsDone: 0, purchases: 0 };
     state.diagnostic = data.diagnostic ? { ...data.diagnostic } : undefined;
     state.onboardingComplete = data.onboardingComplete === true
         || (data.onboardingComplete === undefined && (

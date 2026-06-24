@@ -56,14 +56,14 @@ function openDiagnosticDialog() {
             <h3>📋 Diagnóstico de Perfil</h3>
             <button class="dialog-close-btn" onclick="closeDiagnosticDialog()">×</button>
         </div>
-        <div class="dialog-body" style="padding:1.25rem;">
-            <p style="margin:0 0 1.25rem;line-height:1.5;color:var(--muted);font-size:0.82rem;text-align:center;font-weight:700;">
+        <div class="dialog-body" style="padding:0.75rem;">
+            <p style="margin:0 0 0.75rem;line-height:1.5;color:var(--muted);font-size:0.82rem;text-align:center;font-weight:700;">
                 Responda para conectar-se a outros estudantes com perfil semelhante.
                 Suas respostas são <strong>confidenciais</strong>.
             </p>
-            <div id="diag-progress" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:1.25rem;"></div>
+            <div id="diag-progress" style="display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:0.75rem;"></div>
             <div id="diag-step" style="overflow-y:auto;flex:1;min-height:0;margin-bottom:0.5rem;"></div>
-            <div style="display:flex;gap:0.75rem;margin-top:0.75rem;">
+            <div style="display:flex;gap:0.75rem;margin-top:0.5rem;">
                 <button class="btn-theme" id="diag-prev" onclick="diagPrev()" style="flex:1;">⬅ Voltar</button>
                 <button class="btn-theme" id="diag-next" onclick="diagNext()" style="flex:1;">Próximo ➡</button>
             </div>
@@ -305,5 +305,6 @@ async function submitDiagnostic() {
     markPersistentDiagSeen();
     renderNotificationBadge();
     await refreshNotifications();
+    generateOneNotification();
     scheduleDiagReminder();
 }

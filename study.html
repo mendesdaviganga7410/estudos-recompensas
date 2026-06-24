@@ -91,7 +91,7 @@
 
         .mode-toggle {
             display: flex;
-            gap: 0;
+            gap: 0.5rem;
         }
         .mode-btn {
             padding: 0.55rem 1.2rem;
@@ -100,37 +100,28 @@
             text-transform: uppercase;
             letter-spacing: 0.03em;
             cursor: pointer;
-            background: var(--panel);
-            color: var(--muted);
+            background: var(--surface);
+            color: var(--text);
             border: 3px solid var(--stroke);
-            box-shadow: 3px 3px 0 var(--shadow-color);
-            transition: transform 0.1s, box-shadow 0.1s, background 0.1s, color 0.1s, border-color 0.1s;
-            position: relative;
-        }
-        .mode-btn:first-child {
-            border-radius: var(--element-radius) 0 0 var(--element-radius);
-            border-right-width: 2px;
-        }
-        .mode-btn:last-child {
-            border-radius: 0 var(--element-radius) var(--element-radius) 0;
-            border-left-width: 2px;
+            border-radius: var(--element-radius);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s, color 0.1s;
         }
         .mode-btn:hover {
             transform: translate(-1px, -1px);
-            box-shadow: 4px 4px 0 var(--shadow-color);
-            z-index: 1;
+            box-shadow: 4px 4px 0px var(--shadow-color);
         }
         .mode-btn:active {
-            transform: translate(1px, 1px);
-            box-shadow: 2px 2px 0 var(--shadow-color);
-            z-index: 1;
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
         }
         .mode-btn.active {
-            background: var(--surface);
-            color: var(--text);
+            background: var(--accent);
+            color: var(--accent-text);
             border-color: var(--accent);
-            box-shadow: 3px 3px 0 var(--shadow-color);
-            z-index: 2;
+        }
+        .mode-btn.active:hover {
+            box-shadow: 4px 4px 0px var(--shadow-color);
         }
 
         .pomo-config {

@@ -65,7 +65,12 @@ function onNotifClick(uid, nid) {
     if (uid) openProfileModal(uid);
 
     const n = __notifications.find(x => x.id === nid);
-    if (n) n.seen = true;
+    if (n && !n.seen) {
+        n.seen = true;
+        __unreadCount = __notifications.filter(x => !x.seen).length;
+        __saveNotifs();
+        renderNotificationBadge();
+    }
 }
 
 function openNotificationPanel() {
@@ -119,6 +124,20 @@ function openNotificationPanel() {
         }
     }
 
+    // Item de diagnóstico — sempre a última mensagem na barra
+    if (window.currentUser) {
+        const diagText = hasDiagnostic()
+            ? '📋 Meu Diagnóstico de Perfil — clique para ver ou editar'
+            : '📋 Diagnóstico de Perfil — responda para conectar-se';
+        content += `<div class="notif-item notif-item-persistent" onclick="onNotifDiagClick()">
+            <span class="notif-persistent-icon">📋</span>
+            <div class="notif-body">
+                <div class="notif-text">${diagText}</div>
+                <div class="notif-time">sempre</div>
+            </div>
+        </div>`;
+    }
+
     content += `</div>`;
     panel.innerHTML = content;
     wrap.appendChild(panel);
@@ -127,8 +146,6 @@ function openNotificationPanel() {
     requestAnimationFrame(() => { wrap.classList.add("open"); panel.classList.add("open"); });
     __panelOpen = true;
 
-    __notifications.forEach(n => n.seen = true);
-    __unreadCount = 0;
     renderNotificationBadge();
 }
 

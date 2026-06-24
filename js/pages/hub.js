@@ -91,6 +91,14 @@ function renderHeroHub() {
 
     const ptsEl = $hero('hero-pts');
     if (ptsEl) ptsEl.textContent = `${window.state.pts} Pts`;
+
+    const stats = window.state.stats || {};
+    const statDailies = document.getElementById('stat-dailies');
+    const statEpics = document.getElementById('stat-epics');
+    const statPurchases = document.getElementById('stat-purchases');
+    if (statDailies) statDailies.textContent = stats.dailiesDone || 0;
+    if (statEpics) statEpics.textContent = stats.epicsDone || 0;
+    if (statPurchases) statPurchases.textContent = stats.purchases || 0;
 }
 
 window.renderHeroHub = renderHeroHub;

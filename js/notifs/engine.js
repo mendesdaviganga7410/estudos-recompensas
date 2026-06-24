@@ -5,6 +5,32 @@ let __refreshTimer = null;
 let __diagnosticAnswered = false;
 let __persistentDiagNotif = null;
 let __cachedMatches = [];
+let __lastGenTime = 0;
+const __NOTIF_STORAGE_KEY = 'neuroflow_notifs_v1';
+
+function __saveNotifs() {
+    try {
+        localStorage.setItem(__NOTIF_STORAGE_KEY, JSON.stringify({
+            notifications: __notifications,
+            unreadCount: __unreadCount,
+            lastGenTime: __lastGenTime
+        }));
+    } catch (e) { /* ignore */ }
+}
+
+function __loadNotifs() {
+    try {
+        const raw = localStorage.getItem(__NOTIF_STORAGE_KEY);
+        if (raw) {
+            const data = JSON.parse(raw);
+            __notifications = data.notifications || [];
+            __unreadCount = data.unreadCount || 0;
+            __lastGenTime = data.lastGenTime || 0;
+            return true;
+        }
+    } catch (e) { /* ignore */ }
+    return false;
+}
 
 function calcAgeGroup(birthYear) {
     if (!birthYear) return -1;
@@ -264,8 +290,10 @@ function generateOneNotification() {
         seen: false,
         persistent: false
     });
+    __lastGenTime = Date.now();
     __unreadCount = __notifications.filter(n => !n.seen).length;
     renderNotificationBadge();
+    __saveNotifs();
     if (__panelOpen && $n("notif-panel")) { $n("notif-panel").remove(); openNotificationPanel(); }
 }
 
@@ -302,6 +330,8 @@ function markPersistentDiagSeen() {
 function clearAllNotifications() {
     __notifications = [];
     __unreadCount = 0;
+    __lastGenTime = 0;
+    __saveNotifs();
     renderNotificationBadge();
     if (__panelOpen && $n("notif-panel")) {
         $n("notif-panel").remove();

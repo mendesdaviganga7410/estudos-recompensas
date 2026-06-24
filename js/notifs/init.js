@@ -37,8 +37,10 @@ async function initNotifications() {
         __persistentDiagNotif = null;
         __notifications = [];
         __unreadCount = 0;
+        __lastGenTime = 0;
         __cachedMatches = [];
         __diagAnswers = {};
+        __saveNotifs();
         renderNotificationBadge();
         setTimeout(showDiagnosticPrompt, 1500);
         scheduleDiagnosticPrompt();
@@ -47,10 +49,22 @@ async function initNotifications() {
 
     __diagnosticAnswered = hasDiagnostic();
 
+    // Restaura notificações salvas para não perdê-las entre páginas
+    const hadSaved = __loadNotifs();
+
     if (hasDiagnostic()) {
         initPersistentDiagNotif();
-        renderNotificationBadge();
         await refreshNotifications();
+
+        // Gera no máximo 1 notificação, só se não houver nenhuma salva e já passaram 12h
+        if (!hadSaved && __notifications.length === 0 && Date.now() - __lastGenTime > 12 * 60 * 60 * 1000) {
+            generateOneNotification();
+        } else {
+            // Mantém o seen state salvo e atualiza o badge
+            __unreadCount = __notifications.filter(n => !n.seen).length;
+            renderNotificationBadge();
+        }
+
         scheduleDiagReminder();
     } else {
         __persistentDiagNotif = null;
@@ -85,8 +99,10 @@ async function resetAllDiagnostics() {
     __persistentDiagNotif = null;
     __notifications = [];
     __unreadCount = 0;
+    __lastGenTime = 0;
     __cachedMatches = [];
     __diagAnswers = {};
+    __saveNotifs();
     if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
 
     try {
@@ -144,6 +160,8 @@ window.generateOneNotification  = generateOneNotification;
                 __cachedMatches = [];
                 __notifications = [];
                 __unreadCount = 0;
+                __lastGenTime = 0;
+                localStorage.removeItem('neuroflow_notifs_v1');
                 if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
                 renderNotificationBadge();
             }

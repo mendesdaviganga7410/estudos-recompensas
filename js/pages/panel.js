@@ -145,6 +145,8 @@ function task(id, type, success) {
     if (success) {
         state.pts += t.pts;
         state.xp  += t.xp;
+        if (type === 'd') state.stats.dailiesDone = (state.stats.dailiesDone || 0) + 1;
+        if (type === 'e') state.stats.epicsDone = (state.stats.epicsDone || 0) + 1;
         toast(`+${t.xp} XP / +${t.pts} Pts adicionados.`);
     } else {
         const penalty = t.fXp || 0;
@@ -171,6 +173,7 @@ function buy(id) {
 
     state.pts     -= p.cost;
     state.cd[p.id] = now;
+    state.stats.purchases = (state.stats.purchases || 0) + 1;
 
     toast(`Item adquirido: ${p.name} 🎉`);
     render();

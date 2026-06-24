@@ -45,6 +45,7 @@ export async function saveStateToFirestore(userId, fullState, partial) {
         cd: s.cd || {},
         prefs: s.prefs || {},
         profile: s.profile || {},
+        stats: s.stats || {},
         slots: s.slots || {},
         onboardingComplete: !!s.onboardingComplete,
         updatedAt: Date.now(),
