@@ -14,6 +14,7 @@ dist-ssr
 *.local
 
 # Scripts and Environment
+scripts/git-enviar.sh
 .env
 .agents/
 .env.*
