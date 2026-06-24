@@ -4,7 +4,8 @@
 import {
     db,
     doc, getDoc, setDoc,
-    collection, query, where, getDocs
+    collection, query, where, getDocs,
+    orderBy, limit, deleteDoc
 } from "./init.js";
 
 export async function syncUserData(userId) {
@@ -94,7 +95,74 @@ export async function fetchPublicProfiles(max = 50) {
     }
 }
 
-window.syncUserData          = syncUserData;
-window.saveStateToFirestore  = saveStateToFirestore;
-window.completeOnboarding    = completeOnboarding;
-window.fetchPublicProfiles   = fetchPublicProfiles;
+// ================================================================
+//  HISTÓRICO DE ESTUDOS — subcoleção users/{uid}/studySessions
+// ================================================================
+
+export async function saveStudySession(userId, session) {
+    if (!db) return;
+    try {
+        const ref = doc(db, "users", userId, "studySessions", String(session.id));
+        await setDoc(ref, {
+            ...session,
+            uid: userId,
+            savedAt: Date.now()
+        });
+    } catch (err) {
+        console.error("Erro ao salvar sessão de estudo:", err);
+    }
+}
+
+export async function loadStudySessions(userId, max = 200) {
+    if (!db) return [];
+    try {
+        const ref = collection(db, "users", userId, "studySessions");
+        const q = query(ref, orderBy("timestamp", "desc"), limit(max));
+        const snap = await getDocs(q);
+        return snap.docs.map(d => d.data());
+    } catch (err) {
+        console.error("Erro ao carregar sessões de estudo:", err);
+        return [];
+    }
+}
+
+export async function deleteAllStudySessions(userId) {
+    if (!db) return;
+    try {
+        const ref = collection(db, "users", userId, "studySessions");
+        const snap = await getDocs(ref);
+        const deletions = snap.docs.map(d => deleteDoc(d.ref));
+        await Promise.all(deletions);
+    } catch (err) {
+        console.error("Erro ao limpar histórico de estudos:", err);
+    }
+}
+
+export async function migrateStudySessions(userId) {
+    if (!db) return 0;
+    try {
+        const existing = await loadStudySessions(userId, 1);
+        if (existing.length > 0) return 0; // já migrado
+
+        const raw = localStorage.getItem("historico_estudos");
+        if (!raw) return 0;
+        const list = JSON.parse(raw);
+        if (!Array.isArray(list) || list.length === 0) return 0;
+
+        const saves = list.map(s => saveStudySession(userId, s));
+        await Promise.all(saves);
+        return list.length;
+    } catch (err) {
+        console.error("Erro na migração do histórico:", err);
+        return 0;
+    }
+}
+
+window.saveStudySession           = saveStudySession;
+window.loadStudySessions          = loadStudySessions;
+window.deleteAllStudySessions     = deleteAllStudySessions;
+window.migrateStudySessions       = migrateStudySessions;
+window.syncUserData               = syncUserData;
+window.saveStateToFirestore       = saveStateToFirestore;
+window.completeOnboarding         = completeOnboarding;
+window.fetchPublicProfiles        = fetchPublicProfiles;

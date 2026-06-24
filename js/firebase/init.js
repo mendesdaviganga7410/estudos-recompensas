@@ -18,7 +18,7 @@ let createUserWithEmailAndPassword, signInWithEmailAndPassword;
 let updateProfile, updateEmail, updatePassword;
 let sendEmailVerification, sendPasswordResetEmail;
 
-let doc, getDoc, setDoc, collection, query, where, getDocs;
+let doc, getDoc, setDoc, addDoc, collection, query, where, getDocs, orderBy, limit, deleteDoc, writeBatch;
 
 try {
     const fa = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js");
@@ -44,10 +44,15 @@ try {
     doc        = fs.doc;
     getDoc     = fs.getDoc;
     setDoc     = fs.setDoc;
+    addDoc     = fs.addDoc;
     collection = fs.collection;
     query      = fs.query;
     where      = fs.where;
     getDocs    = fs.getDocs;
+    orderBy    = fs.orderBy;
+    limit      = fs.limit;
+    deleteDoc  = fs.deleteDoc;
+    writeBatch = fs.writeBatch;
 } catch (_) {
     /* Firebase bloqueado ou indisponível — tudo permanece undefined */
 }
@@ -58,5 +63,6 @@ export {
     createUserWithEmailAndPassword, signInWithEmailAndPassword,
     updateProfile, updateEmail, updatePassword,
     sendEmailVerification, sendPasswordResetEmail,
-    doc, getDoc, setDoc, collection, query, where, getDocs
+    doc, getDoc, setDoc, addDoc, collection, query, where, getDocs,
+    orderBy, limit, deleteDoc, writeBatch
 };

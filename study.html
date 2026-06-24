@@ -2061,8 +2061,27 @@
                 list.unshift(session);
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
                 this._renderHistory();
+
+                // Sincroniza com a nuvem se logado
+                if (!window.isGuestMode && window.currentUser && window.saveStudySession) {
+                    window.saveStudySession(window.currentUser.uid, session)
+                        .catch(e => console.warn('Falha ao salvar sessão na nuvem:', e));
+                }
             } catch (e) {
                 console.warn('Erro ao salvar historico:', e);
+            }
+        },
+
+        async _syncFromCloud() {
+            if (window.isGuestMode || !window.currentUser || !window.loadStudySessions) return;
+            try {
+                const remote = await window.loadStudySessions(window.currentUser.uid);
+                if (remote && remote.length > 0) {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(remote));
+                    this._renderHistory();
+                }
+            } catch (e) {
+                console.warn('Erro ao carregar histórico da nuvem:', e);
             }
         },
 
@@ -2124,6 +2143,10 @@
             if (!confirm('Tem certeza? Todo o histórico de sessões será apagado permanentemente.')) return;
             localStorage.removeItem(STORAGE_KEY);
             this._renderHistory();
+            if (!window.isGuestMode && window.currentUser && window.deleteAllStudySessions) {
+                window.deleteAllStudySessions(window.currentUser.uid)
+                    .catch(e => console.warn('Falha ao limpar histórico na nuvem:', e));
+            }
             window.toast?.('🗑 Histórico limpo.');
         },
 
@@ -2321,6 +2344,8 @@
     function showHistorySortDialog() { studyTimer.showHistorySortDialog(); }
     function selectHistorySort(val) { studyTimer.selectHistorySort(val); }
     function closeHistorySortDialog() { studyTimer.closeHistorySortDialog(); }
+    function clearStudyHistory() { studyTimer.clearHistory(); }
+    window.clearStudyHistory = clearStudyHistory;
 
     // Inicializa ao carregar o conteudo
     function renderStudy() {
@@ -2342,6 +2367,19 @@
         studyTimer._renderHistory();
         studyTimer._updatePomoUI();
         if (window.updateGuestUI) window.updateGuestUI();
+
+        // Sincroniza com nuvem se logado
+        if (!window.isGuestMode && window.currentUser) {
+            setTimeout(async () => {
+                // Migra dados locais para nuvem (só na primeira vez)
+                if (window.migrateStudySessions) {
+                    const count = await window.migrateStudySessions(window.currentUser.uid);
+                    if (count > 0) window.toast?.(`☁️ ${count} sessões sincronizadas com a nuvem!`);
+                }
+                // Carrega dados da nuvem
+                await studyTimer._syncFromCloud();
+            }, 300);
+        }
     }
 
     window.renderStudy = renderStudy;
