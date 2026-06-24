@@ -1,0 +1,29 @@
+{
+  "name": "neuroflow",
+  "version": "1.0.0",
+  "description": "Gerenciador de tarefas gamificado e focado em produtividade.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mendesdaviganga7410/estudos-recompensas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/mendesdaviganga7410/estudos-recompensas/issues"
+  },
+  "homepage": "https://github.com/mendesdaviganga7410/estudos-recompensas#readme",
+  "devDependencies": {
+    "vite": "^8.1.0"
+  }
+}

@@ -11,11 +11,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
-    <link rel="stylesheet" href="css/base.css">
-    <link rel="stylesheet" href="css/components.css">
-    <link rel="stylesheet" href="css/layout.css">
-    <link rel="stylesheet" href="css/modals.css">
-    <link rel="stylesheet" href="css/hero.css">
+    <link rel="stylesheet" href="src/styles/global/base.css">
+    <link rel="stylesheet" href="src/styles/components/components.css">
+    <link rel="stylesheet" href="src/styles/global/layout.css">
+    <link rel="stylesheet" href="src/styles/components/modals.css">
+    <link rel="stylesheet" href="src/styles/pages/hero.css">
 </head>
 
 <body data-theme="light" class="guest-mode">
@@ -381,25 +381,25 @@
     </dialog>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
-    <script src="js/templates.js"></script>
-    <script src="js/state.js"></script>
-    <script type="module" src="js/firebase/init.js"></script>
-    <script type="module" src="js/firebase/db.js"></script>
-    <script type="module" src="js/firebase/auth.js"></script>
-    <script src="js/ui/toast.js"></script>
-    <script src="js/ui/theme.js"></script>
-    <script src="js/ui/modals.js"></script>
-    <script src="js/notifs/diagnostic-data.js"></script>
-    <script src="js/notifs/messages.js"></script>
-    <script src="js/notifs/engine.js"></script>
-    <script src="js/notifs/diagnostic-ui.js"></script>
-    <script src="js/notifs/ui.js"></script>
-    <script src="js/notifs/init.js"></script>
-    <script src="js/ui/settings-modal.js"></script>
-    <script src="js/ui/media.js"></script>
-    <script src="js/router.js"></script>
-    <script src="js/pages/hub.js"></script>
-    <script src="js/onboarding.js"></script>
+    <script src="src/shared/templates/templates.js"></script>
+    <script src="src/core/state.js"></script>
+    <script type="module" src="src/core/firebase/init.js"></script>
+    <script type="module" src="src/core/firebase/db.js"></script>
+    <script type="module" src="src/core/firebase/auth.js"></script>
+    <script src="src/shared/ui/toast.js"></script>
+    <script src="src/shared/ui/theme.js"></script>
+    <script src="src/shared/ui/modals.js"></script>
+    <script src="src/features/notifications/diagnostic-data.js"></script>
+    <script src="src/features/notifications/messages.js"></script>
+    <script src="src/features/notifications/engine.js"></script>
+    <script src="src/features/notifications/diagnostic-ui.js"></script>
+    <script src="src/features/notifications/ui.js"></script>
+    <script src="src/features/notifications/init.js"></script>
+    <script src="src/shared/ui/settings-modal.js"></script>
+    <script src="src/shared/ui/media.js"></script>
+    <script src="src/core/router.js"></script>
+    <script src="src/pages/hub/hub.js"></script>
+    <script src="src/features/onboarding/onboarding.js"></script>
     <script>document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('admin-btn');if(b&&window.isAdmin)b.style.display='';});</script>
 </body>
 
