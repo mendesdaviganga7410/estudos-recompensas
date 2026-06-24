@@ -15,6 +15,7 @@ dist-ssr
 
 # Scripts and Environment
 .env
+.agents/
 .env.*
 !.env.example
 
