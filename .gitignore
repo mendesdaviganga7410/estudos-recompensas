@@ -16,7 +16,6 @@ dist-ssr
 # Scripts and Environment
 scripts/git-enviar.sh
 .env
-.agents/
 .env.*
 !.env.example
 
