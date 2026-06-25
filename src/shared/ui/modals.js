@@ -217,11 +217,6 @@ async function renderPublicProfiles() {
         console.error("renderPublicProfiles fetch error:", err);
     }
 
-    console.log(`Comunidade: ${profiles.length} perfis públicos encontrados`);
-    if (profiles.length) {
-        profiles.forEach((p, i) => console.log(`  ${i+1}: ${p.profile?.displayName || 'sem nome'} (${p.uid}) public=${p.profile?.public}`));
-    }
-
     if (!profiles.length) {
         grid.innerHTML = `<div class="community-empty" style="text-align:center;padding:3rem 1rem;color:var(--muted);font-size:0.85rem;font-weight:700;line-height:1.5;">Nenhum perfil público encontrado ainda.<br>🌐 Seja o primeiro a aparecer aqui!</div>`;
         return;
@@ -692,7 +687,7 @@ function adminUnlockAllItems() {
 function adminClearStudyHistory() { if (window.clearStudyHistory) window.clearStudyHistory(); else window.toast?.('Função não disponível nesta página.', true); }
 function adminAddFakeSession() {
     try {
-        const history = JSON.parse(localStorage.getItem('neuroflow_study_history') || '[]');
+        const history = JSON.parse(localStorage.getItem('historico_estudos') || '[]');
         const now = Date.now();
         const duration = Math.floor(Math.random() * 3600) + 600;
         history.push({
@@ -703,7 +698,7 @@ function adminAddFakeSession() {
             timestamp: now,
             note: 'Sessão administrativa'
         });
-        localStorage.setItem('neuroflow_study_history', JSON.stringify(history));
+        localStorage.setItem('historico_estudos', JSON.stringify(history));
         if (window.studyTimer && typeof window.studyTimer._renderHistory === 'function') window.studyTimer._renderHistory();
         window.toast?.('📖 Sessão falsa adicionada ao histórico!');
     } catch(e) { window.toast?.('Erro: ' + e.message, true); }
@@ -758,6 +753,7 @@ function adminFetchProfiles() {
     })();
 }
 
+window.escapeHtml               = escapeHtml;
 window.openAdminPanel          = openAdminPanel;
 window.closeAdminPanel         = closeAdminPanel;
 window.openAuthModal            = openAuthModal;

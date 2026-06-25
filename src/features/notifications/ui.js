@@ -96,7 +96,7 @@ function openNotificationPanel() {
     let content = `<div class="notif-panel-header">
         <h3>🔔 Notificações</h3>
         <div class="notif-header-actions">
-            ${hasDiagnostic() && __notifications.length > 0 ? '<button class="notif-delete-all-btn" onclick="event.stopPropagation();deleteAllNotifications()" title="Limpar notificações">🗑️</button>' : ''}
+            ${hasDiagnostic() && __notifications.some(n => !n.persistent) ? '<button class="notif-delete-all-btn" onclick="event.stopPropagation();deleteAllNotifications()" title="Limpar notificações">🗑️</button>' : ''}
             <button class="dialog-close-btn" onclick="closeNotificationPanel()">×</button>
         </div>
     </div>
@@ -113,29 +113,9 @@ function openNotificationPanel() {
             </div>
         </div>`;
     } else {
-        if (__notifications.length > 0) {
-            __notifications.forEach(n => {
-                content += renderNotifItem(n);
-            });
-        }
-
-        if (__notifications.length === 0) {
-            content += `<div class="notif-empty">Nenhuma notificação no momento. Volte mais tarde!</div>`;
-        }
-    }
-
-    // Item de diagnóstico — sempre a última mensagem na barra
-    if (window.currentUser) {
-        const diagText = hasDiagnostic()
-            ? '📋 Meu Diagnóstico de Perfil — clique para ver ou editar'
-            : '📋 Diagnóstico de Perfil — responda para conectar-se';
-        content += `<div class="notif-item notif-item-persistent" onclick="onNotifDiagClick()">
-            <span class="notif-persistent-icon">📋</span>
-            <div class="notif-body">
-                <div class="notif-text">${diagText}</div>
-                <div class="notif-time">sempre</div>
-            </div>
-        </div>`;
+        __notifications.forEach(n => {
+            content += renderNotifItem(n);
+        });
     }
 
     content += `</div>`;

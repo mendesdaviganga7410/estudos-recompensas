@@ -90,7 +90,6 @@ async function fetchAndRenderProfiles(searchTerm) {
         communityProfiles = [];
     }
 
-    console.log(`Comunidade: ${communityProfiles.length} perfis públicos encontrados`);
     renderHeroCount();
     if (controls) controls.style.display = "flex";
 
@@ -133,7 +132,7 @@ function applyFiltersAndRender(searchTerm) {
         grid.innerHTML = `
             <div class="community-empty">
                 <span class="empty-icon">🔍</span>
-                <strong>Nenhum herói encontrado para "${escapeHtmlCom(term)}"</strong><br>
+                <strong>Nenhum herói encontrado para "${window.escapeHtml(term)}"</strong><br>
                 <span style="font-size:0.8rem;">Tente um termo de busca diferente.</span>
             </div>
         `;
@@ -156,15 +155,15 @@ function applyFiltersAndRender(searchTerm) {
 
         return `
             <div class="player-card" data-idx="${idx}">
-                <div class="player-banner" style="background-image:${bannerUrl ? `url(${escapeHtmlCom(bannerUrl)})` : "linear-gradient(135deg, var(--panel) 0%, var(--bg) 100%)"};">
+                <div class="player-banner" style="background-image:${bannerUrl ? `url(${window.escapeHtml(bannerUrl)})` : "linear-gradient(135deg, var(--panel) 0%, var(--bg) 100%)"};">
                     <div class="player-banner-overlay"></div>
                 </div>
                 <div class="player-card-body">
-                    <img class="player-card-avatar" src="${escapeHtmlCom(avatarUrl)}" alt="" loading="lazy">
-                    <div class="player-card-name">${escapeHtmlCom(displayName)}</div>
-                    ${epicGoal ? `<div class="player-card-goal">"${escapeHtmlCom(epicGoal)}"</div>` : '<div class="player-card-goal">&nbsp;</div>'}
+                    <img class="player-card-avatar" src="${window.escapeHtml(avatarUrl)}" alt="" loading="lazy">
+                    <div class="player-card-name">${window.escapeHtml(displayName)}</div>
+                    ${epicGoal ? `<div class="player-card-goal">"${window.escapeHtml(epicGoal)}"</div>` : '<div class="player-card-goal">&nbsp;</div>'}
                     <div class="player-card-stats">
-                        <span>${tier.i} ${escapeHtmlCom(tier.name)}</span>
+                        <span>${tier.i} ${window.escapeHtml(tier.name)}</span>
                         <span>${p.xp || 0} XP</span>
                         <span>${p.pts || p.pontos || 0} Pts</span>
                     </div>
@@ -198,9 +197,7 @@ function onCommunitySearch() {
 
 function onCommunitySort() { applyFiltersAndRender(); }
 
-function escapeHtmlCom(str) {
-    return String(str ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-}
+
 
 /* =====================================================================
    Profile Detail — página cheia idêntica ao Hub (só leitura)

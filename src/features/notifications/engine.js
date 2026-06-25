@@ -261,6 +261,9 @@ function generateOneNotification() {
 
     if (pool.length === 0) return;
 
+    // Remove notificações não-persistentes anteriores (apenas 1 por vez)
+    __notifications = __notifications.filter(n => n.persistent);
+
     const match = pool[Math.floor(Math.random() * pool.length)];
     const shuffled = Array.from({ length: MESSAGE_GENERATORS.length }, (_, i) => i)
         .sort(() => Math.random() - 0.5);
@@ -302,9 +305,14 @@ function generateOneNotification() {
 function initPersistentDiagNotif() {
     if (!hasDiagnostic() || !window.currentUser) {
         __persistentDiagNotif = null;
+        __notifications = __notifications.filter(n => n.id !== 'diag-persistent');
         return;
     }
-    if (__persistentDiagNotif) return;
+    const existing = __notifications.find(n => n.id === 'diag-persistent');
+    if (existing) {
+        __persistentDiagNotif = existing;
+        return;
+    }
     __persistentDiagNotif = {
         id: 'diag-persistent',
         type: 'diagnosis',
@@ -314,22 +322,24 @@ function initPersistentDiagNotif() {
         seen: true,
         persistent: true
     };
+    __notifications.push(__persistentDiagNotif);
 }
 
 function getPersistentDiagNotif() {
-    return __persistentDiagNotif;
+    return __notifications.find(n => n.id === 'diag-persistent') || null;
 }
 
 function markPersistentDiagSeen() {
-    if (__persistentDiagNotif) {
-        __persistentDiagNotif.seen = true;
+    const diag = __notifications.find(n => n.id === 'diag-persistent');
+    if (diag) {
+        diag.seen = true;
         renderNotificationBadge();
     }
 }
 
 function clearAllNotifications() {
-    __notifications = [];
-    __unreadCount = 0;
+    __notifications = __notifications.filter(n => n.persistent);
+    __unreadCount = __notifications.filter(n => !n.seen).length;
     __lastGenTime = 0;
     __saveNotifs();
     renderNotificationBadge();

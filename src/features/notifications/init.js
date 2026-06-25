@@ -9,7 +9,13 @@ function scheduleDiagReminder() {
     if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
     if (!window.currentUser || !hasDiagnostic()) return;
 
-    const delay = getDiagInterval();
+    const now = new Date();
+    const h = now.getHours();
+    const targetHour = h < 12 ? 12 : 24;
+    const next = new Date(now);
+    next.setHours(targetHour, 0, 0, 0);
+    const delay = next.getTime() - now.getTime();
+
     __diagReminderTimer = setTimeout(() => {
         if (window.currentUser && hasDiagnostic()) {
             generateOneNotification();
@@ -57,7 +63,7 @@ async function initNotifications() {
         await refreshNotifications();
 
         // Gera no máximo 1 notificação, só se não houver nenhuma salva e já passaram 12h
-        if (!hadSaved && __notifications.length === 0 && Date.now() - __lastGenTime > 12 * 60 * 60 * 1000) {
+        if (!hadSaved && !__notifications.some(n => !n.persistent) && Date.now() - __lastGenTime > 12 * 60 * 60 * 1000) {
             generateOneNotification();
         } else {
             // Mantém o seen state salvo e atualiza o badge
@@ -68,6 +74,7 @@ async function initNotifications() {
         scheduleDiagReminder();
     } else {
         __persistentDiagNotif = null;
+        __notifications = __notifications.filter(n => n.id !== 'diag-persistent');
         renderNotificationBadge();
         setTimeout(showDiagnosticPrompt, 3000);
     }

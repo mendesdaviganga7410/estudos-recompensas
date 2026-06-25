@@ -184,7 +184,7 @@ window.task = task;
 window.buy  = buy;
 
 if (window.isPainelPage?.() || document.getElementById('rDailies')) {
-    window.onload = () => {
+    document.addEventListener('DOMContentLoaded', () => {
         if (window.updateGuestUI) window.updateGuestUI();
-    };
+    });
 }

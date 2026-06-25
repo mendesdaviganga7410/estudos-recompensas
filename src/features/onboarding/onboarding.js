@@ -11,13 +11,7 @@ let onboardingCropper = null;
 let onboardingCropTarget = null;
 let isFinishing = false;
 
-function escapeHtml(str) {
-    return String(str ?? '')
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;');
-}
+
 
 function createOnboardingDraft() {
     return {
@@ -197,18 +191,18 @@ function renderWizardCard() {
 
     card.innerHTML = `
         <div style="display:flex;align-items:center;gap:0.75rem;flex-wrap:wrap;">
-            <span class="wizard-category">${escapeHtml(getCategoryLabel(step.category))}</span>
+            <span class="wizard-category">${window.escapeHtml(getCategoryLabel(step.category))}</span>
             <div class="badges" style="margin-left:auto;">${econBadges}</div>
         </div>
         <h3 class="wizard-question">Como quer nomear esta missão?</h3>
-        <p class="wizard-default">Padrão: <strong>${escapeHtml(defaults.name)}</strong>${defaults.desc ? ` — ${escapeHtml(defaults.desc)}` : ''}</p>
+        <p class="wizard-default">Padrão: <strong>${window.escapeHtml(defaults.name)}</strong>${defaults.desc ? ` — ${window.escapeHtml(defaults.desc)}` : ''}</p>
 
         <div class="wizard-options">
             <button type="button" class="btn-theme w-full wizard-opt" data-wizard-action="default">✓ Manter Texto Padrão</button>
             ${presets.map((p, i) => `
                 <button type="button" class="btn-theme w-full wizard-opt preset-opt" data-wizard-action="preset" data-preset-index="${i}">
-                    <span class="preset-profile">${escapeHtml(p.profile)}</span>
-                    <span class="preset-name">${escapeHtml(p.name)}</span>
+                    <span class="preset-profile">${window.escapeHtml(p.profile)}</span>
+                    <span class="preset-name">${window.escapeHtml(p.name)}</span>
                 </button>
             `).join('')}
         </div>
@@ -216,8 +210,8 @@ function renderWizardCard() {
         <details class="wizard-custom-section">
             <summary class="btn-theme w-full" style="justify-content:center;font-size:0.8rem;">✏️ Criar título personalizado</summary>
             <div style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem;">
-                <input type="text" id="wizard-custom-name" placeholder="Título personalizado" value="${escapeHtml(current.name !== defaults.name ? current.name : '')}">
-                ${step.hasDesc ? `<input type="text" id="wizard-custom-desc" placeholder="Descrição personalizada" value="${escapeHtml(current.desc && current.desc !== defaults.desc ? current.desc : '')}">` : ''}
+                <input type="text" id="wizard-custom-name" placeholder="Título personalizado" value="${window.escapeHtml(current.name !== defaults.name ? current.name : '')}">
+                ${step.hasDesc ? `<input type="text" id="wizard-custom-desc" placeholder="Descrição personalizada" value="${window.escapeHtml(current.desc && current.desc !== defaults.desc ? current.desc : '')}">` : ''}
                 <button type="button" class="btn-theme w-full" style="justify-content:center;" data-wizard-action="custom">Salvar</button>
             </div>
         </details>
