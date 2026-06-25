@@ -1,5 +1,5 @@
 # NeuroFlow — Regras do Projeto para Agentes de IA
-**Versão:** 2.0 | **Última atualização:** 2026-06-25
+**Versão:** 2.3 | **Última atualização:** 2026-06-25
 
 > **ATENÇÃO TOTAL, AGENTE DE IA:** Leia este arquivo **integralmente** antes de qualquer ação. Assuma a persona de um **Arquiteto de Software Sênior / Engenheiro Staff+**. Qualquer violação das regras abaixo é inaceitável.
 
@@ -172,7 +172,7 @@ const escapeHtml = str => window.escapeHtml(str); // SyntaxError!
 #### De `state.js`
 | Global | Tipo | Descrição |
 |---|---|---|
-| `window.state` | Object | Estado do usuário (pts, xp, cd, prefs, profile, stats, slots, diagnostic, onboardingComplete) |
+| `window.state` | Object | Estado do usuário (pts, xp, cd, prefs, profile, stats, slots, diagnostic, dailyLog, weeklyLog, lastDailyDate, onboardingComplete) |
 | `window.TIERS` | Array[12] | Tiers Bronze → Diamante Negro |
 | `window.GUEST_STORAGE_KEY` | String | `'neuroflow_guest_v2'` |
 | `window.isGuestMode` | Boolean | true se visitante |
@@ -184,11 +184,16 @@ const escapeHtml = str => window.escapeHtml(str); // SyntaxError!
 | `window.createDefaultState` | Function | Cria snapshot padrão |
 | `window.applyRemoteState(data)` | Function | Sincroniza dados do Firestore para state |
 | `window.saveState()` | Function | Persiste state (Firestore ou localStorage) |
+| `window.getLocalDateStr(d)` | Function | Retorna data local "YYYY-MM-DD" de um Date |
 | `window.saveGuestState()` | Function | Persiste no localStorage (só guest) |
 | `window.loadGuestState()` | Function | Carrega do localStorage |
 | `window.getMergedLists()` | Function | Retorna {dailies, epics, shop} |
 | `window.ativarAdmin()` | Function | Ativa modo admin via console |
 | `window.desativarAdmin()` | Function | Desativa modo admin |
+| `window.getTodayStr()` | Function | Retorna data atual "YYYY-MM-DD" |
+| `window.getYesterdayStr()` | Function | Retorna data de ontem "YYYY-MM-DD" |
+| `window.getWeekStr(date)` | Function | Retorna semana ISO "YYYY-WNN" |
+| `window.calcStreak()` | Function | Calcula ofensiva atual do dailyLog |
 
 #### De `router.js`
 | Global | Tipo | Descrição |
@@ -346,9 +351,14 @@ const escapeHtml = str => window.escapeHtml(str); // SyntaxError!
   stats: {
     dailiesDone: Number,
     epicsDone: Number,
-    purchases: Number
+    purchases: Number,
+    currentStreak: Number,    // ofensiva atual (dias consecutivos)
+    maxStreak: Number         // maior ofensiva já alcançada
   },
-  slots: Object,            // { dailies: {...}, epics: {...}, shop: {...} }
+  dailyLog: Object,          // { "2026-06-24": ["d1","d3"], ... } — IDs de missões diárias concluídas por data
+  weeklyLog: Object,         // { "2026-W26": ["e1"], ... } — IDs de missões semanais concluídas por semana
+  lastDailyDate: String,     // última data com atividade "YYYY-MM-DD"
+  slots: Object,             // { dailies: {...}, epics: {...}, shop: {...} }
   diagnostic: Object,       // respostas do questionário de perfil
   onboardingComplete: Boolean,
   updatedAt: Number         // Date.now()
@@ -529,6 +539,37 @@ Esta é a regra mais crítica do sistema:
 - `modals.js`: Corrigido localStorage key (`neuroflow_daily_reward` → `dailyReward`), removidos `console.log`.
 - `comunidade.js` e `onboarding.js`: `escapeHtml` delega para `window.escapeHtml`.
 - `router.js`: `handleAuthRouting()` esconde `#auth-loading` em TODAS as páginas.
+
+### v2.4 — Calendário de Últimos 7 Dias + Correção de Fuso + Correção Firestore
+
+- `getWeekStr()` corrigido para ISO 8601 verdadeiro (semana começa segunda, UTC para local).
+- `getTodayStr()` e `getYesterdayStr()` corrigidos de `toISOString()` (UTC) para data local — evitava erro de "virada de dia" perto da meia-noite.
+- `calcStreak()` corrigido para data local.
+- `applyAutoPenalties()` corrigido para data local.
+- `getLocalDateStr(d)` adicionado e exposto em `window` como utilitário central.
+- Calendários de ofensiva (Hub e Painel) sincronizados: ambos exibem **últimos 7 dias**, do mais antigo (esquerda) para hoje (direita).
+- **Correção grave:** `saveStateToFirestore()` não incluía `dailyLog`, `weeklyLog` e `lastDailyDate` no payload — estado nunca persistia no Firestore para usuários logados.
+- **Logout reseta para fábrica:** `Object.assign(window.state, window.createDefaultState())` ao invés de `loadGuestState()` — tema e estado voltam ao padrão.
+- Botão "Falhou" (−) re-adicionado nas missões diárias. Falhar agora também registra no `dailyLog` (mesmo estado visual de concluído), evitando dupla penalidade.
+- `.day.done` alterado de `var(--success)` (verde fixo) para `var(--accent)` com `color-mix()` — cor se adapta ao tema.
+- Rankings: "Dopamina Líquida" e "🔥 Ofensiva" agora lado a lado no mesmo container (`.status-metrics`), removendo a dotted border duplicada.
+
+### v2.3 — Streaks, Limites Diários/Semanais e Confete
+- Renomeado "Rotinas Diárias" → "Missões Diárias" e "Marcos Épicos" → "Missões Semanais" em todas as páginas.
+- Missões diárias: limite de 1x/dia, auto-penalidade no day-rollover.
+- Missões semanais: limite de 1x/semana.
+- Sistema de ofensiva (streak) implementado: `calcStreak()`, `state.stats.currentStreak/maxStreak`.
+- Hub exibe ofensiva + mini-calendário dos últimos 7 dias.
+- Comunidade exibe ofensiva nos cards do grid e no perfil detalhado.
+- Confete (sparkle particles) ao concluir missões: 16 partículas CSS com `@keyframes sparkle-fly`.
+- `state.dailyLog`, `state.weeklyLog`, `state.lastDailyDate` adicionados ao schema.
+- Funções utilitárias: `window.getTodayStr()`, `window.getYesterdayStr()`, `window.getWeekStr()`, `window.calcStreak()`.
+
+### v2.2 — Remoção da Loja Estendida
+- Sistema de loja estendida (pool de itens customizáveis com pinning) removido completamente: botão "+ Extender", dialog `#extended-shop-dialog`, funções `openExtendedShop/closeExtendedShop/buyPoolItem/addPoolItem/removePoolItem/togglePinPoolItem/savePoolItemName/savePoolItemCost/startEditPoolItem/getPENCIL_SVG/getCHECK_SVG/getPIN_SVG/renderExtendedShop/getCostRange/getMainSlotsByType/generatePoolId/getBuyButtonHtml/getShopNodeHtmlOpts/_extEditState` removidos de `panel.js`.
+- CSS `.extended-shop-dialog`, `.ext-dialog-*`, `.ext-section-*`, `.ext-shop-grid`, `.pin-icon`, `.ext-edit-*`, `.ext-add-btn` removidos de `components.css`.
+- `state.slots.shopPool` e `state.slots.pinnedShop` removidos de `state.js` e Firestore schema.
+- `buildMergedSlots()` pinned overrides removidos de `templates.js`.
 
 ### v2.0 — AGENTS.md reescrito (auditoria completa)
 - Adicionado checklist pré-tarefa obrigatório.

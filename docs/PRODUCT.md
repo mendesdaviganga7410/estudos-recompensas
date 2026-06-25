@@ -1,5 +1,5 @@
 # Produto: NeuroFlow
-**Versão:** 2.0 | **Última atualização:** 2026-06-25
+**Versão:** 2.4 | **Última atualização:** 2026-06-25
 
 > Este documento centraliza o conhecimento de negócios, visão de produto e funcionalidades do NeuroFlow. É leitura **obrigatória** para qualquer agente de IA antes de executar tarefas neste repositório.
 
@@ -42,8 +42,8 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 **Gerenciador de tarefas gamificado — coração do produto.**
 
 - **Ranking e XP:** barra de progresso visual entre tiers, XP acumulado, pontos de dopamina
-- **Missões Diárias (5 slots):** tarefas com recompensa (+XP, +Pts) e penalidade por falha (-XP)
-- **Marcos Épicos (3 slots):** metas de longo prazo com recompensa maior, sem penalidade
+- **Missões Diárias (5 slots):** tarefas com recompensa (+XP, +Pts) e penalidade por falha (-XP). Só podem ser concluídas uma vez por dia. Penalidade automática ao virar o dia se não concluídas.
+- **Missões Semanais (3 slots):** metas de longo prazo com recompensa maior, sem penalidade. Só podem ser concluídas uma vez por semana.
 - **Loja de Recompensas (8 slots):** itens compráveis com pontos e cooldown individual por item
 - **Persistência:** Firestore (logado) ou localStorage (visitante)
 - **Atualização automática:** loja re-renderizada a cada 30s para atualizar cooldowns
@@ -155,7 +155,7 @@ applyRemoteState(data) → applyPrefs() → handleAuthRouting() → render/rende
     ↓
 initNotifications()
 
-[se null] → loadGuestState() → applyPrefs() → handleAuthRouting() → render/renderStudy
+[se null] → `createDefaultState()` → `saveGuestState()` → `applyPrefs()` → `handleAuthRouting()` → `render/renderStudy`
 ```
 
 ### 4.4 Multi-Page App (MPA) com Vite
@@ -201,6 +201,18 @@ initNotifications()
 
 ---
 
+### 5.4 Ofensiva (Streak)
+- Calculada a partir do `dailyLog`: dias consecutivos (incluindo hoje) com pelo menos 1 missão diária concluída.
+- Exibida no Hub como número (`🔥 Ofensiva`) e mini-calendário dos últimos 7 dias.
+- Exibida no Painel como número + mini-calendário no card de ranking.
+- Exibida nos perfis da Comunidade (card + detalhe).
+- Armazenada em `state.stats.currentStreak` (atual) e `state.stats.maxStreak` (recorde).
+
+### 5.5 Feedback Visual (Confete)
+- Ao concluir uma missão (diária ou semanal), 16 partículas coloridas explodem do botão usando animação CSS `sparkle-fly`.
+
+---
+
 ## 6. Diretrizes de Design e UX
 
 - **Vibrante e Recompensador:** cada ação deve gerar feedback visual (toast, animação, atualização instantânea de stats)
@@ -216,7 +228,6 @@ initNotifications()
 > Seção informativa — implemente apenas com aprovação explícita do usuário.
 
 - [ ] Sistema de conquistas (badges desbloqueáveis por marcos)
-- [ ] Streaks de dias consecutivos de estudo
 - [ ] Notificações push via Firebase Messaging
 - [ ] Exportação de histórico de estudos (CSV/PDF)
 - [ ] Ranking global público na Comunidade
@@ -227,6 +238,27 @@ initNotifications()
 ---
 
 ## 8. Histórico de Evoluções do Produto
+
+### 2026-06-25 — v2.4 (Correção de Fuso + Persistência Firestore + Factory Reset)
+- `getTodayStr()`, `getYesterdayStr()`, `calcStreak()` corrigidos de UTC para data local.
+- `getLocalDateStr(d)` adicionado como utilitário central.
+- **Correção grave:** `dailyLog`, `weeklyLog` e `lastDailyDate` finalmente persistidos no Firestore (não estavam no payload de `saveStateToFirestore()`).
+- Logout reseta estado para fábrica (incluindo tema), ao invés de restaurar guest state do localStorage.
+- Botão "Falhou" (−) re-adicionado nas missões diárias. Falhar registra no `dailyLog` (mesmo estado visual de concluído) e aplica penalidade, evitando dupla penalidade automática.
+- Dias concluídos no calendário de ofensiva agora usam `var(--accent)` com `color-mix()` ao invés de verde fixo.
+- Rankings: "Dopamina Líquida" e "🔥 Ofensiva" lado a lado no mesmo container (`.status-metrics`), removendo a dotted border duplicada.
+
+### 2026-06-25 — v2.3 (Sistema de Streaks + Limites Diários/Semanais)
+- Renomeado "Rotinas Diárias" → "Missões Diárias" e "Marcos Épicos" → "Missões Semanais".
+- Missões diárias só podem ser concluídas 1x/dia; missões semanais 1x/semana.
+- Penalidade automática de XP para missões diárias não concluídas ao virar o dia.
+- Sistema de ofensiva (streak): dias consecutivos com pelo menos 1 missão diária concluída.
+- Streak exibido no Hub (número + mini-calendário 7 dias) e na Comunidade (cards + detalhe).
+- Feedback visual explosivo: partículas coloridas (confete) ao concluir missões.
+- Adicionado `dailyLog`, `weeklyLog`, `lastDailyDate` ao state para rastreamento.
+
+### 2026-06-25 — v2.2
+- Loja estendida (pool de itens customizáveis com pinning) removida completamente.
 
 ### 2026-06-25 — v2.0 (Auditoria e Documentação Completa)
 - PRODUCT.md reescrito com cobertura total: fluxo de auth, balanceamento de gamificação, regras de negócio, stack e decisões arquiteturais.

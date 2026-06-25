@@ -96,9 +96,34 @@ function renderHeroHub() {
     const statDailies = document.getElementById('stat-dailies');
     const statEpics = document.getElementById('stat-epics');
     const statPurchases = document.getElementById('stat-purchases');
+    const statStreak = document.getElementById('stat-streak');
     if (statDailies) statDailies.textContent = stats.dailiesDone || 0;
     if (statEpics) statEpics.textContent = stats.epicsDone || 0;
     if (statPurchases) statPurchases.textContent = stats.purchases || 0;
+    if (statStreak) statStreak.textContent = stats.currentStreak || 0;
+
+    const calEl = document.getElementById('streak-calendar');
+    if (calEl) {
+        const dailyLog = window.state.dailyLog || {};
+        const today = new Date();
+        const days = [];
+        for (let i = 6; i >= 0; i--) {
+            const d = new Date(today);
+            d.setDate(d.getDate() - i);
+            const dateStr = window.getLocalDateStr(d);
+            const log = dailyLog[dateStr];
+            const done = log && log.length > 0;
+            days.push({ dateStr, done, isToday: i === 0, dow: d.getDay() });
+        }
+        const dayLabels = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+        calEl.innerHTML = days.map((d) => {
+            const cls = d.done ? 'day done' : 'day missed';
+            return `<div class="${cls}${d.isToday ? ' today' : ''}" title="${dayLabels[d.dow]} ${d.dateStr.slice(5)}${d.done ? ' ✅' : ''}"><span>${dayLabels[d.dow][0]}</span></div>`;
+        }).join('');
+        if (stats.maxStreak > 0) {
+            calEl.innerHTML += `<span class="streak-max">🔥 Melhor: ${stats.maxStreak} dias</span>`;
+        }
+    }
 }
 
 window.renderHeroHub = renderHeroHub;

@@ -16,6 +16,30 @@
     <link rel="stylesheet" href="src/styles/global/layout.css">
     <link rel="stylesheet" href="src/styles/components/modals.css">
     <link rel="stylesheet" href="src/styles/pages/hero.css">
+    <style>
+        .history-expand-btn {
+            background: var(--panel);
+            border: 2px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--muted);
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+        .history-expand-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+    </style>
 </head>
 
 <body data-theme="light" class="guest-mode">
@@ -77,24 +101,35 @@
                         </div>
                     </div>
                 </div>
-                <div class="status-footer-block">
-                    <span class="bento-label">Dopamina Líquida</span>
-                    <span class="bento-title" id="rPts">0</span>
+                <div class="status-metrics">
+                    <div class="status-metrics-row">
+                        <div class="metric-block">
+                            <span class="bento-label">Dopamina Líquida</span>
+                            <span class="bento-title" id="rPts">0</span>
+                        </div>
+                        <div class="metric-block">
+                            <span class="bento-label">🔥 Ofensiva</span>
+                            <span class="bento-title" id="rStreak">0 dias</span>
+                        </div>
+                    </div>
+                    <div class="streak-calendar" id="rStreakCalendar"></div>
                 </div>
             </div>
 
             <div class="bento-card col-span-2 row-span-2">
-                <h2>Rotinas Diárias</h2>
+                <h2>Missões Diárias</h2>
                 <div class="task-stack" id="rDailies"></div>
             </div>
 
             <div class="bento-card row-span-2">
-                <h2>Loja de Recompensas</h2>
+                <div style="display:flex;align-items:center;justify-content:space-between;">
+                    <h2 style="margin:0;">Loja de Recompensas</h2>
+                </div>
                 <div class="bento-shop-grid" id="rShop"></div>
             </div>
 
             <div class="bento-card col-span-3">
-                <h2>Marcos Épicos de Rendimento</h2>
+                <h2>Missões Semanais</h2>
                 <div class="task-stack" id="rEpics"></div>
             </div>
 

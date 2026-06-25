@@ -48,6 +48,9 @@ export async function saveStateToFirestore(userId, fullState, partial) {
         profile: s.profile || {},
         stats: s.stats || {},
         slots: s.slots || {},
+        dailyLog: s.dailyLog || {},
+        weeklyLog: s.weeklyLog || {},
+        lastDailyDate: s.lastDailyDate || '',
         onboardingComplete: !!s.onboardingComplete,
         updatedAt: Date.now(),
         ...partial

@@ -166,6 +166,7 @@ function applyFiltersAndRender(searchTerm) {
                         <span>${tier.i} ${window.escapeHtml(tier.name)}</span>
                         <span>${p.xp || 0} XP</span>
                         <span>${p.pts || p.pontos || 0} Pts</span>
+                        <span>🔥 ${(p.stats && p.stats.currentStreak) || 0} dias</span>
                     </div>
                 </div>
             </div>
@@ -254,6 +255,7 @@ function openProfileDetail(data) {
     if ($com("pd-stat-dailies")) $com("pd-stat-dailies").textContent = stats.dailiesDone ?? 0;
     if ($com("pd-stat-epics")) $com("pd-stat-epics").textContent = stats.epicsDone ?? 0;
     if ($com("pd-stat-purchases")) $com("pd-stat-purchases").textContent = stats.purchases ?? 0;
+    if ($com("pd-stat-streak")) $com("pd-stat-streak").textContent = stats.currentStreak ?? 0;
 
     const backBtn = $com("pd-back-btn");
     if (backBtn) {

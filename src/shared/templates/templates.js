@@ -259,6 +259,7 @@ function buildMergedSlots(textSlots) {
         ...e,
         name: textSlots.shop[e.id]?.name || ''
     }));
+
     return { dailies, epics, shop };
 }
 

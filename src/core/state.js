@@ -29,10 +29,15 @@ function createDefaultState() {
             description: '',
             public: false
         },
+        dailyLog: {},
+        weeklyLog: {},
+        lastDailyDate: '',
         stats: {
             dailiesDone: 0,
             epicsDone: 0,
-            purchases: 0
+            purchases: 0,
+            currentStreak: 0,
+            maxStreak: 0
         },
         onboardingComplete: false
     };
@@ -61,6 +66,12 @@ function loadGuestState() {
             }
             if (!state.profile) state.profile = { epicGoal: '', bannerUrl: '', displayName: '', description: '', public: false };
             if (state.profile.description === undefined) state.profile.description = '';
+            if (!state.dailyLog) state.dailyLog = {};
+            if (!state.weeklyLog) state.weeklyLog = {};
+            if (!state.lastDailyDate) state.lastDailyDate = '';
+            if (!state.stats) state.stats = {};
+            if (!state.stats.currentStreak) state.stats.currentStreak = 0;
+            if (state.stats.maxStreak === undefined) state.stats.maxStreak = 0;
         }
         state.prefs = (saved && saved.prefs) || {};
         window.isAdmin = state.prefs.isAdmin === true;
@@ -81,7 +92,10 @@ function saveGuestState() {
             profile: state.profile,
             stats: state.stats,
             prefs: state.prefs,
-            onboardingComplete: state.onboardingComplete
+            onboardingComplete: state.onboardingComplete,
+            dailyLog: state.dailyLog,
+            weeklyLog: state.weeklyLog,
+            lastDailyDate: state.lastDailyDate
         };
         localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(payload));
     } catch (err) {
@@ -111,7 +125,12 @@ function applyRemoteState(data) {
     state.prefs = data.prefs || {};
     state.profile = data.profile || { epicGoal: '', bannerUrl: '', displayName: '', description: '', public: false };
     if (state.profile.description === undefined) state.profile.description = '';
-    state.stats = data.stats || { dailiesDone: 0, epicsDone: 0, purchases: 0 };
+    state.stats = data.stats || { dailiesDone: 0, epicsDone: 0, purchases: 0, currentStreak: 0, maxStreak: 0 };
+    if (state.stats.currentStreak === undefined) state.stats.currentStreak = 0;
+    if (state.stats.maxStreak === undefined) state.stats.maxStreak = 0;
+    state.dailyLog = data.dailyLog || {};
+    state.weeklyLog = data.weeklyLog || {};
+    state.lastDailyDate = data.lastDailyDate || '';
     state.diagnostic = data.diagnostic ? { ...data.diagnostic } : undefined;
     state.onboardingComplete = data.onboardingComplete === true
         || (data.onboardingComplete === undefined && (
@@ -169,6 +188,51 @@ function desativarAdmin() {
     if (panel) panel.style.display = 'none';
 }
 
+function getLocalDateStr(d) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function getTodayStr() {
+    return getLocalDateStr(new Date());
+}
+
+function getYesterdayStr() {
+    const d = new Date();
+    d.setDate(d.getDate() - 1);
+    return getLocalDateStr(d);
+}
+
+function getWeekStr(date) {
+    const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+    const dayNum = d.getUTCDay() || 7;
+    d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+    const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    const week = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+    return `${d.getUTCFullYear()}-W${String(week).padStart(2, '0')}`;
+}
+
+function calcStreak() {
+    let streak = 0;
+    const d = new Date();
+    for (let i = 0; i < 365; i++) {
+        const dateStr = getLocalDateStr(d);
+        const log = state.dailyLog[dateStr];
+        if (log && log.length > 0) {
+            streak++;
+            d.setDate(d.getDate() - 1);
+        } else if (i === 0) {
+            d.setDate(d.getDate() - 1);
+            continue;
+        } else {
+            break;
+        }
+    }
+    return streak;
+}
+
 window.TIERS              = TIERS;
 window.GUEST_STORAGE_KEY  = GUEST_STORAGE_KEY;
 window.createDefaultState = createDefaultState;
@@ -179,3 +243,8 @@ window.saveState          = saveState;
 window.applyRemoteState   = applyRemoteState;
 window.ativarAdmin        = ativarAdmin;
 window.desativarAdmin     = desativarAdmin;
+window.getLocalDateStr    = getLocalDateStr;
+window.getTodayStr        = getTodayStr;
+window.getYesterdayStr    = getYesterdayStr;
+window.getWeekStr         = getWeekStr;
+window.calcStreak         = calcStreak;

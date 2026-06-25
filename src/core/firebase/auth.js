@@ -215,7 +215,8 @@ if (auth) {
             if (loginBtns)  loginBtns.style.display  = "flex";
             if (profileDiv) profileDiv.style.display = "none";
 
-            if (window.loadGuestState) window.loadGuestState();
+            Object.assign(window.state, window.createDefaultState());
+            if (window.saveGuestState) window.saveGuestState();
             if (window.applyPrefs) window.applyPrefs(window.state?.prefs || {});
             if (window.handleAuthRouting) window.handleAuthRouting();
             if (window.render) window.render();
