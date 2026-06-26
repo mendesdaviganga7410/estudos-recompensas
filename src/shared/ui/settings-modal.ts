@@ -28,20 +28,20 @@ function loadStudyConfig() {
                 }
             });
         }
-    } catch (_) {}
+    } catch { /* silencioso */ }
 }
 function saveStudyConfig() {
     try { localStorage.setItem(STUDY_CFG_KEY, JSON.stringify(studyConfig)); }
-    catch (_) {}
+    catch { /* silencioso */ }
 }
 
-function applyPomoPreset(focus, brk, cycles) {
-    const focusEl = document.getElementById('pomoFocusMin');
-    const breakEl = document.getElementById('pomoBreakMin');
-    const cyclesEl = document.getElementById('pomoCycles');
-    if (focusEl) focusEl.value = focus;
-    if (breakEl) breakEl.value = brk;
-    if (cyclesEl) cyclesEl.value = cycles;
+function applyPomoPreset(focus: number, brk: number, cycles: number): void {
+    const focusEl = document.getElementById('pomoFocusMin') as HTMLInputElement | null;
+    const breakEl = document.getElementById('pomoBreakMin') as HTMLInputElement | null;
+    const cyclesEl = document.getElementById('pomoCycles') as HTMLInputElement | null;
+    if (focusEl) focusEl.value = String(focus);
+    if (breakEl) breakEl.value = String(brk);
+    if (cyclesEl) cyclesEl.value = String(cycles);
     window.toast?.(`Preset aplicado: ${focus}min foco / ${brk}min descanso`);
     closeStudyConfigDialog();
 }
@@ -53,13 +53,13 @@ function applyTimerSize() {
     display.style.fontSize = sizes[studyConfig.timerSize] || sizes.md;
 }
 
-function openStudyConfigDialog() {
+function openStudyConfigDialog(): void {
     renderStudyConfigDialog();
-    const el = document.getElementById('study-config-dialog');
+    const el = document.getElementById('study-config-dialog') as HTMLDialogElement | null;
     if (el) el.showModal();
 }
-function closeStudyConfigDialog() {
-    const el = document.getElementById('study-config-dialog');
+function closeStudyConfigDialog(): void {
+    const el = document.getElementById('study-config-dialog') as HTMLDialogElement | null;
     if (el) el.close();
 }
 function renderStudyConfigDialog() {
@@ -164,22 +164,22 @@ function renderStudyConfigDialog() {
             studyConfig[key] = checked;
             if (key === 'askBreak' && checked) {
                 studyConfig.autoBreak = false;
-                const other = document.getElementById('cfg_autoBreak');
+                const other = document.getElementById('cfg_autoBreak') as HTMLInputElement | null;
                 if (other) other.checked = false;
             }
             if (key === 'autoBreak' && checked) {
                 studyConfig.askBreak = false;
-                const other = document.getElementById('cfg_askBreak');
+                const other = document.getElementById('cfg_askBreak') as HTMLInputElement | null;
                 if (other) other.checked = false;
             }
             if (key === 'askFocus' && checked) {
                 studyConfig.autoFocus = false;
-                const other = document.getElementById('cfg_autoFocus');
+                const other = document.getElementById('cfg_autoFocus') as HTMLInputElement | null;
                 if (other) other.checked = false;
             }
             if (key === 'autoFocus' && checked) {
                 studyConfig.askFocus = false;
-                const other = document.getElementById('cfg_askFocus');
+                const other = document.getElementById('cfg_askFocus') as HTMLInputElement | null;
                 if (other) other.checked = false;
             }
             saveStudyConfig();
@@ -192,10 +192,10 @@ function renderStudyConfigDialog() {
             saveStudyConfig();
         });
     });
-    body.querySelectorAll('.timer-size-btn').forEach(el => {
-        el.addEventListener('click', function() {
+    body.querySelectorAll('.timer-size-btn').forEach((el: Element) => {
+        el.addEventListener('click', function(this: HTMLElement) {
             studyConfig.timerSize = this.dataset.size;
-            body.querySelectorAll('.timer-size-btn').forEach(b => b.style.borderColor = '');
+            (body.querySelectorAll('.timer-size-btn') as NodeListOf<HTMLElement>).forEach(b => b.style.borderColor = '');
             this.style.borderColor = 'var(--accent)';
             applyTimerSize();
             saveStudyConfig();

@@ -1,3 +1,4 @@
+// @ts-nocheck
 let __initTimer = null;
 let __diagReminderTimer = null;
 

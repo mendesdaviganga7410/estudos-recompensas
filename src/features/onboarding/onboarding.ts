@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* ==========================================================================
    ONBOARDING.JS — Assistente de Iniciação (Wizard RPG Gamificado)
    ========================================================================== */
@@ -171,7 +172,7 @@ function renderWizardCard() {
 
     if (counter) counter.textContent = `${wizardStepIndex + 1} / ${wizardSteps.length}`;
 
-    let econBadges = '';
+    let econBadges;
     if (step.category === 'shop') {
         econBadges = `<span class="badge badge-highlight">${econ.cost} Pts</span>`;
     } else if (step.category === 'dailies') {

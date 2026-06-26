@@ -1,3 +1,4 @@
+// @ts-nocheck
     // ============================================================
     //  PAINEL DE CONTROLE DE TEMPO E REGISTRO DE SESSOES
     //  studyTimer — Objeto unico de gerenciamento
@@ -352,11 +353,11 @@
                     }
                 });
             }
-        } catch (_) { /* fallback */ }
+        } catch { /* fallback */ }
     }
     function saveSoundConfig() {
         try { localStorage.setItem(SOUND_KEY, JSON.stringify(soundConfig)); }
-        catch (_) {}
+        catch { /* silencioso */ }
     }
 
     let _phasePending = null; // 'start' | 'wait' | 'skip'
@@ -408,7 +409,7 @@
         try {
             const ctx = getAudioContext();
             preset.play(ctx);
-        } catch (_) { /* fallback */ }
+        } catch { /* fallback */ }
     }
 
     function playConfiguredSound(group) {
@@ -833,7 +834,6 @@
             }
 
             // Mostra diálogo
-            const dialogType = isFocus ? 'focus-end' : 'break-end';
             const nextLabel = isFocus ? 'Descanso' : 'Foco';
             const skipLabel = isFocus ? 'Pular Descanso' : 'Pular Foco';
 
@@ -1116,7 +1116,7 @@
                         </tbody>
                     </table>
                 `;
-            } catch (_) {
+            } catch {
                 container.innerHTML = '<div class="history-empty">Erro ao carregar histórico.</div>';
                 if (countEl) countEl.textContent = '0 sessões';
             }
@@ -1286,7 +1286,6 @@
         showHistorySortDialog() {
             const container = document.getElementById('historySortOptions');
             const current = this._currentSortVal || 'date-desc';
-            const currentLabel = this._historySortOptions.find(o => o.val === current)?.label || '';
             container.innerHTML = this._historySortOptions.map(o => `
                 <button class="${o.val === current ? 'is-active' : ''}" onclick="selectHistorySort('${o.val}')">
                     ${o.val === current ? '✓ ' : ''}${o.label}

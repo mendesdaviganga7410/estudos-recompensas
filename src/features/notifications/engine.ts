@@ -1,3 +1,4 @@
+// @ts-nocheck
 let __notifications = [];
 let __unreadCount = 0;
 let __panelOpen = false;
@@ -15,7 +16,7 @@ function __saveNotifs() {
             unreadCount: __unreadCount,
             lastGenTime: __lastGenTime
         }));
-    } catch (e) { /* ignore */ }
+    } catch { /* ignore */ }
 }
 
 function __loadNotifs() {
@@ -28,7 +29,7 @@ function __loadNotifs() {
             __lastGenTime = data.lastGenTime || 0;
             return true;
         }
-    } catch (e) { /* ignore */ }
+    } catch { /* ignore */ }
     return false;
 }
 

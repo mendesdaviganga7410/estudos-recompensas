@@ -82,8 +82,8 @@ function openSettingsModal() {
     if ($("radiusValue")) $("radiusValue").textContent = savedRadius;
     if ($("shadowValue")) $("shadowValue").textContent = savedShadow;
 
-    const lockNotices   = document.querySelectorAll('.tab-lock-notice');
-    const authContents  = document.querySelectorAll('.tab-auth-content');
+    const lockNotices   = document.querySelectorAll('.tab-lock-notice') as NodeListOf<HTMLElement>;
+    const authContents  = document.querySelectorAll('.tab-auth-content') as NodeListOf<HTMLElement>;
 
     const profile = window.state?.profile || {};
     if (window.currentUser) {
@@ -279,7 +279,7 @@ function renderSoundTab() {
                 ${Object.entries(SOUND_PRESETS[g.key] || {}).map(([id, p]) => `
                     <div class="sound-option ${id === cfg[g.key] ? 'active' : ''}"
                          onclick="selectSound('${g.key}','${id}')">
-                        <span>${p.name}</span>
+                        <span>${(p as Record<string, string>).name}</span>
                         <button class="preview-btn" onclick="event.stopPropagation(); playSound('${g.key}','${id}')">▶</button>
                     </div>
                 `).join('')}
@@ -518,7 +518,7 @@ function saveQuickBanner() {
         if (!blob) { toast("Erro ao processar imagem.", true); return; }
         const reader = new FileReader();
         reader.onload = () => {
-            const dataUrl = reader.result;
+            const dataUrl = reader.result as string;
             if (window.updateUserProfileBanner) {
                 window.updateUserProfileBanner(dataUrl);
                 closeQuickBannerDialog();
@@ -717,9 +717,9 @@ function adminRefreshNotifs() {
     })();
 }
 
-function adminLogState() { console.log('📊 STATE:', JSON.parse(JSON.stringify(window.state))); console.log('👤 User:', window.currentUser); window.toast?.('📊 Estado logado no console.'); }
-function adminForceSave() { if (window.saveState) window.saveState().then(() => window.toast?.('💾 Estado salvo!')).catch(() => window.toast?.('Erro ao salvar.', true)); }
-function adminForceReload() { if (window.currentUser && window.syncUserData) window.syncUserData(window.currentUser.uid).then(() => window.toast?.('🔄 Estado recarregado!')); else window.toast?.('Faça login para recarregar.', true); }
+function adminLogState() { console.warn('📊 STATE:', JSON.parse(JSON.stringify(window.state))); console.warn('👤 User:', window.currentUser); window.toast?.('📊 Estado logado no console.'); }
+function adminForceSave() { if (window.saveState) { const p = window.saveState(); if (p && typeof p.then === 'function') p.then(() => window.toast?.('💾 Estado salvo!')).catch(() => window.toast?.('Erro ao salvar.', true)); } }
+function adminForceReload() { if (window.currentUser && window.syncUserData) window.syncUserData((window.currentUser as Record<string, string>).uid).then(() => window.toast?.('🔄 Estado recarregado!')); else window.toast?.('Faça login para recarregar.', true); }
 function adminResetState() {
     if (!confirm('Tem certeza? Isso vai zerar pts, XP e cooldowns.')) return;
     if (!window.state) return;
@@ -735,7 +735,7 @@ function adminResetTheme() { if (window.resetDefaults) window.resetDefaults(); e
 function adminRandomTheme() {
     if (window.changeTheme) {
         const total = 18;
-        const r = Math.floor(Math.random() * total);
+        const r = String(Math.floor(Math.random() * total));
         window.changeTheme(r);
         window.toast?.('🎨 Tema aleatório aplicado!');
     }
@@ -747,7 +747,7 @@ function adminFetchProfiles() {
     (async () => {
         if (window.fetchPublicProfiles) {
             const p = await window.fetchPublicProfiles(200);
-            console.log('🌐 Perfis públicos:', p);
+            console.warn('🌐 Perfis públicos:', p);
             window.toast?.('🌐 ' + p.length + ' perfis encontrados. Ver console.');
         }
     })();

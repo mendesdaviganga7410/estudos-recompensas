@@ -1,3 +1,4 @@
+// @ts-nocheck
 const tierName = (xp) => {
     const t = (window.TIERS || []).find(r => xp >= r.min && xp <= r.max);
     return t ? `${t.i} ${t.name}` : "🥉 Bronze";

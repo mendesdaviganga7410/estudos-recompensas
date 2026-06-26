@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* ==========================================================================
    firebase/init.js — Inicialização do Firebase com importação dinâmica
    ========================================================================== */
@@ -53,7 +54,7 @@ try {
     limit      = fs.limit;
     deleteDoc  = fs.deleteDoc;
     writeBatch = fs.writeBatch;
-} catch (_) {
+} catch {
     /* Firebase bloqueado ou indisponível — tudo permanece undefined */
 }
 

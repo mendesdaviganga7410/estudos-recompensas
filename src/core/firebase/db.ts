@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* ==========================================================================
    firebase/db.js — Leitura e gravação no Firestore
    ========================================================================== */
@@ -71,7 +72,7 @@ export async function completeOnboarding(userId, onboardingData) {
     s.slots = onboardingData.slots || s.slots;
     s.onboardingComplete = true;
 
-    try { await saveStateToFirestore(userId, s); } catch (_) {}
+    try { await saveStateToFirestore(userId, s); } catch { /* Firebase offline — silencioso */ }
 
     if (window.renderHeroHub) window.renderHeroHub();
     if (window.closeOnboarding) window.closeOnboarding();

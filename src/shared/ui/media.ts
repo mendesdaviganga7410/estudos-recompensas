@@ -8,8 +8,9 @@ function initPhotoPicker() {
 
     dropZone.addEventListener("click", () => fileInput.click());
 
-    fileInput.addEventListener("change", e => {
-        if (e.target.files.length > 0) processFile(e.target.files[0]);
+    fileInput.addEventListener("change", (e: Event) => {
+        const input = e.target as HTMLInputElement;
+        if (input.files && input.files.length > 0) processFile(input.files[0]);
     });
 
     dropZone.addEventListener("dragover", e => {
@@ -32,17 +33,20 @@ function initPhotoPicker() {
     });
 }
 
-function processFile(file) {
+function processFile(file: File): void {
     if (!file?.type.startsWith("image/")) {
         toast("Selecione um arquivo de imagem válido.", true);
         return;
     }
     const reader = new FileReader();
-    reader.onload = event => {
-        const img = $("image-to-crop");
-        img.src = event.target.result;
-        $("photo-drop-zone").style.display = "none";
-        $("crop-container").style.display  = "flex";
+    reader.onload = (event: ProgressEvent<FileReader>) => {
+        const img = $("image-to-crop") as HTMLImageElement | null;
+        if (!img) return;
+        img.src = event.target?.result as string;
+        const dropZone = $("photo-drop-zone");
+        if (dropZone) dropZone.style.display = "none";
+        const cropCont = $("crop-container");
+        if (cropCont) cropCont.style.display = "flex";
 
         if (cropperInstance) cropperInstance.destroy();
         cropperInstance = new Cropper(img, {
@@ -58,7 +62,7 @@ function processFile(file) {
     reader.readAsDataURL(file);
 }
 
-function saveCroppedPhoto() {
+function saveCroppedPhoto(): void {
     if (!cropperInstance) return;
     const canvas = cropperInstance.getCroppedCanvas({
         width: 256, height: 256,
@@ -77,14 +81,14 @@ function saveCroppedPhoto() {
     }, "image/jpeg", 0.85);
 }
 
-function cancelCrop() {
+function cancelCrop(): void {
     if (cropperInstance) { cropperInstance.destroy(); cropperInstance = null; }
     const dropZone  = $("photo-drop-zone");
     const cropCont  = $("crop-container");
     const fileInput = $("photo-file-input");
     if (dropZone)  dropZone.style.display = "block";
     if (cropCont)  cropCont.style.display  = "none";
-    if (fileInput) fileInput.value = "";
+    if (fileInput) (fileInput as HTMLInputElement).value = "";
 }
 
 function initBannerPicker() {
@@ -94,8 +98,9 @@ function initBannerPicker() {
 
     dropZone.addEventListener("click", () => fileInput.click());
 
-    fileInput.addEventListener("change", e => {
-        if (e.target.files.length > 0) processBannerFile(e.target.files[0]);
+    fileInput.addEventListener("change", (e: Event) => {
+        const input = e.target as HTMLInputElement;
+        if (input.files && input.files.length > 0) processBannerFile(input.files[0]);
     });
 
     dropZone.addEventListener("dragover", e => {
@@ -110,17 +115,20 @@ function initBannerPicker() {
     });
 }
 
-function processBannerFile(file) {
+function processBannerFile(file: File): void {
     if (!file?.type.startsWith("image/")) {
         toast("Selecione um arquivo de imagem válido.", true);
         return;
     }
     const reader = new FileReader();
-    reader.onload = event => {
-        const img = $("banner-image-to-crop");
-        img.src = event.target.result;
-        $("banner-drop-zone").style.display = "none";
-        $("banner-crop-container").style.display  = "flex";
+    reader.onload = (event: ProgressEvent<FileReader>) => {
+        const img = $("banner-image-to-crop") as HTMLImageElement | null;
+        if (!img) return;
+        img.src = event.target?.result as string;
+        const dropZone = $("banner-drop-zone");
+        if (dropZone) dropZone.style.display = "none";
+        const cropCont = $("banner-crop-container");
+        if (cropCont) cropCont.style.display = "flex";
 
         if (bannerCropperInstance) bannerCropperInstance.destroy();
         bannerCropperInstance = new Cropper(img, {
@@ -147,7 +155,7 @@ function saveCroppedBanner() {
         if (!blob) { toast("Erro ao processar imagem.", true); return; }
         const reader = new FileReader();
         reader.onload = () => {
-            const dataUrl = reader.result;
+            const dataUrl = reader.result as string;
             if (window.updateUserProfileBanner) {
                 window.updateUserProfileBanner(dataUrl);
                 cancelBannerCrop();
@@ -159,14 +167,14 @@ function saveCroppedBanner() {
     }, "image/jpeg", 0.85);
 }
 
-function cancelBannerCrop() {
+function cancelBannerCrop(): void {
     if (bannerCropperInstance) { bannerCropperInstance.destroy(); bannerCropperInstance = null; }
     const dropZone = $("banner-drop-zone");
     const cropCont  = $("banner-crop-container");
     const fileInput = $("banner-file-input");
     if (dropZone) dropZone.style.display = "block";
     if (cropCont) cropCont.style.display  = "none";
-    if (fileInput) fileInput.value = "";
+    if (fileInput) (fileInput as HTMLInputElement).value = "";
 }
 
 window.cancelCrop        = cancelCrop;

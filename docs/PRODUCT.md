@@ -1,5 +1,5 @@
 # Produto: NeuroFlow
-**Versão:** 2.5 | **Última atualização:** 2026-06-25
+**Versão:** 3.3 | **Última atualização:** 2026-06-25
 
 > Este documento centraliza o conhecimento de negócios, visão de produto e funcionalidades do NeuroFlow. É leitura **obrigatória** para qualquer agente de IA antes de executar tarefas neste repositório.
 
@@ -23,7 +23,7 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 ### 1.3 Pilares do Design
 - **Vibrante e engajador:** micro-interações, toasts, animações de recompensa
 - **Gamificação séria:** o sistema de XP/Pts deve parecer justo e motivador, não inflado
-- **Performance:** Vanilla JS sem frameworks pesados, Firebase via CDN
+- **Performance:** Vanilla TypeScript sem frameworks pesados, Firebase via CDN
 
 ---
 
@@ -63,7 +63,7 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 - **Sincronização:** histórico persistido em localStorage (`historico_estudos`) e sincronizado com Firestore via subcoleção `studySessions` quando logado
 - **Config de Pomodoro:** acessível via settings-modal (abas separadas)
 
-**Objeto-chave:** `window.studyTimer` (exposto por `study-timer.js`)
+**Objeto-chave:** `window.studyTimer` (exposto por `study-timer.ts`)
 
 ### 2.4. Comunidade (`comunidade.html`)
 **Elemento social para conexão entre estudantes.**
@@ -74,7 +74,7 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 - Detalhe de perfil: view completa de outro herói com ranking global, progresso de tier e estatísticas
 - **Visitantes:** veem aviso de login, não têm acesso ao grid
 
-**Funções-chave:** `window.renderComunidade()`, `window.openProfileDetail(data)`, `window.fetchPublicProfiles(max?)`
+**Funções-chave:** `window.renderComunidade()`, `window.openProfileDetail(data)`, `window.fetchCommunityProfiles(limit?)`
 
 ### 2.5. Autenticação e Modos de Acesso
 
@@ -100,13 +100,13 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 - **Toast de lembrete:** "Responda ao Diagnóstico" exibido a cada 2 minutos para quem não respondeu
 - **Badge:** número de não-lidas no ícone de sino; ponto laranja quando diagnóstico pendente
 - **Armazenamento:** notificações persistidas em localStorage `'neuroflow_notifs_v1'` entre navegações
-- **Arquivos:** `engine.js` (estado + matching), `ui.js` (render), `init.js` (timers + exports)
+- **Arquivos:** `engine.ts` (estado + matching), `ui.ts` (render), `init.ts` (timers + exports)
 
 ### 3.2. Diagnóstico de Perfil
-- Questionário adaptativo de ~8 perguntas (de um total de 21 em `diagnostic-data.js`)
+- Questionário adaptativo de ~8 perguntas (de um total de 21 em `diagnostic-data.ts`)
 - Organizado em tracks: `vest` (vestibulando), `conc` (concurseiro), `work` (mercado de trabalho), `fit` (fitness), `learn` (aprendizado pessoal)
 - Pergunta inicial (`focusAreas`) define quais tracks o usuário verá
-- Usado para calcular compatibilidade de matching com outros usuários (score de proximidade em `engine.js`)
+- Usado para calcular compatibilidade de matching com outros usuários (score de proximidade em `engine.ts`)
 - Resultado armazenado no Firestore como `state.diagnostic`
 - Versão do diagnóstico: `DIAGNOSTIC_VERSION` — quando a versão muda, diagnóstico é resetado automaticamente
 
@@ -135,10 +135,12 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 
 ## 4. Stack Técnica e Decisões Arquiteturais
 
-### 4.1 Por que Vanilla JS (sem frameworks)?
+### 4.1 Por que Vanilla TypeScript (sem frameworks React)?
 - **Performance:** zero bundle overhead, carregamento imediato
 - **Hospedagem simples:** qualquer CDN estático serve o `dist/`
-- **Manutenibilidade:** qualquer dev com conhecimento básico de JS/HTML/CSS entende o código
+- **Manutenibilidade:** TypeScript com `strict: false` — qualquer dev com conhecimento básico de TS/HTML/CSS entende o código
+- **Segurança de tipos:** ~120 globais tipados em `globals.d.ts`, typecheck com `tsc`, lint com ESLint flat config + typescript-eslint
+- **Testes automatizados:** Vitest + jsdom para funções puras (30 testes, ~1.1s)
 - **Restrição:** não introduza React, Vue ou Angular sem ordem explícita do usuário
 
 ### 4.2 Por que Firebase via CDN dinâmico?
@@ -159,9 +161,10 @@ initNotifications()
 [se null] → `createDefaultState()` → `saveGuestState()` → `applyPrefs()` → `handleAuthRouting()` → `render/renderStudy`
 ```
 
-### 4.4 Multi-Page App (MPA) com Vite
+### 4.4 Multi-Page App (MPA) com Vite + TypeScript
 - 4 entries no `vite.config.js`: `index.html`, `panel.html`, `study.html`, `comunidade.html`
 - HTMLs ficam na raiz (requerimento do Vite MPA)
+- Scripts importados como `.ts` — Vite compila com esbuild (sem bundling de type="module" scripts)
 - `npm run dev` → servidor HMR na porta 5173
 - `npm run build` → gera `dist/` com assets otimizados
 
@@ -235,10 +238,28 @@ initNotifications()
 - [ ] Chat entre usuários com alta compatibilidade de matching
 - [ ] Perfis de tema compartilháveis
 - [ ] Integração com calendário para agendamento de sessões
+- [x] Testes unitários com Vitest para funções puras (`calcStreak`, `getWeekStr`, `getLocalDateStr`, etc.)
 
 ---
 
 ## 8. Histórico de Evoluções do Produto
+
+### 2026-06-25 — v3.2 (Testes Automatizados)
+- Vitest 4.1.9 + jsdom instalado; `npm run test` / `npm run test:watch`.
+- 3 suites de teste (~30 testes): `date.test.ts`, `streak.test.ts`, `state.test.ts`.
+- Setup file com polyfill de localStorage para Node.js.
+
+### 2026-06-25 — v3.1 (Type Safety)
+- `modals.ts`: 47 erros de tipo corrigidos — `@ts-nocheck` removido.
+- `globals.d.ts`: `Document.getElementById` com overload `any` (pragmático para DOM não-estrito).
+- `npm run typecheck`, `lint`, `build` — zero erros.
+
+### 2026-06-25 — v3.0 (TypeScript Migration + ESLint)
+- Todos os 22 arquivos `.js` migrados para `.ts`.
+- TypeScript 6.0.3 + `tsconfig.json` com `strict: false`.
+- ESLint flat config com `typescript-eslint` parser.
+- `src/types/globals.d.ts` com ~120 globais tipados.
+- Lint e typecheck passando limpo.
 
 ### 2026-06-25 — v2.5 (Modo Momentum)
 - Botão "▶ Iniciar" na métrica "🚀 Momentum" dentro do ranking card do Painel.

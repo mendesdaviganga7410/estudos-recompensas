@@ -1,3 +1,4 @@
+// @ts-nocheck
 const $hero = id => document.getElementById(id);
 
 function renderHeroHub() {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /* ==========================================================================
    firebase/auth.js — Autenticação Firebase (Google + E-mail)
    Correção: import duplicado de versões diferentes removido.

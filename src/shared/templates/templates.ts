@@ -1,25 +1,25 @@
 const SLOT_ECONOMICS = Object.freeze({
     dailies: Object.freeze([
-        Object.freeze({ id: 'd1', xp: 10,  pts: 5,  fXp: 5  }),
-        Object.freeze({ id: 'd2', xp: 15,  pts: 10, fXp: 10 }),
-        Object.freeze({ id: 'd3', xp: 25,  pts: 20, fXp: 15 }),
-        Object.freeze({ id: 'd4', xp: 30,  pts: 25, fXp: 15 }),
-        Object.freeze({ id: 'd5', xp: 25,  pts: 20, fXp: 10 })
+        Object.freeze({ id: 'd1' as const, xp: 10,  pts: 5,  fXp: 5  }),
+        Object.freeze({ id: 'd2' as const, xp: 15,  pts: 10, fXp: 10 }),
+        Object.freeze({ id: 'd3' as const, xp: 25,  pts: 20, fXp: 15 }),
+        Object.freeze({ id: 'd4' as const, xp: 30,  pts: 25, fXp: 15 }),
+        Object.freeze({ id: 'd5' as const, xp: 25,  pts: 20, fXp: 10 })
     ]),
     epics: Object.freeze([
-        Object.freeze({ id: 'e1', xp: 200, pts: 150 }),
-        Object.freeze({ id: 'e2', xp: 180, pts: 120 }),
-        Object.freeze({ id: 'e3', xp: 150, pts: 100 })
+        Object.freeze({ id: 'e1' as const, xp: 200, pts: 150 }),
+        Object.freeze({ id: 'e2' as const, xp: 180, pts: 120 }),
+        Object.freeze({ id: 'e3' as const, xp: 150, pts: 100 })
     ]),
     shop: Object.freeze([
-        Object.freeze({ id: 's1', cost: 35,   type: 'day', label: 'Diário',  cd: 86400000   }),
-        Object.freeze({ id: 's2', cost: 80,   type: 'day', label: 'Diário',  cd: 86400000   }),
-        Object.freeze({ id: 's3', cost: 120,  type: 'day', label: 'Diário',  cd: 86400000   }),
-        Object.freeze({ id: 's4', cost: 200,  type: 'wk',  label: 'Semanal', cd: 604800000  }),
-        Object.freeze({ id: 's5', cost: 500,  type: 'wk',  label: 'Semanal', cd: 604800000  }),
-        Object.freeze({ id: 's6', cost: 800,  type: 'wk',  label: 'Semanal', cd: 604800000  }),
-        Object.freeze({ id: 's7', cost: 1500, type: 'mo',  label: 'Mensal',  cd: 2592000000 }),
-        Object.freeze({ id: 's8', cost: 2000, type: 'mo',  label: 'Mensal',  cd: 2592000000 })
+        Object.freeze({ id: 's1' as const, cost: 35,   type: 'day' as const, label: 'Diário',  cd: 86400000   }),
+        Object.freeze({ id: 's2' as const, cost: 80,   type: 'day' as const, label: 'Diário',  cd: 86400000   }),
+        Object.freeze({ id: 's3' as const, cost: 120,  type: 'day' as const, label: 'Diário',  cd: 86400000   }),
+        Object.freeze({ id: 's4' as const, cost: 200,  type: 'wk'  as const, label: 'Semanal', cd: 604800000  }),
+        Object.freeze({ id: 's5' as const, cost: 500,  type: 'wk'  as const, label: 'Semanal', cd: 604800000  }),
+        Object.freeze({ id: 's6' as const, cost: 800,  type: 'wk'  as const, label: 'Semanal', cd: 604800000  }),
+        Object.freeze({ id: 's7' as const, cost: 1500, type: 'mo'  as const, label: 'Mensal',  cd: 2592000000 }),
+        Object.freeze({ id: 's8' as const, cost: 2000, type: 'mo'  as const, label: 'Mensal',  cd: 2592000000 })
     ])
 });
 
@@ -227,14 +227,14 @@ const STARTER_PACKAGES = {
     }
 };
 
-function cloneDefaultSlotText() {
+function cloneDefaultSlotText(): Record<string, Record<string, { name: string; desc?: string }>> {
     return JSON.parse(JSON.stringify(DEFAULT_SLOT_TEXT));
 }
 
-function mergeSlotText(base, override) {
+function mergeSlotText(base: Record<string, unknown>, override?: Record<string, unknown> | null): Record<string, Record<string, { name: string; desc?: string }>> {
     const result = cloneDefaultSlotText();
     const source = override || base || {};
-    for (const category of ['dailies', 'epics', 'shop']) {
+    for (const category of ['dailies', 'epics', 'shop'] as const) {
         if (source[category]) {
             for (const [id, text] of Object.entries(source[category])) {
                 result[category][id] = { ...result[category][id], ...text };
@@ -244,27 +244,27 @@ function mergeSlotText(base, override) {
     return result;
 }
 
-function buildMergedSlots(textSlots) {
+function buildMergedSlots(textSlots: Record<string, Record<string, { name?: string; desc?: string }>>) {
     const dailies = SLOT_ECONOMICS.dailies.map(e => ({
         ...e,
-        name: textSlots.dailies[e.id]?.name || '',
-        desc: textSlots.dailies[e.id]?.desc || ''
+        name: textSlots.dailies?.[e.id]?.name || '',
+        desc: textSlots.dailies?.[e.id]?.desc || ''
     }));
     const epics = SLOT_ECONOMICS.epics.map(e => ({
         ...e,
-        name: textSlots.epics[e.id]?.name || '',
-        desc: textSlots.epics[e.id]?.desc || ''
+        name: textSlots.epics?.[e.id]?.name || '',
+        desc: textSlots.epics?.[e.id]?.desc || ''
     }));
     const shop = SLOT_ECONOMICS.shop.map(e => ({
         ...e,
-        name: textSlots.shop[e.id]?.name || ''
+        name: textSlots.shop?.[e.id]?.name || ''
     }));
 
     return { dailies, epics, shop };
 }
 
 function getWizardSteps() {
-    const steps = [];
+    const steps: Array<{ category: string; id: string; economics: object; hasDesc: boolean }> = [];
     for (const e of SLOT_ECONOMICS.dailies) {
         steps.push({ category: 'dailies', id: e.id, economics: e, hasDesc: true });
     }
@@ -277,11 +277,11 @@ function getWizardSteps() {
     return steps;
 }
 
-function getDefaultText(category, id) {
+function getDefaultText(category: string, id: string) {
     return DEFAULT_SLOT_TEXT[category]?.[id] || { name: '', desc: '' };
 }
 
-function getSlotPresets(id) {
+function getSlotPresets(id: string) {
     return SLOT_PRESETS[id] || [];
 }
 

@@ -28,10 +28,10 @@ function setGuestMode(active) {
 
 function updateGuestUI() {
     const isGuest = window.isGuestMode;
-    const profileTab = document.querySelector('.tab-btn[onclick*="tab-profile"]');
-    const securityTab = document.querySelector('.tab-btn[onclick*="tab-security"]');
-    const heroOnly = document.querySelectorAll('.auth-only');
-    const guestOnly = document.querySelectorAll('.guest-only');
+    const profileTab = document.querySelector('.tab-btn[onclick*="tab-profile"]') as HTMLElement | null;
+    const securityTab = document.querySelector('.tab-btn[onclick*="tab-security"]') as HTMLElement | null;
+    const heroOnly = document.querySelectorAll('.auth-only') as NodeListOf<HTMLElement>;
+    const guestOnly = document.querySelectorAll('.guest-only') as NodeListOf<HTMLElement>;
 
     if (profileTab) profileTab.style.display = isGuest ? 'none' : '';
     if (securityTab) securityTab.style.display = isGuest ? 'none' : '';
@@ -103,7 +103,7 @@ function enterGuestMode() {
     }
     setGuestMode(true);
     window.loadGuestState();
-    if (window.applyPrefs) window.applyPrefs(window.state.prefs || {});
+    if (window.applyPrefs) window.applyPrefs((window.state.prefs || {}) as UserPrefs);
     navigateTo(ROUTES.guest);
 }
 

@@ -4,24 +4,49 @@ Gerenciador de tarefas gamificado e focado em produtividade. Transforma o ato de
 
 ## Estrutura do Projeto
 
-Este projeto utiliza uma arquitetura Web Vanilla profissional, com separação Domain-Driven:
+Este projeto utiliza uma arquitetura Web Vanilla com TypeScript e MPA (Multi-Page App) via Vite.
 
-- `/src/core` — Configurações centrais, Firebase (init, db, auth), Router e State.
-- `/src/features` — Lógica de domínio de negócio: Notificações (diagnóstico + matching) e Onboarding.
-- `/src/pages` — Scripts específicos por página (Hub, Panel, Comunidade, Study/Pomodoro).
-- `/src/shared` — UI components, templates de slots, modais, temas, toasts e utilitários.
-- `/src/styles` — CSS organizado em global (variáveis, reset), components e pages.
-- `/docs` — Documentação de produto e arquitetura.
-- `/.agents` — Regras e contexto para agentes de IA (lido automaticamente via `opencode.json`).
-- `opencode.json` — Config do opencode: `{ "instructions": [".agents/AGENTS.md"] }`.
+```
+/                           # HTMLs na raiz (requisito Vite MPA)
+├── index.html              # Hero Hub
+├── panel.html              # Painel/Dashboard
+├── study.html              # Modo Estudo/Pomodoro
+├── comunidade.html         # Comunidade Social
+├── src/
+│   ├── core/               # State, Router, Firebase (init/db/auth)
+│   ├── features/           # Notificações (diagnóstico+matching), Onboarding
+│   ├── pages/              # Scripts por página (hub, panel, study-timer, comunidade)
+│   ├── shared/             # UI (modais, temas, toasts, media, settings), Templates de slots
+│   ├── styles/             # CSS organizado: global (variáveis, reset), components, pages
+│   ├── types/              # globals.d.ts (~120 globais tipados)
+│   └── __tests__/          # Testes unitários (Vitest + jsdom)
+├── docs/                   # Documentação de produto e arquitetura
+├── .agents/                # Regras para agentes de IA (lido via opencode.json)
+├── vite.config.js          # 4 entradas MPA
+├── vitest.config.ts        # Configuração Vitest
+├── eslint.config.js        # ESLint flat config
+└── tsconfig.json           # strict: false, allowJs: true
+```
 
-Arquivos HTML na raiz (`index.html`, `panel.html`, `study.html`, `comunidade.html`) por compatibilidade com o MPA do Vite.
+## Integração com Agentes de IA
 
-## Dependências
-- **Vite** (devDependency) — servidor de desenvolvimento e bundler para produção
-- **Firebase** (via CDN, SDK v10.8.0) — Auth + Firestore, importado dinamicamente em `src/core/firebase/`
-- **CropperJS** (via CDN) — Recorte de imagens para avatar e banner
-- **Google Fonts** — Tipografia
+Este repositório usa `opencode.json` na raiz para instruir agentes de IA com as regras em `.agents/AGENTS.md`. O arquivo contém o mapeamento completo de globais (`window.*`), ordem de carregamento de scripts, localStorage keys, schema do Firestore, regras de CSS e padrões de debugging.
+
+> Ao trabalhar neste projeto com um agente de IA, garanta que ele leia `.agents/AGENTS.md` e `docs/PRODUCT.md` antes de qualquer edição.
+
+## Stack
+
+**Sem frameworks pesados** — Vanilla TypeScript puro. Nenhuma dependência de produção.
+
+| Categoria | Tecnologia |
+|---|---|
+| Build | Vite 8.x (`dev`, `build`, `preview`) |
+| TypeScript | TS 6.x (`typecheck`) |
+| Lint | ESLint 10.x + typescript-eslint (`lint`, `lint:fix`) |
+| Testes | Vitest 4.x + jsdom (`test`, `test:watch`) |
+| Banco + Auth | Firebase SDK v10.8.0 via CDN dinâmico |
+| Imagens | CropperJS via CDN, DiceBear API (fallback avatar) |
+| Tipografia | Google Fonts (Space Grotesk) |
 
 ## Execução
 
@@ -34,9 +59,22 @@ Servidor em http://localhost:5173 com HMR.
 
 ### Build para Produção
 ```bash
-npm run build
+npm run build       # gera dist/ com assets otimizados
+npm run preview     # serve localmente o conteúdo de dist/
 ```
-Gera `dist/` com HTML/CSS/JS otimizados. Hospede o conteúdo dessa pasta em qualquer CDN estático.
+Hospede o conteúdo de `dist/` em qualquer CDN estático.
+
+### Testes
+```bash
+npm run test        # executa uma vez
+npm run test:watch  # modo watch
+```
+
+### Type Checking + Lint
+```bash
+npm run typecheck
+npm run lint
+```
 
 ## Páginas da Aplicação
 
@@ -50,7 +88,7 @@ Gera `dist/` com HTML/CSS/JS otimizados. Hospede o conteúdo dessa pasta em qual
 ## Arquitetura Técnica
 
 ### Firebase (ES Modules via CDN)
-Os módulos do Firebase (`init.js`, `db.js`, `auth.js`) são carregados como `type="module"` e importam o SDK dinamicamente. Executam **após** os scripts regulares (deferred), garantindo que `window.state`, `window.handleAuthRouting`, `window.render` etc. já estejam definidos quando o callback de auth dispara.
+Os módulos do Firebase (`init.ts`, `db.ts`, `auth.ts`) são carregados como `type="module"` e importam o SDK dinamicamente. Executam **após** os scripts regulares (deferred), garantindo que `window.state`, `window.handleAuthRouting`, `window.render` etc. já estejam definidos quando o callback de auth dispara.
 
 ### Fluxo de Autenticação
 ```
@@ -63,9 +101,9 @@ onAuthStateChanged
 ```
 
 ### Sistema de Notificações
-- `engine.js` — estado (`__notifications[]`), lógica de matching, persistência em localStorage
-- `ui.js` — render do painel dropdown e mini-modais de perfil
-- `init.js` — timers, inicialização e exports globais
+- `engine.ts` — estado (`__notifications[]`), lógica de matching, persistência em localStorage
+- `ui.ts` — render do painel dropdown e mini-modais de perfil
+- `init.ts` — timers, inicialização e exports globais
 - Diagnóstico de perfil: notificação persistente (não apagável)
 - Matching: máximo 1 notificação regular por vez, agendada para 00:00 ou 12:00 local
 
@@ -75,10 +113,10 @@ onAuthStateChanged
 - Valores econômicos (XP, Pts, custo, cooldown) fixos em `SLOT_ECONOMICS` — não altere sem revisão de balanceamento
 
 ### escapeHtml
-A função `escapeHtml` é **definida uma única vez** em `modals.js` e exposta como `window.escapeHtml`. Todos os outros scripts a usam via `window.escapeHtml(str)` diretamente. Nunca crie uma segunda declaração com `const escapeHtml`.
+A função `escapeHtml` é **definida uma única vez** em `modals.ts` e exposta como `window.escapeHtml`. Todos os outros scripts a usam via `window.escapeHtml(str)` diretamente. Nunca crie uma segunda declaração com `const escapeHtml`.
 
 ### Estudo / Pomodoro
-O timer completo está em `src/pages/study/study-timer.js` (extraído do inline de `study.html`). Expõe `window.studyTimer` com modos `'simple'` e `'pomodoro'`. Configurações de break auto/manual em `settings-modal.js`.
+O timer completo está em `src/pages/study/study-timer.ts` (extraído do inline de `study.html`). Expõe `window.studyTimer` com modos `'simple'` e `'pomodoro'`. Configurações de break auto/manual em `settings-modal.ts`.
 
 ## Scripts Removidos (histórico)
 - `scripts/refactor.cjs` e `refactor2.cjs` — utilitários de refatoração obsoletos

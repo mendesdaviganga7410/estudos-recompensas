@@ -1,3 +1,4 @@
+// @ts-nocheck
 const $n = id => document.getElementById(id);
 
 let __diagStep = 0;

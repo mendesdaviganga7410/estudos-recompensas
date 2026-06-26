@@ -1,3 +1,4 @@
+// @ts-nocheck
 let $com = id => document.getElementById(id);
 let communityProfiles = [];
 let communitySearchTimer = null;

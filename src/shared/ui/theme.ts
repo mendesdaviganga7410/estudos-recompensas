@@ -23,15 +23,15 @@ const THEME_LABELS = {
     "outerwilds-light":  "Lareira Gentil",
 };
 
-function persistPrefs(prefs) {
+function persistPrefs(prefs: UserPrefs): void {
     window.state.prefs = prefs;
     if (window.currentUser && window.saveStateToFirestore) {
-        window.saveStateToFirestore(window.currentUser.uid, window.state)
-            .catch(err => console.warn("Prefs: sincronização pendente.", err));
+        window.saveStateToFirestore((window.currentUser as Record<string, string>).uid, window.state)
+            .catch((err: unknown) => console.warn("Prefs: sincronização pendente.", err));
     }
 }
 
-function applyPrefs(prefs) {
+function applyPrefs(prefs: UserPrefs): void {
     const theme  = prefs.theme  || "light";
     const radius = prefs.radius || "16px";
     const shadow = prefs.shadow || "6px";
@@ -40,53 +40,57 @@ function applyPrefs(prefs) {
     document.documentElement.style.setProperty('--base-radius', radius);
     document.documentElement.style.setProperty('--shadow-depth', shadow);
 
-    if ($("radiusSlider")) $("radiusSlider").value = parseInt(radius);
-    if ($("shadowSlider")) $("shadowSlider").value = parseInt(shadow);
-    if ($("radiusValue")) $("radiusValue").textContent = radius;
-    if ($("shadowValue")) $("shadowValue").textContent = shadow;
+    const rs = $("radiusSlider") as HTMLInputElement | null;
+    if (rs) rs.value = String(parseInt(radius));
+    const ss = $("shadowSlider") as HTMLInputElement | null;
+    if (ss) ss.value = String(parseInt(shadow));
+    const rv = $("radiusValue");
+    if (rv) rv.textContent = radius;
+    const sv = $("shadowValue");
+    if (sv) sv.textContent = shadow;
     const lbl = $("current-theme-label");
     if (lbl) lbl.textContent = THEME_LABELS[theme] || theme;
 }
 
-function changeTheme(themeName) {
+function changeTheme(themeName: string): void {
     document.body.setAttribute("data-theme", themeName);
     const lbl = $("current-theme-label");
-    if (lbl) lbl.textContent = THEME_LABELS[themeName] || themeName;
-    const prefs = { ...(window.state.prefs || {}), theme: themeName };
+    if (lbl) lbl.textContent = (THEME_LABELS as Record<string, string>)[themeName] || themeName;
+    const prefs: UserPrefs = { ...(window.state.prefs || {}), theme: themeName, radius: window.state.prefs?.radius || "16px", shadow: window.state.prefs?.shadow || "6px" };
     window.state.prefs = prefs;
     persistPrefs(prefs);
 }
 
-function changeRadius(radiusValue) {
+function changeRadius(radiusValue: string): void {
     document.documentElement.style.setProperty('--base-radius', radiusValue);
-    const prefs = { ...(window.state.prefs || {}), radius: radiusValue };
+    const prefs: UserPrefs = { ...(window.state.prefs || {}), radius: radiusValue, theme: window.state.prefs?.theme || "light", shadow: window.state.prefs?.shadow || "6px" };
     window.state.prefs = prefs;
     persistPrefs(prefs);
     const valEl = $("radiusValue");
     if (valEl) valEl.textContent = radiusValue;
 }
 
-function changeShadow(shadowValue) {
+function changeShadow(shadowValue: string): void {
     document.documentElement.style.setProperty('--shadow-depth', shadowValue);
-    const prefs = { ...(window.state.prefs || {}), shadow: shadowValue };
+    const prefs: UserPrefs = { ...(window.state.prefs || {}), shadow: shadowValue, theme: window.state.prefs?.theme || "light", radius: window.state.prefs?.radius || "16px" };
     window.state.prefs = prefs;
     persistPrefs(prefs);
     const valEl = $("shadowValue");
     if (valEl) valEl.textContent = shadowValue;
 }
 
-function initTheme() {
+function initTheme(): void {
     const prefs = window.state.prefs || {};
-    applyPrefs(prefs);
+    applyPrefs(prefs as UserPrefs);
 }
 
-function openThemeDialog() {
-    const dialog = $("theme-dialog");
+function openThemeDialog(): void {
+    const dialog = $("theme-dialog") as HTMLDialogElement | null;
     if (dialog) dialog.showModal();
 }
 
-function closeThemeDialog() {
-    const dialog = $("theme-dialog");
+function closeThemeDialog(): void {
+    const dialog = $("theme-dialog") as HTMLDialogElement | null;
     if (dialog) dialog.close();
 }
 

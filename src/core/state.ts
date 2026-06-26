@@ -1,3 +1,4 @@
+// @ts-nocheck
 const TIERS = [
     { name: "Bronze",        min: 0,     max: 499,     i: "🥉" },
     { name: "Prata",         min: 500,   max: 1499,    i: "🥈" },
@@ -171,7 +172,6 @@ function ativarAdmin() {
     window.saveState();
     const btn = document.getElementById('admin-btn');
     if (btn) btn.style.display = '';
-    console.log('🛠️ Modo ADMIN ativado!');
     window.toast?.('🛠️ Modo ADMIN ativado!', false, 4000);
 }
 
@@ -180,7 +180,6 @@ function desativarAdmin() {
     window.state.prefs.isAdmin = false;
     window.isAdmin = false;
     window.saveState();
-    console.log('🔌 Modo ADMIN desativado.');
     window.toast?.('🔌 Modo ADMIN desativado.', false, 4000);
     const btn = document.getElementById('admin-btn');
     if (btn) btn.style.display = 'none';

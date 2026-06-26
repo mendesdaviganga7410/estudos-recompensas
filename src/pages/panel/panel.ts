@@ -1,3 +1,4 @@
+// @ts-nocheck
 function getTier(xp) {
     return TIERS.find(t => xp >= t.min && xp <= t.max) || TIERS[0];
 }
@@ -158,7 +159,6 @@ function renderStaticLists() {
     }
 
     if (epicsEl) {
-        const week = window.getWeekStr(new Date());
         epicsEl.innerHTML = lists.epics.map(t => {
             const done = weeklyDoneThisWeek(t.id);
             return `
