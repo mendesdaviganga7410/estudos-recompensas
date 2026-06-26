@@ -317,6 +317,11 @@ const escapeHtml = str => window.escapeHtml(str); // SyntaxError!
 | `window.render()` | panel.js | Renderiza painel (stats + shop + listas) |
 | `window.task(id, type, success)` | panel.js | Completa/falha missão |
 | `window.buy(id)` | panel.js | Compra item da loja |
+| `window.enterMomentum()` | panel.js | Inicia Modo Momentum |
+| `window.exitMomentum()` | panel.js | Sai do Modo Momentum |
+| `window.momentumComplete()` | panel.js | Conclui missão ativa no Momentum |
+| `window.momentumFail()` | panel.js | Falha missão ativa no Momentum |
+| `window.momentumActive` | panel.js | Boolean — true se Momentum está ativo |
 | `window.renderComunidade()` | comunidade.js | Renderiza grid da comunidade |
 | `window.onCommunitySearch()` | comunidade.js | Handler de busca com debounce |
 | `window.onCommunitySort()` | comunidade.js | Handler de ordenação |
@@ -553,6 +558,16 @@ Esta é a regra mais crítica do sistema:
 - Botão "Falhou" (−) re-adicionado nas missões diárias. Falhar agora também registra no `dailyLog` (mesmo estado visual de concluído), evitando dupla penalidade.
 - `.day.done` alterado de `var(--success)` (verde fixo) para `var(--accent)` com `color-mix()` — cor se adapta ao tema.
 - Rankings: "Dopamina Líquida" e "🔥 Ofensiva" agora lado a lado no mesmo container (`.status-metrics`), removendo a dotted border duplicada.
+
+### v2.5 — Modo Momentum
+
+- **Modo Momentum:** botão "▶ Iniciar" na métrica "🚀 Momentum" dentro do ranking card do Painel.
+- Ao ativar, um overlay fullscreen com `backdrop-filter: blur(6px)` isola a primeira missão diária não concluída, eliminando distrações.
+- Ao completar ou falhar, avança automaticamente para a próxima missão da fila.
+- Quando todas as missões diárias são resolvidas, exibe "🎉 Todas as missões do dia concluídas!" + botão "Voltar ao Painel".
+- Tecla `Escape` sai do modo a qualquer momento.
+- `task()` modificada para não chamar `render()` quando `window.momentumActive === true`.
+- Novos globals: `window.enterMomentum()`, `window.exitMomentum()`, `window.momentumComplete()`, `window.momentumFail()`, `window.momentumActive`.
 
 ### v2.3 — Streaks, Limites Diários/Semanais e Confete
 - Renomeado "Rotinas Diárias" → "Missões Diárias" e "Marcos Épicos" → "Missões Semanais" em todas as páginas.

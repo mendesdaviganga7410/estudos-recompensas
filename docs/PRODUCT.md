@@ -1,5 +1,5 @@
 # Produto: NeuroFlow
-**Versão:** 2.4 | **Última atualização:** 2026-06-25
+**Versão:** 2.5 | **Última atualização:** 2026-06-25
 
 > Este documento centraliza o conhecimento de negócios, visão de produto e funcionalidades do NeuroFlow. É leitura **obrigatória** para qualquer agente de IA antes de executar tarefas neste repositório.
 
@@ -45,10 +45,11 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 - **Missões Diárias (5 slots):** tarefas com recompensa (+XP, +Pts) e penalidade por falha (-XP). Só podem ser concluídas uma vez por dia. Penalidade automática ao virar o dia se não concluídas.
 - **Missões Semanais (3 slots):** metas de longo prazo com recompensa maior, sem penalidade. Só podem ser concluídas uma vez por semana.
 - **Loja de Recompensas (8 slots):** itens compráveis com pontos e cooldown individual por item
+- **Modo Momentum:** overlay de foco que isola a primeira missão diária não concluída, eliminando distrações. Avança automaticamente ao completar/falhar. Tecla Escape sai do modo.
 - **Persistência:** Firestore (logado) ou localStorage (visitante)
 - **Atualização automática:** loja re-renderizada a cada 30s para atualizar cooldowns
 
-**Funções-chave:** `window.render()`, `window.task(id, type, success)`, `window.buy(id)`
+**Funções-chave:** `window.render()`, `window.task(id, type, success)`, `window.buy(id)`, `window.enterMomentum()`
 
 ### 2.3. Modo Estudo / Pomodoro (`study.html`)
 **Ferramenta de foco com histórico e sons.**
@@ -238,6 +239,13 @@ initNotifications()
 ---
 
 ## 8. Histórico de Evoluções do Produto
+
+### 2026-06-25 — v2.5 (Modo Momentum)
+- Botão "▶ Iniciar" na métrica "🚀 Momentum" dentro do ranking card do Painel.
+- Ao ativar, um overlay fullscreen com `backdrop-filter: blur(6px)` isola a primeira missão diária não concluída.
+- Ao completar ou falhar, avança automaticamente para a próxima missão da fila.
+- Quando todas as missões diárias são resolvidas, exibe "🎉 Todas as missões do dia concluídas!" + botão "Voltar ao Painel".
+- Tecla Escape sai do modo a qualquer momento.
 
 ### 2026-06-25 — v2.4 (Correção de Fuso + Persistência Firestore + Factory Reset)
 - `getTodayStr()`, `getYesterdayStr()`, `calcStreak()` corrigidos de UTC para data local.

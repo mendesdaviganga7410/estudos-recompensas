@@ -290,7 +290,7 @@ function task(id, type, success) {
     }
 
     state.lastDailyDate = window.getTodayStr();
-    render();
+    if (!window.momentumActive) render();
     persistState();
 
     const newTier = getTier(state.xp);
@@ -318,6 +318,109 @@ function buy(id) {
 
 window.task = task;
 window.buy  = buy;
+
+/* --------------------------------------------------------------------------
+   MOMENTUM MODE
+   -------------------------------------------------------------------------- */
+let momentumActive = false;
+let momentumQueue = [];
+window.momentumActive = momentumActive;
+
+function showMomentumCard(html) {
+    let overlay = document.getElementById('momentum-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.className = 'momentum-overlay';
+        overlay.id = 'momentum-overlay';
+        overlay.addEventListener('keydown', e => { if (e.key === 'Escape') exitMomentum(); });
+        document.body.appendChild(overlay);
+        overlay.focus();
+    }
+    overlay.innerHTML = html;
+}
+
+function enterMomentum() {
+    if (momentumActive) return;
+    const lists = window.getMergedLists?.() || { dailies: [] };
+    const dailies = lists.dailies.filter(t => !dailyDoneToday(t.id));
+    if (dailies.length === 0) {
+        window.toast?.('🎉 Todas as missões do dia já foram concluídas!');
+        return;
+    }
+    momentumActive = true;
+    window.momentumActive = true;
+    momentumQueue = dailies;
+    document.addEventListener('keydown', onMomentumKeydown);
+    renderMomentumTask(0);
+}
+
+function renderMomentumTask(index) {
+    if (index >= momentumQueue.length) {
+        showMomentumCard(`
+            <div class="momentum-card">
+                <div class="momentum-title" style="font-size:2.5rem;">🎉</div>
+                <div class="momentum-done">Todas as missões do dia concluídas!</div>
+                <div class="momentum-exit"><button onclick="exitMomentum()">Voltar ao Painel</button></div>
+            </div>
+        `);
+        return;
+    }
+    const t = momentumQueue[index];
+    showMomentumCard(`
+        <div class="momentum-card">
+            <span class="momentum-label">🚀 Modo Momentum</span>
+            <div class="momentum-title">${window.escapeHtml(t.name)}</div>
+            <div class="momentum-desc">${window.escapeHtml(t.desc)}</div>
+            <div class="momentum-badges">
+                <span class="badge badge-highlight">+${t.pts} Pts</span>
+                <span class="badge">+${t.xp} XP</span>
+                <span class="badge">-${t.fXp} XP penalidade</span>
+            </div>
+            <div class="momentum-actions">
+                <button class="btn-ctrl btn-del" onclick="momentumFail()" title="Falhou">−</button>
+                <button class="btn-ctrl btn-ok" onclick="momentumComplete()" title="Concluído">+</button>
+            </div>
+            <div class="momentum-exit"><button onclick="exitMomentum()">Sair</button></div>
+        </div>
+    `);
+}
+
+function momentumComplete() {
+    if (momentumQueue.length === 0) return;
+    const t = momentumQueue[0];
+    window.task(t.id, 'd', true);
+    momentumQueue.shift();
+    renderMomentumTask(0);
+}
+
+function momentumFail() {
+    if (momentumQueue.length === 0) return;
+    const t = momentumQueue[0];
+    window.task(t.id, 'd', false);
+    momentumQueue.shift();
+    renderMomentumTask(0);
+}
+
+function onMomentumKeydown(e) {
+    if (e.key === 'Escape') {
+        exitMomentum();
+    }
+}
+
+function exitMomentum() {
+    momentumActive = false;
+    window.momentumActive = false;
+    momentumQueue = [];
+    document.removeEventListener('keydown', onMomentumKeydown);
+    const overlay = document.getElementById('momentum-overlay');
+    if (overlay) overlay.remove();
+    render();
+}
+
+window.enterMomentum = enterMomentum;
+window.exitMomentum = exitMomentum;
+window.momentumComplete = momentumComplete;
+window.momentumFail = momentumFail;
 
 if (window.isPainelPage?.() || document.getElementById('rDailies')) {
     document.addEventListener('DOMContentLoaded', () => {
