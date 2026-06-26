@@ -127,6 +127,7 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 - 22 temas disponíveis (8 claros, 14 escuros)
   - **Claros:** Padrão Claro, Café com Leite, Flor de Cerejeira, Brisa do Mar, Lavanda Suave, Menta Fresca, Solarized Light, Lareira Gentil
   - **Escuros:** Dark Padrão, Dark Industrial, Cyberpunk, Dark Ocean, Monochrome, Cacau Intenso, Floresta Noturna, Âmbar Profundo, Noite de Vampiro, Catppuccin Mocha, Nordic Ice, Dracula Sync, GitHub Premium, Fogueira Cósmica
+  - *Obs: Nem todos os 22 temas estão expostos nos botões de preview do HTML (faltam dark-industrial, dark-cyberpunk, dark-ocean, dark-monochrome). Ao adicionar um tema, atualize base.css, THEME_LABELS em theme.ts, e os 4 HTMLs.*
 - Aplicado via `data-theme` no `<body>` — variáveis CSS controlam toda a paleta
 - Persistido em `state.prefs.theme` (Firestore ou localStorage)
 - Customização adicional: border-radius global e profundidade de sombra (persistidos em `prefs.radius` e `prefs.shadow`)

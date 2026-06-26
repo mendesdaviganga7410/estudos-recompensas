@@ -13,8 +13,10 @@ dist
 dist-ssr
 *.local
 
-# Scripts and Environment
-scripts/git-enviar.sh
+# TypeScript
+*.tsbuildinfo
+
+# Environment
 .env
 .env.*
 !.env.example
