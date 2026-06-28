@@ -67,6 +67,29 @@ interface UserPrefs {
   isAdmin?: boolean;
 }
 
+interface StudyBlock {
+  id: string; // UUID
+  userId: string;
+  materia: string;
+  topico: string;
+  conteudo: string;
+  createdAt: number;
+  lastReviewDate: number;
+  nextReviewDate: number;
+  status: 'pending' | 'due' | 'overdue' | 'completed';
+  reviewSettingsId?: string;
+  currentIntervalIndex: number;
+  repetition: number;
+  color: string; // Adicionado: Cor associada ao bloco
+}
+
+interface ActiveReviewSetting {
+  id: string;
+  name: string;
+  intervals: number[];
+  easeFactorMultiplier: number;
+}
+
 interface AppState {
   pontos: number;
   pts: number;
@@ -80,8 +103,10 @@ interface AppState {
   dailyLog: Record<string, string[]>;
   weeklyLog: Record<string, string[]>;
   lastDailyDate: string;
+  activeReviewSetting: ActiveReviewSetting | null;
   onboardingComplete: boolean;
   updatedAt: number;
+  studyBlocks: StudyBlock[];
 }
 
 interface MergedSlot {
@@ -179,6 +204,13 @@ interface Window {
   loadStudySessions(uid: string, max?: number): Promise<Record<string, unknown>[]>;
   deleteAllStudySessions(uid: string): Promise<void>;
   migrateStudySessions(uid: string): Promise<void>;
+  saveStudyBlock(uid: string, block: StudyBlock): Promise<void>;
+  loadStudyBlocks(uid: string): Promise<StudyBlock[]>;
+  deleteStudyBlock(uid: string, blockId: string): Promise<void>;
+  getActiveReviewSettings(): ActiveReviewSetting;
+  renderReviewSettingsRow(): void;
+  onPresetChange(): void;
+  applyReviewSettings(): void;
 
   ROUTES: Record<string, string>;
   navigateTo(url: string): void;
@@ -193,7 +225,8 @@ interface Window {
   isHubPage(): boolean;
   isPainelPage(): boolean;
   isStudyPage(): boolean;
-  isComunidadePage(): boolean;
+        isComunidadePage(): boolean;
+        isReviewPage(): boolean;
 
   renderHeroHub(): void;
   render(): void;
@@ -207,6 +240,21 @@ interface Window {
   renderComunidade(): void;
   onCommunitySearch(): void;
   onCommunitySort(): void;
+  renderReviewPage(): void;
+  openAddBlockDialog(): void;
+  closeAddBlockDialog(): void;
+  addStudyBlock(): void;
+  renderStudyBlocksList(): void;
+  applyReviewFilters(): void;
+  populateMateriaFilter(): void;
+  updateReviewStats(): void;
+  openReviewBlockDialog(blockId: string): void;
+  closeReviewFeedbackDialog(): void;
+  submitReviewFeedback(difficulty: string): void;
+  deleteStudyBlockById(blockId: string): void;
+  _reviewBlockId: string | null;
+  calculateNextReview(block: StudyBlock, settings: ActiveReviewSetting, difficulty: string): Record<string, unknown>;
+  updateBlocksStatus(): void;
   studyTimer: Record<string, unknown>;
   startOnboarding(): void;
   closeOnboarding(): void;
@@ -225,6 +273,8 @@ interface Window {
   clearAllNotifications(): void;
   deleteAllNotifications(): void;
   generateOneNotification(): void;
+  generateReviewNotif(): void;
+  onReviewNotifClick(): void;
   scheduleDiagReminder(): void;
   openDiagnosticDialog(): void;
   closeDiagnosticDialog(): void;

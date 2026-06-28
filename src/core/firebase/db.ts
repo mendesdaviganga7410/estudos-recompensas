@@ -52,7 +52,9 @@ export async function saveStateToFirestore(userId, fullState, partial) {
         dailyLog: s.dailyLog || {},
         weeklyLog: s.weeklyLog || {},
         lastDailyDate: s.lastDailyDate || '',
+        activeReviewSetting: s.activeReviewSetting || null,
         onboardingComplete: !!s.onboardingComplete,
+        studyBlocks: s.studyBlocks || [],
         updatedAt: Date.now(),
         ...partial
     };
@@ -142,6 +144,47 @@ export async function deleteAllStudySessions(userId) {
     }
 }
 
+// ================================================================
+//  BLOCO DE ESTUDO E CONFIGURAÇÕES DE REVISÃO — subcoleções
+// ================================================================
+
+export async function saveStudyBlock(userId, block) {
+    if (!db) return;
+    try {
+        const ref = doc(db, "users", userId, "studyBlocks", String(block.id));
+        await setDoc(ref, {
+            ...block,
+            userId: userId,
+            savedAt: Date.now() // Novo campo para rastrear a última modificação no Firestore
+        }, { merge: true });
+    } catch (err) {
+        console.error("Erro ao salvar bloco de estudo:", err);
+    }
+}
+
+export async function loadStudyBlocks(userId) {
+    if (!db) return [];
+    try {
+        const ref = collection(db, "users", userId, "studyBlocks");
+        const q = query(ref, orderBy("createdAt", "desc")); // Ordenar por criação para consistência
+        const snap = await getDocs(q);
+        return snap.docs.map(d => d.data());
+    } catch (err) {
+        console.error("Erro ao carregar blocos de estudo:", err);
+        return [];
+    }
+}
+
+export async function deleteStudyBlock(userId, blockId) {
+    if (!db) return;
+    try {
+        const ref = doc(db, "users", userId, "studyBlocks", String(blockId));
+        await deleteDoc(ref);
+    } catch (err) {
+        console.error("Erro ao deletar bloco de estudo:", err);
+    }
+}
+
 export async function migrateStudySessions(userId) {
     if (!db) return 0;
     try {
@@ -166,6 +209,9 @@ window.saveStudySession           = saveStudySession;
 window.loadStudySessions          = loadStudySessions;
 window.deleteAllStudySessions     = deleteAllStudySessions;
 window.migrateStudySessions       = migrateStudySessions;
+window.saveStudyBlock           = saveStudyBlock;
+window.loadStudyBlocks          = loadStudyBlocks;
+window.deleteStudyBlock         = deleteStudyBlock;
 window.syncUserData               = syncUserData;
 window.saveStateToFirestore       = saveStateToFirestore;
 window.completeOnboarding         = completeOnboarding;

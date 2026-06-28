@@ -4,7 +4,8 @@ const ROUTES = {
     painel:     'panel.html',
     guest:      'panel.html',
     comunidade: 'comunidade.html',
-    estudo:     'study.html'
+    estudo:     'study.html',
+    review:     'review.html'
 };
 
 function getCurrentPage() {
@@ -17,6 +18,7 @@ function isHubPage()     { return getCurrentPage() === 'index.html'; }
 function isPainelPage()  { return getCurrentPage() === 'panel.html'; }
 function isHeroPage()    { return isHubPage(); }
 function isComunidadePage() { return getCurrentPage() === 'comunidade.html'; }
+function isReviewPage() { return getCurrentPage() === 'review.html'; }
 function isStudyPage()     { return getCurrentPage() === 'study.html'; }
 
 function setGuestMode(active) {
@@ -82,10 +84,36 @@ function handleAuthRouting() {
         if (window.renderStudy) window.renderStudy();
         return;
     }
+    if (isReviewPage()) {
+        if (window.renderReviewPage) window.renderReviewPage();
+        return;
+    }
     if (isHubPage() || isInicioPage()) {
         if (window.renderHeroHub) window.renderHeroHub();
     }
 }
+
+// Hook para garantir que a renderização da página de revisão ocorra após o handleAuthRouting
+// Isso previne que a página de revisão renderize antes que window.state.studyBlocks seja populado
+const originalHandleAuthRouting = window.handleAuthRouting;
+window.handleAuthRouting = async () => {
+    await originalHandleAuthRouting();
+    if (window.isReviewPage?.()) {
+        if (window.state.studyBlocks && window.state.studyBlocks.length === 0 && window.currentUser && window.loadStudyBlocks) {
+            // Se o estado estiver vazio e for um usuário logado, tentar carregar do Firestore
+            const loadedBlocks = await window.loadStudyBlocks(String(window.currentUser.uid));
+            window.state.studyBlocks = loadedBlocks; // Atualiza o estado
+            window.renderStudyBlocksList(); // Renderiza com os dados carregados
+        } else if (window.isGuestMode && (!window.state.studyBlocks || window.state.studyBlocks.length === 0)) {
+            // Para modo convidado, garantir que o estado local seja carregado e renderizado
+            window.loadGuestState();
+            window.renderStudyBlocksList();
+        } else if (window.state.studyBlocks && window.state.studyBlocks.length > 0) {
+             // Se já tem dados no estado, apenas renderiza
+            window.renderStudyBlocksList();
+        }
+    }
+};
 
 function renderGuestLanding() {
     const landing = document.getElementById('guest-landing');

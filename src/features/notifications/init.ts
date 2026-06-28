@@ -82,10 +82,16 @@ async function initNotifications() {
 
     scheduleDiagnosticPrompt();
 
+    // Notificação de revisão periódica
+    generateReviewNotif();
+
     if (__refreshTimer) clearInterval(__refreshTimer);
     __refreshTimer = setInterval(() => {
         if (window.currentUser && hasDiagnostic()) {
             refreshNotifications();
+        }
+        if (window.state?.studyBlocks) {
+            generateReviewNotif();
         }
     }, 300000);
 }
@@ -153,6 +159,8 @@ window.markPersistentDiagSeen   = markPersistentDiagSeen;
 window.clearAllNotifications    = clearAllNotifications;
 window.scheduleDiagReminder     = scheduleDiagReminder;
 window.generateOneNotification  = generateOneNotification;
+window.generateReviewNotif      = generateReviewNotif;
+window.onReviewNotifClick       = onReviewNotifClick;
 
 /* Monitora mudanças de currentUser para (re)inicializar */
 (function watchUser() {

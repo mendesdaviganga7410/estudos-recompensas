@@ -1,5 +1,5 @@
 # Produto: NeuroFlow
-**Versão:** 3.3 | **Última atualização:** 2026-06-25
+**Versão:** 4.0 | **Última atualização:** 2026-06-28
 
 > Este documento centraliza o conhecimento de negócios, visão de produto e funcionalidades do NeuroFlow. É leitura **obrigatória** para qualquer agente de IA antes de executar tarefas neste repositório.
 
@@ -76,7 +76,20 @@ O **NeuroFlow** é um gerenciador de tarefas altamente gamificado, desenvolvido 
 
 **Funções-chave:** `window.renderComunidade()`, `window.openProfileDetail(data)`, `window.fetchCommunityProfiles(limit?)`
 
-### 2.5. Autenticação e Modos de Acesso
+### 2.5. Revisão Espaçada (`review.html`)
+**Sistema de repetição espaçada para blocos de estudo.**
+
+- **Blocos de Estudo:** cards com matéria, tópico, conteúdo e cor customizável (auto-sugerida por matéria)
+- **Configurações de Revisão:** 5 presets padrão (Curta, Mensal, Semestral, Intensiva, Longo Prazo) + configurações personalizadas (nome, array de intervalos, easeFactorMultiplier)
+- **Algoritmo SM-2 adaptado:** avanço de índice baseado na dificuldade reportada (Fácil→+2, Médio→+1, Difícil→+0)
+- **Status visuais:** verde (revisado hoje), laranja (pendente), vermelho (atrasado), cor padrão (sem revisão)
+- **Ferramentas:** busca por texto, filtro por status/matéria, ordenação por data/material/criação, barra de estatísticas
+- **Notificações:** integradas ao sistema existente — badge no sino com contagem de blocos due/overdue, notificação persistente no painel
+- **Persistência:** dados salvos em `state.studyBlocks` e `state.reviewSettings` — Firestore (logado) ou localStorage (visitante)
+
+**Funções-chave:** `window.renderReviewPage()`, `window.addStudyBlock()`, `window.submitReviewFeedback(difficulty)`, `window.calculateNextReview()`
+
+### 2.6. Autenticação e Modos de Acesso
 
 | Modo | Acesso | Persistência |
 |---|---|---|
@@ -163,7 +176,7 @@ initNotifications()
 ```
 
 ### 4.4 Multi-Page App (MPA) com Vite + TypeScript
-- 4 entries no `vite.config.js`: `index.html`, `panel.html`, `study.html`, `comunidade.html`
+- 5 entries no `vite.config.js`: `index.html`, `panel.html`, `study.html`, `review.html`, `comunidade.html`
 - HTMLs ficam na raiz (requerimento do Vite MPA)
 - Scripts importados como `.ts` — Vite compila com esbuild (sem bundling de type="module" scripts)
 - `npm run dev` → servidor HMR na porta 5173
@@ -244,6 +257,14 @@ initNotifications()
 ---
 
 ## 8. Histórico de Evoluções do Produto
+
+### 2026-06-28 — v4.0 (Revisão Espaçada)
+- **Nova página:** `review.html` com sistema completo de repetição espaçada (SM-2 adaptado)
+- **Blocos de estudo:** criação, revisão com feedback de dificuldade, cores customizáveis, status visuais
+- **Configurações de revisão:** 5 presets padrão + suporte a configurações personalizadas
+- **Filtros e busca:** toolbar com busca textual, filtro por status/matéria, ordenação e barra de estatísticas
+- **Notificações integradas:** notificação persistente no painel de notificações para blocos due/overdue
+- **20+ novos globals** expostos em `window.*` e documentados
 
 ### 2026-06-25 — v3.2 (Testes Automatizados)
 - Vitest 4.1.9 + jsdom instalado; `npm run test` / `npm run test:watch`.

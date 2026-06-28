@@ -40,7 +40,9 @@ function createDefaultState() {
             currentStreak: 0,
             maxStreak: 0
         },
-        onboardingComplete: false
+        activeReviewSetting: null,
+        onboardingComplete: false,
+        studyBlocks: []
     };
 }
 
@@ -73,6 +75,8 @@ function loadGuestState() {
             if (!state.stats) state.stats = {};
             if (!state.stats.currentStreak) state.stats.currentStreak = 0;
             if (state.stats.maxStreak === undefined) state.stats.maxStreak = 0;
+            if (!state.studyBlocks) state.studyBlocks = [];
+            state.studyBlocks.forEach(block => { if (!block.color) block.color = 'var(--accent)'; }); // Garante cor padrão
         }
         state.prefs = (saved && saved.prefs) || {};
         window.isAdmin = state.prefs.isAdmin === true;
@@ -96,7 +100,9 @@ function saveGuestState() {
             onboardingComplete: state.onboardingComplete,
             dailyLog: state.dailyLog,
             weeklyLog: state.weeklyLog,
-            lastDailyDate: state.lastDailyDate
+            lastDailyDate: state.lastDailyDate,
+            activeReviewSetting: state.activeReviewSetting,
+            studyBlocks: state.studyBlocks
         };
         localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(payload));
     } catch (err) {
@@ -133,6 +139,8 @@ function applyRemoteState(data) {
     state.weeklyLog = data.weeklyLog || {};
     state.lastDailyDate = data.lastDailyDate || '';
     state.diagnostic = data.diagnostic ? { ...data.diagnostic } : undefined;
+    state.activeReviewSetting = data.activeReviewSetting || null;
+    state.studyBlocks = data.studyBlocks || [];
     state.onboardingComplete = data.onboardingComplete === true
         || (data.onboardingComplete === undefined && (
             (typeof data.xp === 'number' && data.xp > 0)

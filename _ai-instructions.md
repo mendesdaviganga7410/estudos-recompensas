@@ -55,6 +55,7 @@ Antes de modificar qualquer arquivo, confirme mentalmente cada item:
 ├── index.html              # Hero Hub (MPA entry 1)
 ├── panel.html              # Painel/Dashboard (MPA entry 2)
 ├── study.html              # Modo Estudo/Pomodoro (MPA entry 3)
+├── review.html             # Revisão Espaçada (MPA entry 5)
 ├── comunidade.html         # Comunidade (MPA entry 4)
 ├── vite.config.js          # Configuração Vite (4 entries MPA)
 ├── vitest.config.ts        # Configuração Vitest + jsdom
@@ -74,6 +75,7 @@ Antes de modificar qualquer arquivo, confirme mentalmente cada item:
     ├── core/
     │   ├── state.ts        # Estado global (window.state, TIERS, createDefaultState, etc.)
     │   ├── router.ts       # Navegação, detecção de página, guest mode
+    │   └── review-logic.ts # Algoritmo SM-2 adaptado, cálculo de revisão
     │   └── firebase/
     │       ├── init.ts     # Inicializa Firebase CDN (ES module, type="module")
     │       ├── auth.ts     # Autenticação (ES module, type="module")
@@ -92,6 +94,7 @@ Antes de modificar qualquer arquivo, confirme mentalmente cada item:
     │   ├── hub/hub.ts              # renderHeroHub()
     │   ├── panel/panel.ts          # render(), task(), buy(), momentum
     │   ├── study/study-timer.ts    # window.studyTimer (objeto completo)
+    │   ├── review/review.ts        # renderReviewPage(), CRUD blocks, filtros
     │   └── comunidade/comunidade.ts  # renderComunidade(), profile detail
     ├── shared/
     │   ├── templates/
@@ -146,13 +149,15 @@ Esta ordem é obrigatória em **TODAS** as páginas HTML. A quebra desta ordem c
 16. [regular]        src/shared/ui/settings-modal.ts
 17. [regular]        src/shared/ui/media.ts (NÃO em study.html)
 18. [regular]        src/core/router.ts
-19. [regular]        src/pages/<pagina>/<pagina>.ts  ← específico da página
-20. [inline]         admin-btn lógica (apenas index.html, panel.html, comunidade.html)
+19. [regular]        src/core/review-logic.ts (NÃO em index.html, panel.html, study.html)
+20. [regular]        src/pages/<pagina>/<pagina>.ts  ← específico da página
+21. [inline]         admin-btn lógica (apenas index.html, panel.html, comunidade.html)
 ```
 
 **Variações por página:**
-- `study.html` — **não** inclui CropperJS CDN, **não** inclui `media.ts`, **não** inclui `onboarding.ts`
+- `study.html` — **não** inclui CropperJS CDN, **não** inclui `media.ts`, **não** inclui `onboarding.ts`, **não** inclui `review-logic.ts`
 - `comunidade.html` — **não** inclui `onboarding.ts`
+- `review.html` — **não** inclui `onboarding.ts`
 
 **Por que os módulos Firebase executam por último:** `type="module"` são sempre deferred. Isso garante que quando `onAuthStateChanged` dispara, todos os `window.*` dos scripts regulares já estão definidos. O Vite compila `.ts` como se fossem `.js` normais (esbuild), sem bundling — scripts regulares rodam no escopo global e expõem via `window.*`.
 
@@ -312,6 +317,12 @@ TODOS os globais DEVEM estar declarados em `src/types/globals.d.ts` dentro da in
 | `window.sendPasswordReset(email)` | `(e: string) => void` | Link de redefinição |
 | `window.sendVerification()` | `() => void` | E-mail de verificação |
 
+#### De `review-logic.ts`
+| Global | Tipo | Descrição |
+|---|---|---|
+| `window.calculateNextReview(block, settings, difficulty)` | `Function` | SM-2 adaptado: avança índice conforme dificuldade |
+| `window.updateBlocksStatus()` | `() => void` | Atualiza status overdue/due/pending/completed |
+
 #### De `firebase/db.ts` (ES module)
 | Global | Tipo | Descrição |
 |---|---|---|
@@ -334,6 +345,8 @@ TODOS os globais DEVEM estar declarados em `src/types/globals.d.ts` dentro da in
 | `window.clearAllNotifications()` | `() => void` | Limpa não-persistentes |
 | `window.deleteAllNotifications()` | `() => void` | clearAll + toast |
 | `window.generateOneNotification()` | `() => void` | Gera 1 notificação de match |
+| `window.generateReviewNotif()` | `() => void` | Cria/remove notificação de blocos de revisão due/overdue |
+| `window.onReviewNotifClick()` | `() => void` | Handler clique — navega para review.html |
 | `window.scheduleDiagReminder()` | `() => void` | Agenda lembrete de diagnóstico |
 | `window.openDiagnosticDialog()` | `() => void` | Abre questionário |
 | `window.closeDiagnosticDialog()` | `() => void` | Fecha questionário |
@@ -354,6 +367,27 @@ TODOS os globais DEVEM estar declarados em `src/types/globals.d.ts` dentro da in
 | `window.momentumComplete()` | panel.ts | Conclui missão no Momentum |
 | `window.momentumFail()` | panel.ts | Falha missão no Momentum |
 | `window.momentumActive` | panel.ts | `boolean` — true se Momentum ativo |
+| `window.renderReviewPage()` | review.ts | Renderiza página de revisão espaçada |
+| `window.openAddBlockDialog()` | review.ts | Abre dialog para adicionar bloco |
+| `window.closeAddBlockDialog()` | review.ts | Fecha dialog de adicionar bloco |
+| `window.addStudyBlock()` | review.ts | Salva novo bloco de estudo |
+| `window.renderStudyBlocksList()` | review.ts | Renderiza lista de blocos com filtros |
+| `window.applyReviewFilters()` | review.ts | Aplica busca, filtros e ordenação |
+| `window.populateMateriaFilter()` | review.ts | Popula filtro de matéria |
+| `window.updateReviewStats()` | review.ts | Atualiza barra de estatísticas |
+| `window.openReviewSettingsDialog()` | review.ts | Abre dialog de config de revisão |
+| `window.closeReviewSettingsDialog()` | review.ts | Fecha dialog de config |
+| `window.renderReviewSettingsDialog()` | review.ts | Renderiza lista de configurações |
+| `window.openCustomReviewSettingsDialog()` | review.ts | Abre dialog de config personalizada |
+| `window.closeCustomReviewSettingsDialog()` | review.ts | Fecha dialog de config personalizada |
+| `window.editReviewSettings(id)` | review.ts | Edita config personalizada |
+| `window.saveCustomReviewSettings()` | review.ts | Salva config personalizada |
+| `window.deleteReviewSettings(id)` | review.ts | Exclui config personalizada |
+| `window.initDefaultReviewSettings()` | review.ts | Inicializa presets padrão |
+| `window.openReviewBlockDialog(id)` | review.ts | Abre dialog de feedback de revisão |
+| `window.closeReviewFeedbackDialog()` | review.ts | Fecha dialog de feedback |
+| `window.submitReviewFeedback(difficulty)` | review.ts | Submete feedback (easy/medium/hard) |
+| `window.deleteStudyBlockById(id)` | review.ts | Exclui bloco de estudo |
 | `window.renderComunidade()` | comunidade.ts | Renderiza grid da comunidade |
 | `window.onCommunitySearch()` | comunidade.ts | Handler de busca com debounce |
 | `window.onCommunitySort()` | comunidade.ts | Handler de ordenação |
@@ -436,6 +470,8 @@ TODOS os globais DEVEM estar declarados em `src/types/globals.d.ts` dentro da in
     maxStreak: Number
   },
   slots: Object,            // { dailies: {...}, epics: {...}, shop: {...} }
+  studyBlocks: Array,       // [{id, userId, materia, topico, conteudo, color, reviewSettingsId, nextReviewDate, status, ...}]
+  reviewSettings: Array,    // [{id, userId, name, desc, intervals, easeFactorMultiplier, isPreset}]
   diagnostic: Object,       // respostas do questionário de perfil
   dailyLog: Object,         // { "YYYY-MM-DD": ["d1","d2",...] }
   weeklyLog: Object,        // { "2026-W26": ["e1","e2",...] }
@@ -627,3 +663,13 @@ Esta é a regra mais crítica do sistema:
 - **Regras de código:** Seção 10.6 (novos testes), Seção 11.6 (erros de typecheck). Checklist pré-tarefa inclui `globals.d.ts` e `typecheck`/`lint`.
 - **Estrutura de pastas:** Adicionados `src/types/`, `src/__tests__/`, `vitest.config.ts`, `eslint.config.js`, `tsconfig.json`, `scripts/git-enviar.sh`.
 - **Removida** proibição de TypeScript (agora é a stack oficial). Removida referência a `"NÃO INTRODUZA TypeScript"`.\n- **Removidos** temas não encontrados no `base.css` atual (`dark-industrial`, `dark-cyberpunk`, `dark-ocean`, `dark-monochrome` — confirmar existência).\n- **Comentário sobre JavaScript puro removido** — agora é TypeScript nativo.
+
+### v4.0 — Revisão Espaçada (2026-06-28)
+- **Nova página:** `review.html` (MPA entry 5) + `src/pages/review/review.ts` com render, CRUD, filtros, busca, ordenação e barra de estatísticas.
+- **Nova funcionalidade:** Sistema de blocos de estudo com cores customizáveis (auto-sugeridas por matéria), configurações de revisão com 5 presets (`Curta`, `Mensal`, `Semestral`, `Intensiva`, `Longo Prazo`) + configurações personalizadas.
+- **Algoritmo SM-2 adaptado:** `src/core/review-logic.ts` com `calculateNextReview()` (difficulty: easy→+2 índices, medium→+1, hard→+0; aplica `easeFactorMultiplier`; clamp ao último intervalo) e `updateBlocksStatus()` (overdue/due/pending/completed conforme `nextReviewDate`).
+- **Notificações de revisão:** `generateReviewNotif()` em `engine.ts` cria notificação persistente `review-persistent` quando há blocos due/overdue. `onReviewNotifClick()` navega para `review.html`.
+- **UI do badge:** `renderNotificationBadge()` mostra o badge mesmo sem diagnóstico se houver notificações não-lidas (revisões). Painel de notificações lista notificações mesmo sem diagnóstico.
+- **Estilos de status:** `review.css` com `border-left-color` override via `!important` (due→warning, overdue→failure), `box-shadow` pulsante para overdue, opacidade reduzida para completed.
+- **Globals:** `~20 novos globals` adicionados ao `globals.d.ts` e documentados na Seção 4.4.
+- **Schema Firestore:** `studyBlocks[]` e `reviewSettings[]` adicionados ao schema `users/{uid}`.

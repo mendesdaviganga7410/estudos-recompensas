@@ -349,3 +349,52 @@ function clearAllNotifications() {
         openNotificationPanel();
     }
 }
+
+/* ---- PERSISTENT REVIEW NOTIFICATION ---- */
+
+function generateReviewNotif() {
+    __notifications = __notifications.filter(n => n.id !== 'review-persistent');
+
+    const blocks = window.state?.studyBlocks || [];
+    const overdue = blocks.filter(b => b.status === 'overdue');
+    const due = blocks.filter(b => b.status === 'due');
+
+    if (overdue.length === 0 && due.length === 0) {
+        __unreadCount = __notifications.filter(n => !n.seen).length;
+        renderNotificationBadge();
+        __saveNotifs();
+        return;
+    }
+
+    let text;
+    if (overdue.length > 0) {
+        text = `🔴 ${overdue.length} bloco${overdue.length > 1 ? 's' : ''} de estudo atrasado${overdue.length > 1 ? 's' : ''}! Revise agora.`;
+        if (due.length > 0) {
+            text += ` (+${due.length} pendente${due.length > 1 ? 's' : ''})`;
+        }
+    } else {
+        text = `🟠 ${due.length} bloco${due.length > 1 ? 's' : ''} para revisar hoje.`;
+    }
+
+    __notifications.unshift({
+        id: 'review-persistent',
+        type: 'review',
+        avatar: '',
+        text: text,
+        time: Date.now(),
+        seen: false,
+        persistent: true
+    });
+
+    __unreadCount = __notifications.filter(n => !n.seen).length;
+    renderNotificationBadge();
+    __saveNotifs();
+}
+
+function onReviewNotifClick() {
+    closeNotificationPanel();
+    const page = window.getCurrentPage ? window.getCurrentPage() : '';
+    if (page !== 'review') {
+        window.navigateTo('review.html');
+    }
+}
