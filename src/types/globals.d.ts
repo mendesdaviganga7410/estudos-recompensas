@@ -87,7 +87,7 @@ interface ActiveReviewSetting {
   id: string;
   name: string;
   intervals: number[];
-  easeFactorMultiplier: number;
+  easeFactorMultiplier?: number;
 }
 
 interface AppState {
@@ -209,8 +209,11 @@ interface Window {
   deleteStudyBlock(uid: string, blockId: string): Promise<void>;
   getActiveReviewSettings(): ActiveReviewSetting;
   renderReviewSettingsRow(): void;
-  onPresetChange(): void;
   applyReviewSettings(): void;
+  openReviewSettingsDialog(): void;
+  closeReviewSettingsDialog(): void;
+  renderReviewSettingsDialog(): void;
+  selectPresetFromDialog(presetId: string): void;
 
   ROUTES: Record<string, string>;
   navigateTo(url: string): void;
@@ -294,7 +297,9 @@ interface Window {
   soundConfig: Record<string, unknown>;
   SOUND_PRESETS: Record<string, unknown>;
   saveSoundConfig(): void;
-  playSound(group: string): void;
+  loadSoundConfig(): void;
+  playSound(group: string, presetId: string): void;
+  playConfiguredSound(group: string): void;
   _shopInterval: number | undefined;
   initQuickAvatarPicker(): void;
   initQuickBannerPicker(): void;

@@ -167,15 +167,15 @@
     </dialog>
 
     <dialog id="review-feedback-dialog" class="theme-bento-dialog">
-        <div class="bento-card dialog-theme-card" style="max-width:480px;">
+        <div class="bento-card dialog-theme-card" style="max-width:520px;">
             <div class="dialog-header-block">
                 <h3>🔄 Revisar Bloco</h3>
                 <button class="dialog-close-btn" onclick="window.closeReviewFeedbackDialog()">×</button>
             </div>
             <div class="dialog-body">
-                <h3 id="reviewBlockTitle" style="color:var(--text-title);margin-bottom:0.5rem;"></h3>
-                <p id="reviewBlockConteudo" style="color:var(--text-secondary);font-size:0.9rem;margin-bottom:1.5rem;line-height:1.5;background:var(--panel);padding:1rem;border-radius:var(--element-radius);"></p>
-                <p style="color:var(--text-muted);font-size:0.85rem;margin-bottom:1rem;text-align:center;">Como foi a revisão?</p>
+                <h3 id="reviewBlockTitle"></h3>
+                <p id="reviewBlockConteudo" style="font-size:0.9rem;line-height:1.5;background:var(--panel);padding:1rem;border-radius:var(--element-radius);"></p>
+                <p style="font-size:0.85rem;margin-bottom:1rem;text-align:center;">Como foi a revisão?</p>
                 <div class="difficulty-buttons">
                     <button class="btn-theme difficulty-btn" onclick="window.submitReviewFeedback('hard')" style="background:var(--failure);color:white;width:auto;flex:1;">
                         🔴 Difícil
@@ -207,6 +207,7 @@
     <script src="src/features/notifications/ui.ts"></script>
     <script src="src/features/notifications/init.ts"></script>
     <script src="src/shared/ui/settings-modal.ts"></script>
+    <script src="src/shared/ui/review-settings-dialog.ts"></script>
     <script src="src/shared/ui/media.ts"></script>
     <script src="src/core/router.ts"></script>
     <script src="src/core/review-logic.ts"></script>

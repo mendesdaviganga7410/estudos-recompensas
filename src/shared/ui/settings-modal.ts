@@ -2,6 +2,383 @@
    SETTINGS-MODAL — Modal único de configurações injetado dinamicamente
    ===================================================================== */
 
+const SOUND_KEY = 'estudo_config_som';
+
+// ============================================================
+//  SISTEMA DE SONS — PRESETS CONFIGURAVEIS
+//  Grupos: start, pause, complete, alarm
+//  Disponivel em todas as paginas via settings-modal
+// ============================================================
+
+const SOUND_PRESETS = {
+    start: {
+        classico: {
+            name: '🔔 Clássico',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'triangle';
+                o.frequency.value = 660;
+                g.gain.value = 0.25;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 0.5);
+            }
+        },
+        sinal: {
+            name: '📯 Sinal',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'sine';
+                o.frequency.value = 880;
+                g.gain.value = 0.2;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 0.35);
+            }
+        },
+        suave: {
+            name: '🌊 Suave',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'sine';
+                o.frequency.value = 528;
+                g.gain.value = 0.2;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 0.8);
+            }
+        },
+        clique: {
+            name: '👆 Clique',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'square';
+                o.frequency.value = 440;
+                g.gain.value = 0.1;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 0.06);
+            }
+        },
+        silence: {
+            name: '🔇 Silêncio',
+            play() {}
+        }
+    },
+    complete: {
+        fanfarra: {
+            name: '🎺 Fanfarra',
+            play(ctx) {
+                [523, 659, 784, 1047].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'square';
+                    o.frequency.value = freq;
+                    g.gain.value = 0.2;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15 + i * 0.18);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.18);
+                    o.stop(ctx.currentTime + 0.35 + i * 0.18);
+                });
+            }
+        },
+        triunfo: {
+            name: '🏆 Triunfo',
+            play(ctx) {
+                const notes = [523, 659, 784, 1047, 784, 1047, 1319];
+                notes.forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'triangle';
+                    o.frequency.value = freq;
+                    g.gain.value = 0.3;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3 + i * 0.12);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.12);
+                    o.stop(ctx.currentTime + 0.45 + i * 0.12);
+                });
+            }
+        },
+        classico: {
+            name: '🔔 Clássico',
+            play(ctx) {
+                [660, 880].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = freq;
+                    g.gain.value = 0.25;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3 + i * 0.32);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.32);
+                    o.stop(ctx.currentTime + 0.45 + i * 0.32);
+                });
+            }
+        },
+        digital: {
+            name: '📟 Digital',
+            play(ctx) {
+                let count = 0;
+                for (let i = 0; i < 3; i++) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'square';
+                    o.frequency.value = i % 2 === 0 ? 1200 : 800;
+                    g.gain.value = 0.15;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08 + count * 0.14);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + count * 0.14);
+                    o.stop(ctx.currentTime + 0.15 + count * 0.14);
+                    count++;
+                }
+            }
+        },
+        suave: {
+            name: '🌊 Suave',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'sine';
+                o.frequency.value = 528;
+                g.gain.value = 0.3;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.5);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 1.5);
+            }
+        },
+        despertar: {
+            name: '⏰ Despertar',
+            play(ctx) {
+                for (let i = 0; i < 20; i++) {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sawtooth';
+                    const freq = i % 2 === 0 ? 880 : 660;
+                    o.frequency.value = freq;
+                    o.frequency.linearRampToValueAtTime(freq * 1.5, ctx.currentTime + 0.12 + i * 0.28);
+                    g.gain.value = 0.15;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2 + i * 0.28);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.28);
+                    o.stop(ctx.currentTime + 0.35 + i * 0.28);
+                }
+            }
+        }
+    },
+    alarm: {
+        atencao: {
+            name: '⚠️ Atenção',
+            play(ctx) {
+                [880, 1100].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'square';
+                    o.frequency.value = freq;
+                    g.gain.value = 0.15;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12 + i * 0.2);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.2);
+                    o.stop(ctx.currentTime + 0.2 + i * 0.2);
+                });
+            }
+        },
+        classico: {
+            name: '🔔 Clássico',
+            play(ctx) {
+                [880, 1100].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = freq;
+                    g.gain.value = 0.2;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.2 + i * 0.25);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.25);
+                    o.stop(ctx.currentTime + 0.3 + i * 0.25);
+                });
+            }
+        },
+        sinal: {
+            name: '📯 Sinal',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'triangle';
+                o.frequency.value = 1047;
+                g.gain.value = 0.25;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.6);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 0.6);
+            }
+        },
+        campainha: {
+            name: '🔔 Campainha',
+            play(ctx) {
+                [660, 880, 660, 880].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'sine';
+                    o.frequency.value = freq;
+                    g.gain.value = 0.2;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08 + i * 0.25);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.25);
+                    o.stop(ctx.currentTime + 0.15 + i * 0.25);
+                });
+            }
+        },
+        suave: {
+            name: '🌊 Suave',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'sine';
+                o.frequency.value = 660;
+                g.gain.value = 0.25;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.0);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 1.0);
+            }
+        }
+    },
+    pause: {
+        clique: {
+            name: '👆 Clique',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'square';
+                o.frequency.value = 440;
+                g.gain.value = 0.1;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 0.06);
+            }
+        },
+        sinal: {
+            name: '📯 Sinal',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'triangle';
+                o.frequency.value = 660;
+                g.gain.value = 0.2;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 0.3);
+            }
+        },
+        suave: {
+            name: '🌊 Suave',
+            play(ctx) {
+                const o = ctx.createOscillator();
+                const g = ctx.createGain();
+                o.type = 'sine';
+                o.frequency.value = 528;
+                g.gain.value = 0.2;
+                g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+                o.connect(g);
+                g.connect(ctx.destination);
+                o.start();
+                o.stop(ctx.currentTime + 0.5);
+            }
+        },
+        alerta: {
+            name: '🔊 Alerta',
+            play(ctx) {
+                [660, 440].forEach((freq, i) => {
+                    const o = ctx.createOscillator();
+                    const g = ctx.createGain();
+                    o.type = 'square';
+                    o.frequency.value = freq;
+                    g.gain.value = 0.12;
+                    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.08 + i * 0.12);
+                    o.connect(g);
+                    g.connect(ctx.destination);
+                    o.start(ctx.currentTime + i * 0.12);
+                    o.stop(ctx.currentTime + 0.12 + i * 0.12);
+                });
+            }
+        },
+        silence: {
+            name: '🔇 Silêncio',
+            play() { /* sem som */ }
+        }
+    }
+};
+
+let soundConfig = { start: 'classico', pause: 'silence', complete: 'classico', alarm: 'classico' };
+
+function loadSoundConfig() {
+    try {
+        const raw = localStorage.getItem(SOUND_KEY);
+        if (raw) {
+            const saved = JSON.parse(raw);
+            const validKeys = { start: true, pause: true, complete: true, alarm: true };
+            Object.keys(saved).forEach(k => {
+                if (validKeys[k] && SOUND_PRESETS[k] && SOUND_PRESETS[k][saved[k]]) {
+                    soundConfig[k] = saved[k];
+                }
+            });
+        }
+    } catch { /* fallback */ }
+}
+
+function saveSoundConfig() {
+    try { localStorage.setItem(SOUND_KEY, JSON.stringify(soundConfig)); }
+    catch { /* silencioso */ }
+}
+
+function getAudioContext() {
+    return new (window.AudioContext || (window as any).webkitAudioContext)();
+}
+
+function playSound(group, presetId) {
+    const preset = SOUND_PRESETS[group] && SOUND_PRESETS[group][presetId];
+    if (!preset) return;
+    try {
+        const ctx = getAudioContext();
+        preset.play(ctx);
+    } catch { /* fallback */ }
+}
+
+function playConfiguredSound(group) {
+    const presetId = soundConfig[group] || 'classico';
+    playSound(group, presetId);
+}
+
+loadSoundConfig();
+
 const STUDY_CFG_KEY = 'estudo_config';
 
 // ============================================================
@@ -349,7 +726,8 @@ function getSettingsModalHTML() {
                     </div>
                     <div id="tab-advanced" class="tab-panel">
                         <div style="display:flex;flex-direction:column;gap:1rem;">
-                            <button class="btn-theme w-full" onclick="openStudyConfigDialog()" style="justify-content:center;">\ud83d\udcda Configura\u00e7\u00f5es de Estudo</button>
+                            <button class="btn-theme w-full" onclick="openStudyConfigDialog()" style="justify-content:center;">📚 Configurações de Estudo</button>
+                            <button class="btn-theme w-full" onclick="openReviewSettingsDialog()" style="justify-content:center;">🔄 Configurações de Revisão</button>
                         </div>
                     </div>
                 </div>
@@ -410,3 +788,10 @@ window.renderStudyConfigDialog = renderStudyConfigDialog;
 window.applyPomoPreset        = applyPomoPreset;
 window.applyTimerSize         = applyTimerSize;
 window.clearStudyHistory      = clearStudyHistory;
+
+window.SOUND_PRESETS          = SOUND_PRESETS;
+window.soundConfig            = soundConfig;
+window.loadSoundConfig        = loadSoundConfig;
+window.saveSoundConfig        = saveSoundConfig;
+window.playSound              = playSound;
+window.playConfiguredSound    = playConfiguredSound;

@@ -1,20 +1,5 @@
 // @ts-nocheck
 
-const DEFAULT_REVIEW_PRESETS = [
-    { id: 'curta',      name: '📅 Curta',     desc: '3 intervalos rápidos',  intervals: [1, 3, 7],                           easeFactorMultiplier: 1.0 },
-    { id: 'mensal',     name: '📚 Mensal',    desc: 'Revisões mensais',      intervals: [7, 15, 30],                         easeFactorMultiplier: 1.0 },
-    { id: 'semestral',  name: '📖 Semestral', desc: 'Revisões semestrais',   intervals: [7, 15, 30, 60, 120, 180],           easeFactorMultiplier: 1.2 },
-    { id: 'intensiva',  name: '⚡ Intensiva', desc: 'Alta frequência',       intervals: [1, 2, 4, 7, 14, 30],                easeFactorMultiplier: 0.9 },
-    { id: 'longoprazo', name: '🌟 Longo Prazo',desc: 'Espaçamento máximo',   intervals: [30, 60, 120, 240, 365],             easeFactorMultiplier: 1.4 },
-];
-
-function getActiveReviewSettings() {
-    if (window.state && window.state.activeReviewSetting) {
-        return window.state.activeReviewSetting;
-    }
-    return DEFAULT_REVIEW_PRESETS[1];
-}
-
 function renderReviewPage() {
     const loading = document.getElementById('auth-loading');
     if (loading) loading.style.display = 'none';
@@ -68,67 +53,38 @@ function renderReviewSettingsRow() {
     const row = document.getElementById('reviewSettingsRow');
     if (!row) return;
 
-    const active = getActiveReviewSettings();
+    const active = window.getActiveReviewSettings();
     const isCustom = active.id === 'custom';
 
     row.innerHTML = `
         <div class="settings-row-controls">
-            <label for="reviewPresetSelect" class="settings-label">⚙️ Revisão</label>
-            <select id="reviewPresetSelect" onchange="window.onPresetChange()">
-                ${DEFAULT_REVIEW_PRESETS.map(p => `
-                    <option value="${p.id}" ${p.id === active.id ? 'selected' : ''}>${p.name} (${p.intervals.join(', ')}d)</option>
-                `).join('')}
-                <option value="custom" ${isCustom ? 'selected' : ''}>✏️ Personalizar</option>
-            </select>
+            <button type="button" class="preset-select-wrapper" onclick="window.openReviewSettingsDialog()">
+                <span class="settings-label">⚙️ Revisão</span>
+                <span class="preset-current">${window.escapeHtml(active.name)} (${active.intervals.join(', ')}d)</span>
+                <span class="preset-arrow">▾</span>
+            </button>
             <div id="customSettingsInline" class="custom-settings-inline" ${!isCustom ? 'style="display:none"' : ''}>
                 <input type="text" id="customIntervalsInput" placeholder="Intervalos (ex: 7, 15, 30)" value="${isCustom ? active.intervals.join(', ') : ''}" autocomplete="off">
-                <input type="number" id="customEaseInput" placeholder="Facilidade" value="${isCustom ? active.easeFactorMultiplier : '1.0'}" step="0.1" min="0.5" max="2.0">
             </div>
             <button class="btn-theme settings-ok-btn" onclick="window.applyReviewSettings()">OK</button>
         </div>
     `;
 }
 
-function onPresetChange() {
-    const select = document.getElementById('reviewPresetSelect');
-    if (!select) return;
-    const customInline = document.getElementById('customSettingsInline');
-    if (customInline) {
-        customInline.style.display = select.value === 'custom' ? 'flex' : 'none';
-        if (select.value === 'custom') {
-            document.getElementById('customIntervalsInput')?.focus();
-        }
-    }
-}
-
 function applyReviewSettings() {
-    const select = document.getElementById('reviewPresetSelect');
-    if (!select) return;
-    const presetId = select.value;
-
-    let setting;
-    if (presetId === 'custom') {
-        const intervalsInput = document.getElementById('customIntervalsInput');
-        const easeInput = document.getElementById('customEaseInput');
-        const intervalsStr = (intervalsInput?.value || '').trim();
-        const intervals = intervalsStr.split(/[,\s]+/).map(Number).filter(n => !isNaN(n) && n > 0);
-        if (intervals.length === 0) {
-            window.toast?.('Digite pelo menos um intervalo válido (ex: 7, 15, 30).', true);
-            return;
-        }
-        intervals.sort((a, b) => a - b);
-        setting = {
-            id: 'custom',
-            name: '✏️ Personalizar',
-            intervals: intervals,
-            easeFactorMultiplier: parseFloat(easeInput?.value) || 1.0
-        };
-    } else {
-        const preset = DEFAULT_REVIEW_PRESETS.find(p => p.id === presetId);
-        if (!preset) return;
-        setting = { ...preset };
+    const intervalsInput = document.getElementById('customIntervalsInput');
+    const intervalsStr = (intervalsInput?.value || '').trim();
+    const intervals = intervalsStr.split(/[,\s]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+    if (intervals.length === 0) {
+        window.toast?.('Digite pelo menos um intervalo válido (ex: 7, 15, 30).', true);
+        return;
     }
-
+    intervals.sort((a, b) => a - b);
+    const setting = {
+        id: 'custom',
+        name: '✏️ Personalizar',
+        intervals: intervals
+    };
     window.state.activeReviewSetting = setting;
     window.saveState();
     window.toast?.(`✅ Revisão: ${setting.name}`);
@@ -223,12 +179,12 @@ function addStudyBlock() {
         return;
     }
 
-    const settings = getActiveReviewSettings();
-    const nextReview = window.calculateNextReview(
-        { currentIntervalIndex: 0, repetition: 0 },
-        settings,
-        'medium'
-    );
+    const settings = window.getActiveReviewSettings();
+    const intervals = settings.intervals;
+    const firstInterval = intervals[0] || 1;
+    const now = Date.now();
+    const nextDate = new Date(now);
+    nextDate.setDate(nextDate.getDate() + firstInterval);
 
     const newBlock = {
         id: crypto.randomUUID(),
@@ -236,11 +192,11 @@ function addStudyBlock() {
         materia: materia,
         topico: topico,
         conteudo: conteudo,
-        createdAt: Date.now(),
-        lastReviewDate: nextReview.lastReviewDate,
-        nextReviewDate: nextReview.nextReviewDate,
-        status: 'due',
-        currentIntervalIndex: nextReview.currentIntervalIndex,
+        createdAt: now,
+        lastReviewDate: now,
+        nextReviewDate: nextDate.getTime(),
+        status: 'pending',
+        currentIntervalIndex: 0,
         repetition: 0,
         color: color
     };
@@ -305,7 +261,7 @@ function renderStudyBlocksList() {
     });
 
     // Renderizar
-    const settings = getActiveReviewSettings();
+    const settings = window.getActiveReviewSettings();
     const settingsName = settings ? settings.name : 'Mensal';
 
     const addBlockButton = `
@@ -325,8 +281,11 @@ function renderStudyBlocksList() {
 
     const blockItemsHtml = blocks.map(block => {
         const reviewBtnDisabled = block.status === 'completed' ? 'disabled' : '';
+        const borderStyle = block.status === 'pending'
+            ? ` style="border-left: 5px solid ${window.escapeHtml(block.color || 'var(--accent)')};"`
+            : '';
         return `
-            <div class="study-block-item status-${block.status}" style="border-left: 5px solid ${window.escapeHtml(block.color || 'var(--accent)')};">
+            <div class="study-block-item status-${block.status}"${borderStyle}>
                 <div class="block-header">
                     <h3>${window.escapeHtml(block.materia)}: ${window.escapeHtml(block.topico)}</h3>
                 </div>
@@ -377,19 +336,24 @@ function submitReviewFeedback(difficulty) {
     if (blockIndex === -1) return;
 
     const block = blocks[blockIndex];
-    const settings = getActiveReviewSettings();
+    const settings = window.getActiveReviewSettings();
+    const intervals = settings.intervals;
+    const oldIntervalIndex = block.currentIntervalIndex;
 
-    const result = window.calculateNextReview(block, settings, difficulty);
+    // Para blocos atrasados, usa a data originalmente agendada como referência
+    const referenceDate = block.status === 'overdue' ? block.nextReviewDate : undefined;
+    const result = window.calculateNextReview(block, settings, difficulty, referenceDate);
 
     block.lastReviewDate = result.lastReviewDate;
     block.nextReviewDate = result.nextReviewDate;
     block.currentIntervalIndex = result.currentIntervalIndex;
     block.repetition = result.repetition;
 
-    if (block.currentIntervalIndex >= (settings.intervals.length - 1)) {
+    // Se o bloco já estava no último intervalo antes desta revisão, conclui permanentemente
+    if (oldIntervalIndex >= intervals.length - 1) {
         block.status = 'completed';
     } else {
-        block.status = 'completed';
+        block.status = result.status;
     }
 
     window.saveState();
@@ -437,9 +401,7 @@ window.renderStudyBlocksList = renderStudyBlocksList;
 window.applyReviewFilters = applyReviewFilters;
 window.populateMateriaFilter = populateMateriaFilter;
 window.updateReviewStats = updateReviewStats;
-window.getActiveReviewSettings = getActiveReviewSettings;
 window.renderReviewSettingsRow = renderReviewSettingsRow;
-window.onPresetChange = onPresetChange;
 window.applyReviewSettings = applyReviewSettings;
 
 window.openReviewBlockDialog = openReviewBlockDialog;

@@ -37,42 +37,58 @@
     flex-wrap: wrap;
 }
 
-.settings-label {
+/* Wrapper clicável — botão único com label + preset + seta */
+.preset-select-wrapper {
     display: flex;
     align-items: center;
+    gap: 0.5rem;
+    padding: 0.65rem 1rem;
+    background: var(--panel);
+    border: 3px solid var(--stroke);
+    border-radius: var(--element-radius);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+    color: var(--text);
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    outline: none;
+    min-width: 280px;
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+}
+
+.preset-select-wrapper:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+}
+
+.preset-select-wrapper:focus-visible {
+    border-color: var(--accent);
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0px var(--shadow-color);
+}
+
+.preset-select-wrapper .settings-label {
     font-weight: 800;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     color: var(--text);
     text-transform: uppercase;
     letter-spacing: 0.03em;
     white-space: nowrap;
-    padding: 0.65rem 0.75rem;
-    background: var(--panel);
-    border: 3px solid var(--stroke);
-    border-radius: var(--element-radius);
-    box-shadow: 4px 4px 0px var(--shadow-color);
 }
 
-.settings-row-controls select,
-.custom-settings-inline input {
-    padding: 0.65rem 0.75rem;
-    background: var(--panel);
-    border: 3px solid var(--stroke);
-    border-radius: var(--element-radius);
+.preset-current {
+    flex: 1;
+    text-align: left;
     color: var(--text);
-    font-size: 0.85rem;
-    font-family: inherit;
-    outline: none;
-    box-sizing: border-box;
-    box-shadow: 4px 4px 0px var(--shadow-color);
-    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+    font-size: 0.95rem;
+    font-weight: 700;
 }
 
-.settings-row-controls select {
-    width: auto;
-    min-width: 200px;
-    cursor: pointer;
-    appearance: auto;
+.preset-arrow {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    flex-shrink: 0;
 }
 
 .custom-settings-inline {
@@ -86,19 +102,134 @@
 .custom-settings-inline input {
     flex: 1;
     min-width: 140px;
+    padding: 0.65rem 0.75rem;
+    background: var(--panel);
+    border: 3px solid var(--stroke);
+    border-radius: var(--element-radius);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
+    outline: none;
+    box-sizing: border-box;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
 }
 
-.settings-row-controls select:hover,
 .custom-settings-inline input:hover {
     transform: translate(-1px, -1px);
-    box-shadow: 5px 5px 0px var(--shadow-color);
+    box-shadow: 4px 4px 0px var(--shadow-color);
 }
 
-.settings-row-controls select:focus,
 .custom-settings-inline input:focus {
     border-color: var(--accent);
     transform: translate(-2px, -2px);
-    box-shadow: 6px 6px 0px var(--shadow-color);
+    box-shadow: 5px 5px 0px var(--shadow-color);
+}
+
+/* Dialog: layout com abas (inspirado no settings-modal) */
+.review-settings-layout {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 1.5rem;
+    flex: 1;
+    min-height: 0;
+    padding: 1.5rem 1rem;
+    padding-bottom: 1.75rem;
+}
+
+.review-settings-sidebar {
+    display: flex; flex-direction: column; gap: 0.5rem;
+    background: var(--panel);
+    border: 2px solid var(--stroke);
+    border-radius: var(--card-radius);
+    padding: 0.75rem;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    overflow-y: auto;
+}
+
+.review-settings-content {
+    overflow-y: auto;
+    min-height: 0;
+    padding: 0 0.5rem 0.25rem 0;
+}
+
+.rs-tab-btn {
+    background: transparent;
+    border: 2px solid transparent;
+    border-left: 3px solid transparent;
+    color: var(--text);
+    padding: 0.75rem 0.85rem;
+    border-radius: var(--element-radius);
+    font-size: 0.9rem; font-weight: 800;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.1s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: inherit;
+}
+
+.rs-tab-btn:hover { background: var(--bg); border-color: var(--stroke); }
+
+.rs-tab-btn.active {
+    background: var(--surface);
+    border-left-color: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    transform: translate(-1px, -1px);
+}
+
+.rs-section-title {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--text-title);
+    margin-bottom: 1.25rem;
+    letter-spacing: 0.02em;
+    background: var(--panel);
+    border: 3px solid var(--stroke);
+    border-radius: var(--element-radius);
+    padding: 0.75rem 1rem;
+    box-shadow: 4px 4px 0px var(--shadow-color);
+}
+
+/* Preset options inside dialog — usam btn-theme como base */
+.preset-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+}
+
+.preset-option.btn-theme {
+    flex-direction: column;
+    align-items: flex-start;
+    text-align: left;
+    gap: 0.15rem;
+    padding: 0.75rem 1.25rem;
+}
+
+.preset-option.btn-theme.preset-option--active {
+    border-color: var(--accent);
+}
+
+.preset-option-name {
+    font-weight: 800;
+    font-size: 1rem;
+    color: var(--text-title);
+}
+
+.preset-option-desc {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 400;
+}
+
+.preset-option-intervals {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    font-weight: 400;
+    font-family: monospace;
 }
 
 .settings-ok-btn {
@@ -117,6 +248,7 @@
     color: var(--text-title);
     margin-bottom: 1.5rem;
     font-size: 1.5rem;
+    font-weight: 900;
 }
 
 /* Grid de blocos */
@@ -138,6 +270,7 @@
     gap: 0.5rem;
     transition: all 0.2s ease;
     position: relative;
+    font-family: inherit;
 }
 
 .study-block-item:hover {
@@ -147,6 +280,7 @@
 
 .study-block-item h3 {
     font-size: 1.1rem;
+    font-weight: 800;
     color: var(--text-title);
     margin-bottom: 0.3rem;
 }
@@ -168,6 +302,8 @@
     color: var(--text-muted);
     padding: 2rem;
     font-style: italic;
+    font-weight: 700;
+    font-family: inherit;
     grid-column: 1 / -1;
 }
 
@@ -182,6 +318,7 @@
     background-color: var(--panel);
     color: var(--text-secondary);
     cursor: pointer;
+    font-family: inherit;
     font-size: 1.2rem;
     font-weight: 700;
     transition: all 0.2s ease;
@@ -236,27 +373,37 @@
     cursor: pointer;
 }
 
-/* Cores de status */
+/* Cores de status — sólidas, sem transparência, sem opacidade */
 .study-block-item.status-due {
-    background-color: var(--bg-card-due);
-    border-left-color: var(--warning, #f39c12) !important;
+    background: #fef3c7;
+    border: 3px solid #f59e0b;
+    box-shadow: 6px 6px 0px #d97706;
+    border-left: 5px solid #f59e0b;
+    opacity: 1;
 }
 
 .study-block-item.status-overdue {
-    background-color: var(--bg-card-overdue);
-    border-left-color: var(--failure, #e74c3c) !important;
-    box-shadow: 0 0 0 1px var(--failure);
+    background: #fef2f2;
+    border: 3px solid #ef4444;
+    box-shadow: 6px 6px 0px #dc2626;
+    border-left: 5px solid #ef4444;
+    opacity: 1;
 }
 
 .study-block-item.status-completed {
-    background-color: var(--bg-card-completed);
-    opacity: 0.85;
+    background: #f0fdf4;
+    border: 3px solid #22c55e;
+    box-shadow: 6px 6px 0px #16a34a;
+    border-left: 5px solid #22c55e;
+    opacity: 1;
 }
 
-:root {
-    --bg-card-due: rgba(255, 165, 0, 0.1);
-    --bg-card-overdue: rgba(255, 50, 50, 0.15);
-    --bg-card-completed: rgba(46, 204, 113, 0.1);
+/* pending / normal: segue o tema */
+.study-block-item.status-pending {
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
+    opacity: 1;
 }
 
 /* Toolbar de filtros */
@@ -310,14 +457,22 @@
 .toolbar-filters select {
     width: auto;
     min-width: 140px;
-    padding: 0.65rem 0.75rem;
+    padding: 0.65rem 2.5rem 0.65rem 1rem;
     background: var(--panel);
     border: 3px solid var(--stroke);
     border-radius: var(--element-radius);
     color: var(--text);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    font-family: inherit;
     cursor: pointer;
-    appearance: auto;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: var(--select-arrow);
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 12px;
     outline: none;
     box-shadow: 4px 4px 0px var(--shadow-color);
     transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
@@ -398,6 +553,22 @@
 }
 
 /* Difficulty buttons */
+#review-feedback-dialog .dialog-body {
+    font-family: inherit;
+    padding: 1rem 1.25rem 1.5rem;
+}
+#review-feedback-dialog #reviewBlockTitle {
+    font-family: inherit;
+    font-weight: 800;
+    font-size: 1.1rem;
+}
+#review-feedback-dialog #reviewBlockConteudo {
+    font-family: inherit;
+    font-weight: 400;
+}
+#review-feedback-dialog p {
+    font-family: inherit;
+}
 .difficulty-buttons {
     display: flex;
     gap: 0.5rem;

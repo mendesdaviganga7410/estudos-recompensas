@@ -87,6 +87,71 @@
     background: var(--panel); line-height: 1.5;
 }
 
+/* Sound tab (settings modal) */
+.sound-group {
+    margin-bottom: 1.25rem;
+}
+.sound-group:last-child { margin-bottom: 0; }
+.sound-group-title {
+    font-size: 0.8rem;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+    margin-bottom: 0.6rem;
+    display: block;
+}
+.sound-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 0.5rem;
+}
+.sound-option {
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    border-radius: var(--element-radius);
+    padding: 0.5rem;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-align: center;
+    color: var(--text);
+    box-shadow: 2px 2px 0 var(--shadow-color);
+    transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+}
+.sound-option:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 3px 3px 0 var(--shadow-color);
+}
+.sound-option.active {
+    border-color: var(--accent);
+    background: var(--panel);
+    box-shadow: 0 0 0 2px var(--accent), 2px 2px 0 var(--shadow-color);
+}
+.sound-option .preview-btn {
+    font-size: 0.6rem;
+    background: var(--bg);
+    border: 2px solid var(--stroke);
+    border-radius: calc(var(--element-radius) * 0.5);
+    padding: 0.15rem 0.5rem;
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 700;
+    margin-top: 0.15rem;
+    transition: background 0.1s;
+}
+.sound-option .preview-btn:hover {
+    background: var(--accent);
+    color: var(--accent-text);
+}
+.sound-dialog {
+    max-width: 480px !important;
+}
+
 .theme-bento-dialog {
     position: fixed;
     top: 50%; left: 50%;

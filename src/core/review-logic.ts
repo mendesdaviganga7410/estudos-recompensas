@@ -1,6 +1,6 @@
 // @ts-nocheck
 
-function calculateNextReview(block, reviewSettings, difficulty) {
+function calculateNextReview(block, reviewSettings, difficulty, referenceDate) {
     if (!reviewSettings) {
         reviewSettings = { intervals: [1, 3, 7, 15, 30], easeFactorMultiplier: 1.0 };
     }
@@ -36,9 +36,11 @@ function calculateNextReview(block, reviewSettings, difficulty) {
     // Garante no mínimo 1 dia
     daysUntilNext = Math.max(1, daysUntilNext);
 
-    const now = Date.now();
-    const lastReviewDate = now;
-    const nextReviewDate = new Date(now);
+    // Para blocos atrasados, usa a data originalmente agendada como referência
+    // para calcular o próximo intervalo (não a data atual)
+    const baseDate = referenceDate || Date.now();
+    const lastReviewDate = Date.now();
+    const nextReviewDate = new Date(baseDate);
     nextReviewDate.setDate(nextReviewDate.getDate() + daysUntilNext);
 
     // Determina o status baseado na data da próxima revisão
