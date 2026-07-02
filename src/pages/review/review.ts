@@ -411,11 +411,8 @@ window.deleteStudyBlockById = deleteStudyBlockById;
 
 document.addEventListener('DOMContentLoaded', () => {
     if (window.isReviewPage?.()) {
-        if (!window.currentUser && (!window.state.studyBlocks || window.state.studyBlocks.length === 0)) {
-            window.loadGuestState();
-        }
-        if (window.updateBlocksStatus) window.updateBlocksStatus();
-        window.generateReviewNotif?.();
-        window.renderReviewPage();
+        // Loading permanece visível até auth resolver
+        // A renderização acontece via handleAuthRouting() após auth resolver,
+        // consistente com as demais páginas (panel, hub, etc.)
     }
 });

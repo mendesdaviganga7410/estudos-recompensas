@@ -216,7 +216,13 @@ if (auth) {
             if (loginBtns)  loginBtns.style.display  = "flex";
             if (profileDiv) profileDiv.style.display = "none";
 
-            Object.assign(window.state, window.createDefaultState());
+            // Preserva estado de convidado existente em vez de resetar
+            const guestRaw = localStorage.getItem(window.GUEST_STORAGE_KEY);
+            if (guestRaw) {
+                window.loadGuestState?.();
+            } else {
+                Object.assign(window.state, window.createDefaultState());
+            }
             if (window.saveGuestState) window.saveGuestState();
             if (window.applyPrefs) window.applyPrefs(window.state?.prefs || {});
             if (window.handleAuthRouting) window.handleAuthRouting();

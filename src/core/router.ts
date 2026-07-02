@@ -93,25 +93,17 @@ function handleAuthRouting() {
     }
 }
 
-// Hook para garantir que a renderização da página de revisão ocorra após o handleAuthRouting
-// Isso previne que a página de revisão renderize antes que window.state.studyBlocks seja populado
 const originalHandleAuthRouting = window.handleAuthRouting;
 window.handleAuthRouting = async () => {
     await originalHandleAuthRouting();
     if (window.isReviewPage?.()) {
-        if (window.state.studyBlocks && window.state.studyBlocks.length === 0 && window.currentUser && window.loadStudyBlocks) {
-            // Se o estado estiver vazio e for um usuário logado, tentar carregar do Firestore
-            const loadedBlocks = await window.loadStudyBlocks(String(window.currentUser.uid));
-            window.state.studyBlocks = loadedBlocks; // Atualiza o estado
-            window.renderStudyBlocksList(); // Renderiza com os dados carregados
-        } else if (window.isGuestMode && (!window.state.studyBlocks || window.state.studyBlocks.length === 0)) {
-            // Para modo convidado, garantir que o estado local seja carregado e renderizado
-            window.loadGuestState();
-            window.renderStudyBlocksList();
-        } else if (window.state.studyBlocks && window.state.studyBlocks.length > 0) {
-             // Se já tem dados no estado, apenas renderiza
-            window.renderStudyBlocksList();
+        if (!window.currentUser) {
+            // Guest: original não chamou renderReviewPage, fazemos aqui
+            if (window.renderReviewPage) window.renderReviewPage();
         }
+        if (window.updateBlocksStatus) window.updateBlocksStatus();
+        window.renderStudyBlocksList();
+        window.generateReviewNotif?.();
     }
 };
 
