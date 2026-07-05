@@ -9,7 +9,8 @@ export default defineConfig({
         panel: resolve(__dirname, 'panel.html'),
         study: resolve(__dirname, 'study.html'),
         comunidade: resolve(__dirname, 'comunidade.html'),
-        review: resolve(__dirname, 'review.html')
+        review: resolve(__dirname, 'review.html'),
+        flashcards: resolve(__dirname, 'flashcards.html')
       }
     }
   }

@@ -86,7 +86,7 @@ Nunca deixe uma instrução pontual violar os princípios 1–5 sem autorizaçã
 
 ### 5.1 MPA — Regra crítica de entrada
 
-Existem **5 páginas** (entradas do Vite). Os HTMLs ficam **na raiz** por requisito do Vite MPA:
+Existem **6 páginas** (entradas do Vite). Os HTMLs ficam **na raiz** por requisito do Vite MPA:
 
 | Arquivo HTML | Rota | Propósito |
 |---|---|---|
@@ -95,6 +95,7 @@ Existem **5 páginas** (entradas do Vite). Os HTMLs ficam **na raiz** por requis
 | `study.html` | `/study.html` | Modo Estudo / Pomodoro |
 | `review.html` | `/review.html` | Revisão Espaçada |
 | `comunidade.html` | `/comunidade.html` | Comunidade Social |
+| `flashcards.html` | `/flashcards.html` | Flashcards |
 
 **Nunca mova os HTMLs da raiz.** Nunca crie um SPA wrapper. A navegação entre páginas é via `window.location.href`.
 
@@ -127,6 +128,7 @@ Existem **5 páginas** (entradas do Vite). Os HTMLs ficam **na raiz** por requis
 │   │   ├── panel/panel.ts
 │   │   ├── study/study-timer.ts
 │   │   ├── review/review.ts
+│   │   ├── flashcards/flashcards.ts
 │   │   └── comunidade/comunidade.ts
 │   ├── shared/               # Reutilizáveis entre páginas
 │   │   ├── ui/

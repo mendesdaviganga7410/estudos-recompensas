@@ -5,7 +5,8 @@ const ROUTES = {
     guest:      'panel.html',
     comunidade: 'comunidade.html',
     estudo:     'study.html',
-    review:     'review.html'
+    review:     'review.html',
+    flashcards: 'flashcards.html'
 };
 
 function getCurrentPage() {
@@ -19,6 +20,7 @@ function isPainelPage()  { return getCurrentPage() === 'panel.html'; }
 function isHeroPage()    { return isHubPage(); }
 function isComunidadePage() { return getCurrentPage() === 'comunidade.html'; }
 function isReviewPage() { return getCurrentPage() === 'review.html'; }
+function isFlashcardsPage() { return getCurrentPage() === 'flashcards.html'; }
 function isStudyPage()     { return getCurrentPage() === 'study.html'; }
 
 function setGuestMode(active) {
@@ -56,6 +58,10 @@ function handleAuthRouting() {
             if (window.renderComunidade) window.renderComunidade();
         } else if (isStudyPage()) {
             if (window.renderStudy) window.renderStudy();
+        } else if (isReviewPage()) {
+            if (window.renderReviewPage) window.renderReviewPage();
+        } else if (isFlashcardsPage()) {
+            if (window.renderFlashcardsPage) window.renderFlashcardsPage();
         }
         return;
     }
@@ -88,6 +94,10 @@ function handleAuthRouting() {
         if (window.renderReviewPage) window.renderReviewPage();
         return;
     }
+    if (isFlashcardsPage()) {
+        if (window.renderFlashcardsPage) window.renderFlashcardsPage();
+        return;
+    }
     if (isHubPage() || isInicioPage()) {
         if (window.renderHeroHub) window.renderHeroHub();
     }
@@ -98,7 +108,6 @@ window.handleAuthRouting = async () => {
     await originalHandleAuthRouting();
     if (window.isReviewPage?.()) {
         if (!window.currentUser) {
-            // Guest: original não chamou renderReviewPage, fazemos aqui
             if (window.renderReviewPage) window.renderReviewPage();
         }
         if (window.updateBlocksStatus) window.updateBlocksStatus();
@@ -150,6 +159,8 @@ window.isHubPage         = isHubPage;
 window.isPainelPage      = isPainelPage;
 window.isStudyPage       = isStudyPage;
 window.isHeroPage        = isHeroPage;
+window.isReviewPage      = isReviewPage;
+window.isFlashcardsPage  = isFlashcardsPage;
 window.setGuestMode      = setGuestMode;
 window.updateGuestUI     = updateGuestUI;
 window.navigateTo        = navigateTo;

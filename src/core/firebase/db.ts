@@ -55,6 +55,7 @@ export async function saveStateToFirestore(userId, fullState, partial) {
         activeReviewSetting: s.activeReviewSetting || null,
         onboardingComplete: !!s.onboardingComplete,
         studyBlocks: s.studyBlocks || [],
+        flashcards: s.flashcards || [],
         updatedAt: Date.now(),
         ...partial
     };

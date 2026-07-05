@@ -42,7 +42,8 @@ function createDefaultState() {
         },
         activeReviewSetting: null,
         onboardingComplete: false,
-        studyBlocks: []
+        studyBlocks: [],
+        flashcards: []
     };
 }
 
@@ -76,7 +77,8 @@ function loadGuestState() {
             if (!state.stats.currentStreak) state.stats.currentStreak = 0;
             if (state.stats.maxStreak === undefined) state.stats.maxStreak = 0;
             if (!state.studyBlocks) state.studyBlocks = [];
-            state.studyBlocks.forEach(block => { if (!block.color) block.color = 'var(--accent)'; }); // Garante cor padrão
+            state.studyBlocks.forEach(block => { if (!block.color) block.color = 'var(--accent)'; });
+            if (!state.flashcards) state.flashcards = [];
         }
         state.prefs = (saved && saved.prefs) || {};
         window.isAdmin = state.prefs.isAdmin === true;
@@ -102,7 +104,8 @@ function saveGuestState() {
             weeklyLog: state.weeklyLog,
             lastDailyDate: state.lastDailyDate,
             activeReviewSetting: state.activeReviewSetting,
-            studyBlocks: state.studyBlocks
+            studyBlocks: state.studyBlocks,
+            flashcards: state.flashcards
         };
         localStorage.setItem(GUEST_STORAGE_KEY, JSON.stringify(payload));
     } catch (err) {
@@ -141,6 +144,7 @@ function applyRemoteState(data) {
     state.diagnostic = data.diagnostic ? { ...data.diagnostic } : undefined;
     state.activeReviewSetting = data.activeReviewSetting || null;
     state.studyBlocks = data.studyBlocks || [];
+    state.flashcards = data.flashcards || [];
     state.onboardingComplete = data.onboardingComplete === true
         || (data.onboardingComplete === undefined && (
             (typeof data.xp === 'number' && data.xp > 0)

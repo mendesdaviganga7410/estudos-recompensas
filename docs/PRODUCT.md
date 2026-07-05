@@ -113,6 +113,21 @@ Três personas principais orientam as decisões de produto:
 
 **Funções-chave:** `window.renderReviewPage()`, `window.addStudyBlock()`, `window.submitReviewFeedback(difficulty)`, `window.calculateNextReview()`
 
+### 2.6 Flashcards (`flashcards.html`)
+
+**Sistema de flashcards de uso livre — sem revisão espaçada (por enquanto).**
+
+- **CRUD completo:** adicionar, editar e deletar flashcards via dialog `theme-bento-dialog`
+- **Par front/verso:** cada flashcard possui pergunta (frente) e resposta (verso), mais matéria opcional e cor
+- **Modo estudo:** clique no card → dialog de flip (mostra frente → clique "Virar" → mostra verso) com navegação "Próximo"
+- **Importação:** arquivos JSON (`[{front, back, materia?}]`) ou CSV (colunas `frente,verso,materia`)
+- **Exportar template:** baixa `.json` com 2 flashcards de exemplo
+- **Filtros:** busca textual + filtro por matéria
+- **Persistência:** `state.flashcards` — Firestore (logado) ou localStorage (visitante)
+- **Extensível:** estrutura de dados já aceita campos de spaced repetition (`difficulty`, `nextReview`, `repetition`) para integração futura com SM-2
+
+**Funções-chave:** `window.renderFlashcardsPage()`, `window.addFlashcard()`, `window.openFlashcardStudy()`, `window.importFlashcards()`, `window.exportFlashcardTemplate()`
+
 ---
 
 ## 3. Modos de Acesso e Autenticação

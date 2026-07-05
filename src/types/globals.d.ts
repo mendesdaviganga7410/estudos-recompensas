@@ -90,6 +90,18 @@ interface ActiveReviewSetting {
   easeFactorMultiplier?: number;
 }
 
+interface Flashcard {
+  id: string;
+  front: string;
+  back: string;
+  materia?: string;
+  color?: string;
+  createdAt: number;
+  difficulty?: string;
+  nextReview?: number;
+  repetition?: number;
+}
+
 interface AppState {
   pontos: number;
   pts: number;
@@ -107,6 +119,7 @@ interface AppState {
   onboardingComplete: boolean;
   updatedAt: number;
   studyBlocks: StudyBlock[];
+  flashcards: Flashcard[];
 }
 
 interface MergedSlot {
@@ -216,6 +229,7 @@ interface Window {
   selectPresetFromDialog(presetId: string): void;
 
   ROUTES: Record<string, string>;
+  isFlashcardsPage(): boolean;
   navigateTo(url: string): void;
   handleAuthRouting(): void;
   setGuestMode(bool: boolean): void;
@@ -229,6 +243,7 @@ interface Window {
   isPainelPage(): boolean;
   isStudyPage(): boolean;
         isComunidadePage(): boolean;
+        isFlashcardsPage(): boolean;
         isReviewPage(): boolean;
 
   renderHeroHub(): void;
@@ -243,7 +258,19 @@ interface Window {
   renderComunidade(): void;
   onCommunitySearch(): void;
   onCommunitySort(): void;
+  renderFlashcardsPage(): void;
   renderReviewPage(): void;
+  renderFlashcardsPage(): void;
+  openAddFlashcardDialog(): void;
+  closeAddFlashcardDialog(): void;
+  addFlashcard(): void;
+  deleteFlashcard(id: string): void;
+  openFlashcardStudy(flashcardId: string): void;
+  closeFlashcardStudy(): void;
+  importFlashcards(event: Event): void;
+  exportFlashcardTemplate(): void;
+  renderFlashcardGrid(): void;
+  filterFlashcards(): void;
   openAddBlockDialog(): void;
   closeAddBlockDialog(): void;
   addStudyBlock(): void;

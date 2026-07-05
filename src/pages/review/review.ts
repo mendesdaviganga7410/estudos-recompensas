@@ -1,5 +1,7 @@
 // @ts-nocheck
 
+let _reviewSortReversed = false;
+
 function renderReviewPage() {
     const loading = document.getElementById('auth-loading');
     if (loading) loading.style.display = 'none';
@@ -8,38 +10,71 @@ function renderReviewPage() {
     const contentDiv = document.getElementById('review-page-content');
     if (contentDiv) {
         contentDiv.innerHTML = `
-            <div class="review-stats-bar" id="reviewStatsBar"></div>
-            <div class="review-toolbar">
-                <div class="toolbar-row">
-                    <div class="toolbar-search">
-                        <input type="text" id="reviewSearchInput" placeholder="🔍 Buscar blocos..." oninput="window.applyReviewFilters()" autocomplete="off">
+            <div class="bento-layout">
+                <div class="bento-card col-span-3">
+                    <div class="status-header-block">
+                        <div>
+                            <span class="bento-label">📊 Revisão</span>
+                        </div>
+                        <div id="reviewSettingsHeader"></div>
                     </div>
-                    <div class="toolbar-filters">
-                        <select id="reviewFilterStatus" onchange="window.applyReviewFilters()">
-                            <option value="all">Todos</option>
-                            <option value="due">🔶 A Revisar</option>
-                            <option value="overdue">🔴 Atrasado</option>
-                            <option value="pending">⏳ Pendente</option>
-                            <option value="completed">✅ Completado</option>
-                        </select>
-                        <select id="reviewFilterMateria" onchange="window.applyReviewFilters()">
-                            <option value="all">Todas matérias</option>
-                        </select>
-                        <select id="reviewSortOrder" onchange="window.applyReviewFilters()">
-                            <option value="nextReview-asc">📅 Próxima revisão ↑</option>
-                            <option value="nextReview-desc">📅 Próxima revisão ↓</option>
-                            <option value="materia-asc">📖 Matéria A-Z</option>
-                            <option value="materia-desc">📖 Matéria Z-A</option>
-                            <option value="created-desc">🆕 Criado (recente)</option>
-                            <option value="created-asc">🕐 Criado (antigo)</option>
-                        </select>
+                    <div class="status-metrics">
+                        <div class="status-metrics-row" id="reviewStatsRow">
+                            <div class="metric-block">
+                                <span class="bento-label">🔴 Atrasados</span>
+                                <span class="bento-title stat-overdue" id="rs-overdue">0</span>
+                            </div>
+                            <div class="metric-block">
+                                <span class="bento-label">🟠 Revisar</span>
+                                <span class="bento-title stat-due" id="rs-due">0</span>
+                            </div>
+                            <div class="metric-block">
+                                <span class="bento-label">⏳ Pendentes</span>
+                                <span class="bento-title" id="rs-pending">0</span>
+                            </div>
+                            <div class="metric-block">
+                                <span class="bento-label">✅ Completos</span>
+                                <span class="bento-title stat-done" id="rs-completed">0</span>
+                            </div>
+                            <div class="metric-block">
+                                <span class="bento-label">📦 Total</span>
+                                <span class="bento-title" id="rs-total">0</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="review-settings-row" id="reviewSettingsRow"></div>
-            </div>
-            <div class="study-blocks-list-section bento-card">
-                <h2>Seus Blocos de Estudo</h2>
-                <div id="studyBlocksList" class="study-blocks-list"></div>
+                <div class="bento-card col-span-3">
+                    <div class="toolbar-row">
+                        <div class="toolbar-search">
+                            <input type="text" id="reviewSearchInput" placeholder="🔍 Buscar blocos..." oninput="window.applyReviewFilters()" autocomplete="off">
+                        </div>
+                        <div class="toolbar-filters">
+                            <select id="reviewFilterStatus" onchange="window.applyReviewFilters()">
+                                <option value="all">📋 Todos</option>
+                                <option value="due">🔶 A Revisar</option>
+                                <option value="overdue">🔴 Atrasado</option>
+                                <option value="pending">⏳ Pendente</option>
+                                <option value="completed">✅ Completado</option>
+                            </select>
+                            <select id="reviewFilterMateria" onchange="window.applyReviewFilters()">
+                                <option value="all">📖 Todas</option>
+                            </select>
+                            <select id="reviewSortOrder" onchange="window.applyReviewFilters()">
+                                <option value="nextReview">📅 Data</option>
+                                <option value="materia">📖 Matéria</option>
+                                <option value="created">🆕 Criação</option>
+                            </select>
+                            <button class="btn-theme" id="reviewSortToggle" onclick="window.reverseReviewSort()" title="Alternar ordem" style="width:auto;padding:0.65rem 0.85rem;font-size:0.85rem;">↕ <span id="reviewSortDir">↑</span></button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bento-card col-span-3">
+                    <div style="display:flex;align-items:center;justify-content:space-between;">
+                        <h2 style="margin:0;">Seus Blocos de Estudo</h2>
+                        <button class="btn-theme" onclick="window.openAddBlockDialog()" style="width:auto;">➕ Adicionar</button>
+                    </div>
+                    <div id="studyBlocksList" class="study-blocks-list"></div>
+                </div>
             </div>
         `;
         window.renderReviewSettingsRow();
@@ -49,46 +84,28 @@ function renderReviewPage() {
     window.renderStudyBlocksList();
 }
 
-function renderReviewSettingsRow() {
-    const row = document.getElementById('reviewSettingsRow');
-    if (!row) return;
-
-    const active = window.getActiveReviewSettings();
-    const isCustom = active.id === 'custom';
-
-    row.innerHTML = `
-        <div class="settings-row-controls">
-            <button type="button" class="preset-select-wrapper" onclick="window.openReviewSettingsDialog()">
-                <span class="settings-label">⚙️ Revisão</span>
-                <span class="preset-current">${window.escapeHtml(active.name)} (${active.intervals.join(', ')}d)</span>
-                <span class="preset-arrow">▾</span>
-            </button>
-            <div id="customSettingsInline" class="custom-settings-inline" ${!isCustom ? 'style="display:none"' : ''}>
-                <input type="text" id="customIntervalsInput" placeholder="Intervalos (ex: 7, 15, 30)" value="${isCustom ? active.intervals.join(', ') : ''}" autocomplete="off">
-            </div>
-            <button class="btn-theme settings-ok-btn" onclick="window.applyReviewSettings()">OK</button>
-        </div>
-    `;
+function reverseReviewSort() {
+    _reviewSortReversed = !_reviewSortReversed;
+    const dir = document.getElementById('reviewSortDir');
+    if (dir) dir.textContent = _reviewSortReversed ? '↓' : '↑';
+    window.applyReviewFilters();
 }
 
-function applyReviewSettings() {
-    const intervalsInput = document.getElementById('customIntervalsInput');
-    const intervalsStr = (intervalsInput?.value || '').trim();
-    const intervals = intervalsStr.split(/[,\s]+/).map(Number).filter(n => !isNaN(n) && n > 0);
-    if (intervals.length === 0) {
-        window.toast?.('Digite pelo menos um intervalo válido (ex: 7, 15, 30).', true);
-        return;
-    }
-    intervals.sort((a, b) => a - b);
-    const setting = {
-        id: 'custom',
-        name: '✏️ Personalizar',
-        intervals: intervals
-    };
-    window.state.activeReviewSetting = setting;
-    window.saveState();
-    window.toast?.(`✅ Revisão: ${setting.name}`);
-    window.renderReviewSettingsRow();
+function renderReviewSettingsRow() {
+    const header = document.getElementById('reviewSettingsHeader');
+    if (!header) return;
+
+    const active = window.getActiveReviewSettings();
+
+    header.innerHTML = `
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:0.15rem;">
+            <span class="bento-label" style="margin:0;">⚙️ Revisão Ativa</span>
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <span class="theme-pill" style="font-size:0.75rem;font-weight:800;padding:0.2rem 0.6rem;">${active.intervals.join(', ')}d</span>
+                <button class="btn-theme" onclick="window.openReviewSettingsDialog()" style="width:auto;padding:0.2rem 0.55rem;font-size:0.7rem;background:var(--panel);color:var(--muted);border-width:2px;box-shadow:2px 2px 0px var(--shadow-color);">Trocar</button>
+            </div>
+        </div>
+    `;
 }
 
 function applyReviewFilters() {
@@ -107,20 +124,17 @@ function populateMateriaFilter() {
 }
 
 function updateReviewStats() {
-    const bar = document.getElementById('reviewStatsBar');
-    if (!bar) return;
     const blocks = window.state.studyBlocks || [];
     const overdue = blocks.filter(b => b.status === 'overdue').length;
     const due = blocks.filter(b => b.status === 'due').length;
     const pending = blocks.filter(b => b.status === 'pending').length;
     const completed = blocks.filter(b => b.status === 'completed').length;
-    bar.innerHTML = `
-        <span class="stat-item stat-overdue">🔴 ${overdue} atrasado${overdue !== 1 ? 's' : ''}</span>
-        <span class="stat-item stat-due">🟠 ${due} para revisar</span>
-        <span class="stat-item stat-pending">⏳ ${pending} pendente${pending !== 1 ? 's' : ''}</span>
-        <span class="stat-item stat-done">✅ ${completed} completo${completed !== 1 ? 's' : ''}</span>
-        <span class="stat-item stat-total">📦 ${blocks.length} total</span>
-    `;
+    const e = (id) => document.getElementById(id);
+    if (e('rs-overdue')) e('rs-overdue').textContent = overdue;
+    if (e('rs-due')) e('rs-due').textContent = due;
+    if (e('rs-pending')) e('rs-pending').textContent = pending;
+    if (e('rs-completed')) e('rs-completed').textContent = completed;
+    if (e('rs-total')) e('rs-total').textContent = blocks.length;
 }
 
 function openAddBlockDialog() {
@@ -249,15 +263,11 @@ function renderStudyBlocksList() {
 
     // Aplicar ordenação
     blocks.sort((a, b) => {
-        switch (sortOrder) {
-            case 'nextReview-asc': return (a.nextReviewDate || 0) - (b.nextReviewDate || 0);
-            case 'nextReview-desc': return (b.nextReviewDate || 0) - (a.nextReviewDate || 0);
-            case 'materia-asc': return (a.materia || '').localeCompare(b.materia || '');
-            case 'materia-desc': return (b.materia || '').localeCompare(a.materia || '');
-            case 'created-desc': return (b.createdAt || 0) - (a.createdAt || 0);
-            case 'created-asc': return (a.createdAt || 0) - (b.createdAt || 0);
-            default: return 0;
-        }
+        const sortField = sortOrder;
+        const dir = _reviewSortReversed ? -1 : 1;
+        if (sortField === 'materia') return dir * (a.materia || '').localeCompare(b.materia || '');
+        if (sortField === 'created') return dir * ((a.createdAt || 0) - (b.createdAt || 0));
+        return dir * ((a.nextReviewDate || 0) - (b.nextReviewDate || 0));
     });
 
     // Renderizar
@@ -402,7 +412,7 @@ window.applyReviewFilters = applyReviewFilters;
 window.populateMateriaFilter = populateMateriaFilter;
 window.updateReviewStats = updateReviewStats;
 window.renderReviewSettingsRow = renderReviewSettingsRow;
-window.applyReviewSettings = applyReviewSettings;
+window.reverseReviewSort = reverseReviewSort;
 
 window.openReviewBlockDialog = openReviewBlockDialog;
 window.closeReviewFeedbackDialog = closeReviewFeedbackDialog;

@@ -80,6 +80,7 @@ Não introduza nenhuma das tecnologias abaixo sem autorização explícita do do
 │   │   ├── panel/panel.ts
 │   │   ├── study/study-timer.ts
 │   │   ├── review/review.ts
+│   │   ├── flashcards/flashcards.ts
 │   │   └── comunidade/comunidade.ts
 │   │
 │   ├── shared/         # Reutilizáveis entre páginas
@@ -169,7 +170,7 @@ O mestre de todas as regras é `AGENTS.md`. As réplicas em `agents/` devem ser 
 
 ### HTMLs na raiz — OBRIGATÓRIO
 
-Os 5 HTMLs (`index.html`, `panel.html`, `study.html`, `review.html`, `comunidade.html`) ficam na raiz. Isso é **requisito do Vite MPA**. Nunca mova esses arquivos.
+Os 6 HTMLs (`index.html`, `panel.html`, `study.html`, `review.html`, `comunidade.html`, `flashcards.html`) ficam na raiz. Isso é **requisito do Vite MPA**. Nunca mova esses arquivos.
 
 ### Critério para `src/core/`
 

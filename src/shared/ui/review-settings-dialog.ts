@@ -27,13 +27,15 @@ function openReviewSettingsDialog() {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = `
     <dialog id="review-settings-dialog" class="theme-bento-dialog">
-        <div class="bento-card dialog-theme-card" style="max-width:620px;">
+        <div class="bento-card dialog-theme-card" style="max-width:520px;">
             <div class="dialog-header-block">
                 <h3>⚙️ Configuração de Revisão</h3>
                 <button class="dialog-close-btn" onclick="window.closeReviewSettingsDialog()">×</button>
             </div>
-            <div class="dialog-body" style="padding:0;">
-                <div id="reviewSettingsDialogBody" style="flex:1;min-height:0;"></div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <div id="reviewSettingsDialogBody"></div>
+                </div>
             </div>
         </div>
     </dialog>
@@ -55,29 +57,27 @@ function renderReviewSettingsDialog() {
 
     const active = getActiveReviewSettings();
 
-    dialogBody.className = 'review-settings-layout';
     dialogBody.innerHTML = `
-        <div class="review-settings-sidebar">
-            <button type="button" class="rs-tab-btn active">📋 Predefinições</button>
-        </div>
-        <div class="review-settings-content">
-            <div class="rs-section-title">🎯 Escolha um preset</div>
-            <div class="preset-options">
-                ${DEFAULT_REVIEW_PRESETS.map(p => {
-                    const isActive = p.id === active.id;
-                    return `
-                        <button type="button" class="btn-theme preset-option w-full ${isActive ? 'preset-option--active' : ''}" onclick="window.selectPresetFromDialog('${p.id}')">
-                            <span class="preset-option-name">${p.name}</span>
-                            <span class="preset-option-desc">${p.desc}</span>
-                            <span class="preset-option-intervals">${p.intervals.join(', ')} dias</span>
-                        </button>
-                    `;
-                }).join('')}
-                <button type="button" class="btn-theme preset-option w-full ${active.id === 'custom' ? 'preset-option--active' : ''}" onclick="window.selectPresetFromDialog('custom')">
-                    <span class="preset-option-name">✏️ Personalizar</span>
-                    <span class="preset-option-desc">Defina seus próprios intervalos</span>
-                    <span class="preset-option-intervals">${active.id === 'custom' ? active.intervals.join(', ') + ' dias' : 'Digite na barra de ferramentas'}</span>
-                </button>
+        <h4 class="grid-section-title">🎯 Presets Rápidos</h4>
+        <div class="study-config-grid">
+            ${DEFAULT_REVIEW_PRESETS.map(p => {
+                const isActive = p.id === active.id;
+                return `
+                    <div class="study-config-item"${isActive ? ' style="border-color:var(--accent);box-shadow:4px 4px 0 color-mix(in srgb, var(--accent), var(--shadow-color) 50%);"' : ''}>
+                        <div>
+                            <label>${p.name}</label>
+                            <div class="hint">${p.desc} — ${p.intervals.join(', ')} dias</div>
+                        </div>
+                        <button class="btn-theme" onclick="window.selectPresetFromDialog('${p.id}')" style="padding:0.3rem 0.7rem;font-size:0.75rem;${isActive ? 'border-color:var(--accent);' : ''}">${isActive ? '✓ Ativo' : 'Usar'}</button>
+                    </div>
+                `;
+            }).join('')}
+            <div class="study-config-item" id="customPresetItem"${active.id === 'custom' ? ' style="border-color:var(--accent);box-shadow:4px 4px 0 color-mix(in srgb, var(--accent), var(--shadow-color) 50%);"' : ''}>
+                <div>
+                    <label>✏️ Personalizar</label>
+                    <div class="hint">Defina seus próprios intervalos</div>
+                </div>
+                <button class="btn-theme" onclick="window.selectPresetFromDialog('custom')" style="padding:0.3rem 0.7rem;font-size:0.75rem;${active.id === 'custom' ? 'border-color:var(--accent);' : ''}">${active.id === 'custom' ? '✓ Ativo' : 'Configurar'}</button>
             </div>
         </div>
     `;
@@ -85,16 +85,31 @@ function renderReviewSettingsDialog() {
 
 function selectPresetFromDialog(presetId: string) {
     if (presetId === 'custom') {
-        window.state.activeReviewSetting = {
-            id: 'custom',
-            name: '✏️ Personalizar',
-            intervals: [7, 15, 30]
-        };
-    } else {
-        const preset = DEFAULT_REVIEW_PRESETS.find(p => p.id === presetId);
-        if (!preset) { closeReviewSettingsDialog(); return; }
-        window.state.activeReviewSetting = { ...preset };
+        const dialogBody = document.getElementById('reviewSettingsDialogBody');
+        if (!dialogBody) return;
+        dialogBody.innerHTML = `
+            <h4 class="grid-section-title">✏️ Personalizar Intervalos</h4>
+            <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem;line-height:1.5;">Digite os intervalos em dias, separados por vírgula.</p>
+            <div class="study-config-grid">
+                <div class="study-config-item">
+                    <div>
+                        <label>Intervalos (dias)</label>
+                        <div class="hint">Ex: 7, 15, 30, 60</div>
+                    </div>
+                    <input type="text" id="dialogCustomIntervals" placeholder="7, 15, 30" value="7, 15, 30" autocomplete="off" style="width:160px;padding:0.45rem 0.75rem;background:var(--panel);border:3px solid var(--stroke);border-radius:var(--element-radius);font-weight:800;color:var(--text);font-family:inherit;font-size:0.9rem;outline:none;box-shadow:3px 3px 0 var(--shadow-color);box-sizing:border-box;">
+                </div>
+            </div>
+            <div style="display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1rem;">
+                <button class="btn-theme" onclick="window.renderReviewSettingsDialog()" style="width:auto;background:var(--panel);">Voltar</button>
+                <button class="btn-theme" onclick="window.saveCustomIntervals()" style="width:auto;">Salvar</button>
+            </div>
+        `;
+        return;
     }
+
+    const preset = DEFAULT_REVIEW_PRESETS.find(p => p.id === presetId);
+    if (!preset) { closeReviewSettingsDialog(); return; }
+    window.state.activeReviewSetting = { ...preset };
 
     window.saveState();
     if (typeof window.renderReviewSettingsRow === 'function') window.renderReviewSettingsRow();
@@ -104,8 +119,32 @@ function selectPresetFromDialog(presetId: string) {
     window.toast?.(`✅ Revisão: ${window.state.activeReviewSetting.name}`);
 }
 
+function saveCustomIntervals() {
+    const input = document.getElementById('dialogCustomIntervals') as HTMLInputElement | null;
+    if (!input) return;
+    const intervalsStr = input.value.trim();
+    const intervals = intervalsStr.split(/[,\s]+/).map(Number).filter(n => !isNaN(n) && n > 0);
+    if (intervals.length === 0) {
+        window.toast?.('Digite pelo menos um intervalo válido (ex: 7, 15, 30).', true);
+        return;
+    }
+    intervals.sort((a, b) => a - b);
+    window.state.activeReviewSetting = {
+        id: 'custom',
+        name: '✏️ Personalizar',
+        intervals: intervals
+    };
+    window.saveState();
+    if (typeof window.renderReviewSettingsRow === 'function') window.renderReviewSettingsRow();
+    window.renderReviewSettingsDialog();
+    if (typeof window.renderStudyBlocksList === 'function') window.renderStudyBlocksList();
+    if (typeof window.generateReviewNotif === 'function') window.generateReviewNotif?.();
+    window.toast?.(`✅ Revisão: Personalizado (${intervals.join(', ')}d)`);
+}
+
 window.getActiveReviewSettings = getActiveReviewSettings;
 window.openReviewSettingsDialog = openReviewSettingsDialog;
 window.closeReviewSettingsDialog = closeReviewSettingsDialog;
 window.renderReviewSettingsDialog = renderReviewSettingsDialog;
 window.selectPresetFromDialog = selectPresetFromDialog;
+window.saveCustomIntervals = saveCustomIntervals;
