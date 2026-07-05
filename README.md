@@ -1,124 +1,68 @@
 # NeuroFlow
 
-Gerenciador de tarefas gamificado e focado em produtividade. Transforma o ato de estudar em uma jornada heroica com XP, tiers, missões, loja de recompensas e conexão social entre estudantes.
-
-## Estrutura do Projeto
-
-Este projeto utiliza uma arquitetura Web Vanilla com TypeScript e MPA (Multi-Page App) via Vite.
-
-```
-/                           # HTMLs na raiz (requisito Vite MPA)
-├── index.html              # Hero Hub
-├── panel.html              # Painel/Dashboard
-├── study.html              # Modo Estudo/Pomodoro
-├── comunidade.html         # Comunidade Social
-├── src/
-│   ├── core/               # State, Router, Firebase (init/db/auth)
-│   ├── features/           # Notificações (diagnóstico+matching), Onboarding
-│   ├── pages/              # Scripts por página (hub, panel, study-timer, comunidade)
-│   ├── shared/             # UI (modais, temas, toasts, media, settings), Templates de slots
-│   ├── styles/             # CSS organizado: global (variáveis, reset), components, pages
-│   ├── types/              # globals.d.ts (~120 globais tipados)
-│   └── __tests__/          # Testes unitários (Vitest + jsdom)
-├── docs/                   # Documentação de produto e arquitetura
-├── .agents/                # Regras para agentes de IA (lido via opencode.json)
-├── vite.config.js          # 4 entradas MPA
-├── vitest.config.ts        # Configuração Vitest
-├── eslint.config.js        # ESLint flat config
-└── tsconfig.json           # strict: false, allowJs: true
-```
-
-## Integração com Agentes de IA
-
-Este repositório usa `opencode.json` na raiz para instruir agentes de IA com as regras em `.agents/AGENTS.md`. O arquivo contém o mapeamento completo de globais (`window.*`), ordem de carregamento de scripts, localStorage keys, schema do Firestore, regras de CSS e padrões de debugging.
-
-> Ao trabalhar neste projeto com um agente de IA, garanta que ele leia `.agents/AGENTS.md` e `docs/PRODUCT.md` antes de qualquer edição.
+Gerenciador de tarefas gamificado focado em produtividade para estudantes. Transforma o ato de estudar em uma jornada heroica com XP, tiers, missões, loja de recompensas, timer Pomodoro, revisão espaçada e conexão social.
 
 ## Stack
 
-**Sem frameworks pesados** — Vanilla TypeScript puro. Nenhuma dependência de produção.
-
 | Categoria | Tecnologia |
 |---|---|
-| Build | Vite 8.x (`dev`, `build`, `preview`) |
-| TypeScript | TS 6.x (`typecheck`) |
-| Lint | ESLint 10.x + typescript-eslint (`lint`, `lint:fix`) |
-| Testes | Vitest 4.x + jsdom (`test`, `test:watch`) |
-| Banco + Auth | Firebase SDK v10.8.0 via CDN dinâmico |
+| Build | Vite 8.x |
+| Linguagem | TypeScript 6.x (`strict: false`) |
+| Auth/DB | Firebase 10.8.0 via CDN dinâmico |
+| Testes | Vitest 4.x + jsdom |
+| Estilos | Vanilla CSS com variáveis `data-theme` (22 temas) |
 | Imagens | CropperJS via CDN, DiceBear API (fallback avatar) |
-| Tipografia | Google Fonts (Space Grotesk) |
+| Tipografia | Space Grotesk (Google Fonts) |
 
-## Execução
+**Zero dependências de produção.** Sem React, Vue, Angular, Tailwind, Bootstrap ou qualquer framework não listado.
 
-### Desenvolvimento Local
-```bash
-npm install
-npm run dev
+## Estrutura
+
 ```
-Servidor em http://localhost:5173 com HMR.
-
-### Build para Produção
-```bash
-npm run build       # gera dist/ com assets otimizados
-npm run preview     # serve localmente o conteúdo de dist/
-```
-Hospede o conteúdo de `dist/` em qualquer CDN estático.
-
-### Testes
-```bash
-npm run test        # executa uma vez
-npm run test:watch  # modo watch
-```
-
-### Type Checking + Lint
-```bash
-npm run typecheck
-npm run lint
+├── index.html              # Hero Hub
+├── panel.html              # Painel / Dashboard
+├── study.html              # Modo Estudo / Pomodoro
+├── review.html             # Revisão Espaçada (SM-2)
+├── comunidade.html         # Comunidade Social
+├── src/
+│   ├── core/               # Estado global, roteamento, Firebase
+│   ├── features/           # Notificações, Onboarding
+│   ├── pages/              # Scripts por página (1:1 com HTMLs)
+│   ├── shared/             # UI (modais, temas, toasts), Templates de slots
+│   ├── styles/             # CSS: global (temas, reset), components, pages
+│   ├── types/              # globals.d.ts (~120 globais tipados)
+│   └── __tests__/          # Testes unitários (Vitest)
+├── agents/                 # Réplicas de config para ferramentas de IA
+├── docs/                   # Documentação de produto e arquitetura
+├── scripts/                # Scripts auxiliares (sync-agents, git-enviar)
 ```
 
-## Páginas da Aplicação
+## Páginas
 
 | Página | Arquivo | Descrição |
 |---|---|---|
-| Hero Hub | `index.html` | Perfil do herói, stats, navegação |
-| Painel | `panel.html` | Missões diárias, marcos épicos, loja |
-| Estudo | `study.html` | Timer Pomodoro/Simples + histórico |
+| Hero Hub | `index.html` | Perfil, stats, navegação |
+| Painel | `panel.html` | Missões diárias, épicas, loja, modo Momentum |
+| Estudo | `study.html` | Timer Pomodoro / Simples + histórico |
+| Revisão | `review.html` | Repetição espaçada (SM-2 adaptado) |
 | Comunidade | `comunidade.html` | Grid social de heróis |
 
-## Arquitetura Técnica
+## Comandos
 
-### Firebase (ES Modules via CDN)
-Os módulos do Firebase (`init.ts`, `db.ts`, `auth.ts`) são carregados como `type="module"` e importam o SDK dinamicamente. Executam **após** os scripts regulares (deferred), garantindo que `window.state`, `window.handleAuthRouting`, `window.render` etc. já estejam definidos quando o callback de auth dispara.
-
-### Fluxo de Autenticação
+```bash
+npm install          # Instalar dependências
+npm run dev          # Servidor dev (HMR) em localhost:5173
+npm run build        # Build produção → dist/
+npm run preview      # Servir dist/ localmente
+npm run test         # Testes unitários (Vitest)
+npm run typecheck    # TypeScript check
+npm run lint         # ESLint
+npm run sync-agents  # Sincronizar AGENTS.md → agents/
+npm run verify-agents # Verificar integridade das réplicas
 ```
-onAuthStateChanged
-  ↓ user logado
-  syncUserData(uid) → applyRemoteState() → applyPrefs() → handleAuthRouting() → render()
-  initNotifications()
-  ↓ visitante
-  loadGuestState() → applyPrefs() → handleAuthRouting() → render()
-```
 
-### Sistema de Notificações
-- `engine.ts` — estado (`__notifications[]`), lógica de matching, persistência em localStorage
-- `ui.ts` — render do painel dropdown e mini-modais de perfil
-- `init.ts` — timers, inicialização e exports globais
-- Diagnóstico de perfil: notificação persistente (não apagável)
-- Matching: máximo 1 notificação regular por vez, agendada para 00:00 ou 12:00 local
+## Agentes de IA
 
-### Sistema de Slots (Templates)
-- 16 slots: 5 Dailies, 3 Epics, 8 Shop
-- Texto customizável pelo usuário (onboarding/reopenCustomization)
-- Valores econômicos (XP, Pts, custo, cooldown) fixos em `SLOT_ECONOMICS` — não altere sem revisão de balanceamento
+O `AGENTS.md` na raiz é o protocolo mestre. Réplicas em `agents/` com symlinks na raiz para compatibilidade com Claude Code, Cursor, Windsurf e Copilot.
 
-### escapeHtml
-A função `escapeHtml` é **definida uma única vez** em `modals.ts` e exposta como `window.escapeHtml`. Todos os outros scripts a usam via `window.escapeHtml(str)` diretamente. Nunca crie uma segunda declaração com `const escapeHtml`.
-
-### Estudo / Pomodoro
-O timer completo está em `src/pages/study/study-timer.ts` (extraído do inline de `study.html`). Expõe `window.studyTimer` com modos `'simple'` e `'pomodoro'`. Configurações de break auto/manual em `settings-modal.ts`.
-
-## Scripts Removidos (histórico)
-- `scripts/refactor.cjs` e `refactor2.cjs` — utilitários de refatoração obsoletos
-- `src/core/firebase/config.js` — cópia redundante de `init.js`
-- `src/features/notifications/notifications.js` — 909 linhas de código morto
+Ao trabalhar neste projeto com um agente de IA, inclua "LEIA E OBEDEÇA O AGENTS.md" no prompt, ou configure a ferramenta para ler `AGENTS.md` automaticamente.

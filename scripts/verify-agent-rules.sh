@@ -3,14 +3,15 @@
 # Uso: npm run verify-agents
 
 ROOT="$(dirname "$(dirname "$(realpath "$0")")")"
+AGENTS_DIR="$ROOT/agents"
 MASTER="$ROOT/AGENTS.md"
 REQUIRED=(
   "$ROOT/AGENTS.md"
-  "$ROOT/CLAUDE.md"
-  "$ROOT/AI.md"
-  "$ROOT/.cursorrules"
-  "$ROOT/.windsurfrules"
-  "$ROOT/copilot-instructions.md"
+  "$AGENTS_DIR/CLAUDE.md"
+  "$AGENTS_DIR/AI.md"
+  "$AGENTS_DIR/.cursorrules"
+  "$AGENTS_DIR/.windsurfrules"
+  "$AGENTS_DIR/copilot-instructions.md"
 )
 
 ERRORS=0

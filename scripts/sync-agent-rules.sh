@@ -6,11 +6,12 @@ set -e
 
 ROOT="$(dirname "$(dirname "$(realpath "$0")")")"
 MASTER="$ROOT/AGENTS.md"
+AGENTS_DIR="$ROOT/agents"
 REPLICAS=(
-  "$ROOT/CLAUDE.md"
-  "$ROOT/.cursorrules"
-  "$ROOT/.windsurfrules"
-  "$ROOT/copilot-instructions.md"
+  "$AGENTS_DIR/CLAUDE.md"
+  "$AGENTS_DIR/.cursorrules"
+  "$AGENTS_DIR/.windsurfrules"
+  "$AGENTS_DIR/copilot-instructions.md"
 )
 
 if [ ! -f "$MASTER" ]; then

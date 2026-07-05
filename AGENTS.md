@@ -76,14 +76,15 @@ React, Vue, Angular, Svelte, Solid, Tailwind, Bootstrap, lodash, axios, Redux, J
 
 ## ETAPA 5 — SINCRONIZAÇÃO
 
-Este arquivo (`AGENTS.md`) é o **mestre**. Réplicas:
+Este arquivo (`AGENTS.md`) é o **mestre**. Réplicas em `agents/` com symlinks na raiz:
 
-| Arquivo | Ferramenta |
+| Arquivo (raiz → agents/) | Ferramenta |
 |---|---|
-| `CLAUDE.md` | Claude Code (lido automaticamente) |
-| `.cursorrules` | Cursor |
-| `.windsurfrules` | Windsurf |
-| `copilot-instructions.md` | GitHub Copilot |
+| `CLAUDE.md` → `agents/CLAUDE.md` | Claude Code (lido automaticamente) |
+| `.cursorrules` → `agents/.cursorrules` | Cursor |
+| `.windsurfrules` → `agents/.windsurfrules` | Windsurf |
+| `copilot-instructions.md` → `agents/copilot-instructions.md` | GitHub Copilot |
+| `AI.md` → `agents/AI.md` | Ponto de descoberta universal |
 
 Para sincronizar: `npm run sync-agents`
 

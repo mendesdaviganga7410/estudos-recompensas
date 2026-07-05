@@ -123,17 +123,45 @@ Não introduza nenhuma das tecnologias abaixo sem autorização explícita do do
 │   └── IDEAS.md
 │
 ├── scripts/
-│   └── git-enviar.sh
+│   ├── git-enviar.sh
+│   ├── sync-agent-rules.sh
+│   └── verify-agent-rules.sh
 │
-├── AI.md                      # Ponto de descoberta universal
-├── CLAUDE.md                  # Instruções para Claude
-├── AGENTS.md                  # Instruções universais para agentes
+├── agents/
+│   ├── AI.md                  # Ponto de descoberta universal
+│   ├── CLAUDE.md              # Instruções para Claude (source)
+│   ├── .cursorrules           # Config para Cursor (source)
+│   ├── .windsurfrules         # Config para Windsurf (source)
+│   └── copilot-instructions.md # Instruções para Copilot (source)
+│
+├── AGENTS.md                  # Instruções universais para agentes (mestre)
+├── CLAUDE.md → agents/        # Symlink
+├── .cursorrules → agents/     # Symlink
+├── .windsurfrules → agents/   # Symlink
+├── copilot-instructions.md → agents/ # Symlink
+├── AI.md → agents/            # Symlink
 ├── package.json
 ├── vite.config.js
 ├── tsconfig.json
 ├── vitest.config.ts
 └── eslint.config.js
 ```
+
+---
+
+### agents/ — Réplicas de Configuração de IA
+
+O diretório `agents/` contém os arquivos-fonte de configuração para ferramentas de IA. Na raiz, existem apenas symlinks que apontam para `agents/`, mantendo compatibilidade com as ferramentas que exigem nomes específicos na raiz.
+
+| Arquivo fonte (em agents/) | Symlink na raiz | Consumido por |
+|---|---|---|
+| `agents/CLAUDE.md` | `CLAUDE.md` | Claude Code |
+| `agents/.cursorrules` | `.cursorrules` | Cursor |
+| `agents/.windsurfrules` | `.windsurfrules` | Windsurf |
+| `agents/copilot-instructions.md` | `copilot-instructions.md` | GitHub Copilot |
+| `agents/AI.md` | `AI.md` | Ponto de descoberta universal |
+
+O mestre de todas as regras é `AGENTS.md`. As réplicas em `agents/` devem ser mantidas consistentes com ele (use `npm run sync-agents`).
 
 ---
 
@@ -514,5 +542,5 @@ new Date().toISOString().slice(0, 10)  // UTC — quebra streak em outros fusos
 
 ---
 
-*Última atualização: 2026-07-02*
+*Última atualização: 2026-07-05*
 *Este documento é vivo — atualize ao realizar mudanças arquiteturais reais.*
