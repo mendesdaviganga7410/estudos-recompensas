@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFlow // Sessões de Estudo</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap"
+        rel="stylesheet">
+    <style>
+        .study-timer-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .timer-display {
+            font-size: 3.5rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            font-variant-numeric: tabular-nums;
+            background: var(--bg);
+            border: 3px solid var(--stroke);
+            border-radius: var(--card-radius);
+            padding: 1rem 2rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            width: 100%;
+            text-align: center;
+            color: var(--accent);
+            transition: color 0.3s;
+        }
+        .timer-display.phase-focus { color: var(--success); }
+        .timer-display.phase-break { color: var(--accent); }
+        .timer-phase-label {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .timer-controls {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .btn-timer {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            color: var(--text);
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--element-radius);
+            font-size: 0.85rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            flex: 1;
+        }
+        .btn-timer:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px var(--shadow-color);
+        }
+        .btn-timer:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
+        }
+        .btn-timer:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+        }
+        .btn-timer.start { background: var(--success); color: white; }
+        .btn-timer.pause { background: var(--accent); color: var(--accent-text); }
+        .btn-timer.stop  { background: var(--failure); color: white; }
+        .btn-timer.skip  { background: var(--accent); color: var(--accent-text); }
+
+        .mode-toggle {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .mode-btn {
+            padding: 0.55rem 1.2rem;
+            font-size: 0.78rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            cursor: pointer;
+            background: var(--surface);
+            color: var(--text);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, background 0.1s, color 0.1s;
+        }
+        .mode-btn:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0px var(--shadow-color);
+        }
+        .mode-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
+        }
+        .mode-btn.active {
+            background: var(--accent);
+            color: var(--accent-text);
+            border-color: var(--accent);
+        }
+        .mode-btn.active:hover {
+            box-shadow: 4px 4px 0px var(--shadow-color);
+        }
+
+        .pomo-config {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            width: 100%;
+            max-width: 480px;
+        }
+        .pomo-config .config-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .pomo-config .config-item label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .pomo-config .config-item input {
+            background: var(--panel);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            font-weight: 800;
+            color: var(--text);
+            outline: none;
+            width: 100%;
+            box-shadow: 3px 3px 0 var(--shadow-color);
+            transition: transform 0.1s, box-shadow 0.1s, border-color 0.1s;
+            font-family: inherit;
+            text-align: center;
+        }
+        .pomo-config .config-item input:focus {
+            border-color: var(--accent);
+            transform: translate(-1px, -1px);
+            box-shadow: 4px 4px 0 var(--shadow-color);
+        }
+
+        .pomo-status {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .pomo-status .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.15rem;
+        }
+        .pomo-status .stat span:first-child {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .pomo-status .stat span:last-child {
+            font-size: 1rem;
+            font-weight: 900;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .history-table th {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--muted);
+            text-align: left;
+            padding: 0.5rem 0.6rem;
+            border-bottom: 2px dashed var(--stroke);
+            white-space: nowrap;
+        }
+        .history-table td {
+            padding: 0.6rem 0.6rem;
+            font-weight: 700;
+            border-bottom: 2px solid var(--stroke);
+            white-space: nowrap;
+        }
+        .history-table tr:last-child td {
+            border-bottom: none;
+        }
+        .history-table tr:hover td {
+            background: var(--panel);
+        }
+        .history-empty {
+            text-align: center;
+            padding: 2rem;
+            color: var(--muted);
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .history-expand-btn {
+            background: var(--panel);
+            border: 2px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.25rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 800;
+            color: var(--muted);
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            white-space: nowrap;
+        }
+        .history-expand-btn:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .clear-btn-wrap {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px dashed var(--stroke);
+        }
+        .btn-clear {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            background: var(--surface);
+            border: 2px solid var(--failure);
+            color: var(--failure);
+            padding: 0.5rem 1rem;
+            border-radius: var(--element-radius);
+            font-size: 0.75rem;
+            font-weight: 800;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+        .btn-clear:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .btn-clear:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0px var(--shadow-color);
+        }
+        .session-count {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .tag-modo {
+            display: inline-block;
+            font-size: 0.6rem;
+            font-weight: 800;
+            padding: 0.15rem 0.45rem;
+            border-radius: calc(var(--element-radius) * 0.6);
+            border: 2px solid currentColor;
+        }
+        .tag-modo.simples { color: var(--muted); }
+        .tag-modo.pomodoro { color: var(--accent); }
+
+        .btn-sound-settings {
+            background: var(--panel);
+            border: 2px solid var(--stroke);
+            border-radius: var(--element-radius);
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 2px 2px 0 var(--shadow-color);
+            transition: transform 0.1s, box-shadow 0.1s;
+            flex-shrink: 0;
+        }
+        .btn-sound-settings:hover {
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0 var(--shadow-color);
+        }
+        .btn-sound-settings:active {
+            transform: translate(1px, 1px);
+            box-shadow: 1px 1px 0 var(--shadow-color);
+        }
+        .phase-dialog-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+            margin-top: 1rem;
+        }
+        .phase-dialog-actions .btn-theme {
+            justify-content: center;
+            width: 100%;
+        }
+        .phase-dialog-actions .btn-theme.skip {
+            background: var(--panel);
+            color: var(--muted);
+        }
+
+        .study-config-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .study-config-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.85rem 1rem;
+            box-shadow: 3px 3px 0 var(--shadow-color);
+        }
+        .study-config-item label {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--text);
+            cursor: pointer;
+        }
+        .study-config-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--accent);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+        .study-config-item .hint {
+            font-size: 0.68rem;
+            color: var(--muted);
+            font-weight: 700;
+            margin-top: 0.15rem;
+        }
+        .session-notes {
+            width: 100%;
+            min-height: 80px;
+            border-radius: var(--element-radius);
+            border: 3px solid var(--stroke);
+            background: var(--panel);
+            color: var(--text);
+            padding: 0.75rem 1rem;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 800;
+            resize: vertical;
+            margin-top: 0.5rem;
+            box-sizing: border-box;
+            outline: none;
+            box-shadow: 4px 4px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .session-notes:focus {
+            border-color: var(--accent);
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+        }
+        .btn-notes-toggle {
+            background: var(--panel);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            color: var(--muted);
+            font-size: 0.75rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            box-shadow: 4px 4px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease, color 0.1s ease;
+            font-family: inherit;
+            margin-top: 0.5rem;
+            width: auto;
+            display: inline-block;
+        }
+        .btn-notes-toggle:hover {
+            border-color: var(--accent);
+            color: var(--text);
+            transform: translate(-1px, -1px);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+        }
+        .btn-notes-toggle:active {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0px var(--shadow-color);
+        }
+
+        .history-bento-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 0.75rem;
+        }
+        .history-bento-item {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 1rem;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+            font-family: inherit;
+        }
+        .history-bento-item:hover {
+            transform: translate(-2px, -2px);
+            box-shadow: 5px 5px 0px var(--shadow-color);
+            border-color: var(--accent);
+        }
+        .history-bento-item .hbi-date {
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-weight: 700;
+            letter-spacing: 0.03em;
+        }
+        .history-bento-item .hbi-subject {
+            font-size: 0.95rem;
+            font-weight: 900;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .history-bento-item .hbi-meta {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .history-bento-item .hbi-meta .hbi-mode {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+        .history-bento-item .hbi-meta .hbi-total {
+            color: var(--accent);
+            font-weight: 900;
+        }
+        .history-bento-item .hbi-notes-indicator {
+            font-size: 0.7rem;
+            color: var(--accent);
+        }
+
+        .history-sort-bar {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .history-sort-bar label {
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--muted);
+        }
+        .history-sort-btn {
+            background: var(--panel);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.4rem 0.7rem;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--text);
+            font-family: inherit;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            cursor: pointer;
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .history-sort-btn:hover {
+            border-color: var(--accent);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+
+        .sort-dialog-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .sort-dialog-grid button {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.75rem 1rem;
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--text);
+            font-family: inherit;
+            text-align: left;
+            cursor: pointer;
+            box-shadow: 2px 2px 0px var(--shadow-color);
+            transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+        }
+        .sort-dialog-grid button:hover {
+            border-color: var(--accent);
+            transform: translate(-1px, -1px);
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .sort-dialog-grid button.is-active {
+            border-color: var(--accent);
+            background: color-mix(in srgb, var(--accent) 15%, var(--surface));
+        }
+
+        .history-detail {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .history-detail .hd-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .history-detail .hd-header .hd-date {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--muted);
+            letter-spacing: 0.03em;
+        }
+        .history-detail .hd-header .hd-subject {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--text);
+        }
+        .history-detail .hd-header .hd-mode-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            padding: 0.3rem 0.7rem;
+            border-radius: var(--element-radius);
+            background: var(--surface);
+            border: 2px solid var(--stroke);
+            box-shadow: 2px 2px 0px var(--shadow-color);
+        }
+        .history-detail .hd-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 0.6rem;
+        }
+        .history-detail .hd-stat {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 0.75rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .history-detail .hd-stat .hd-stat-label {
+            font-size: 0.6rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .history-detail .hd-stat .hd-stat-value {
+            font-size: 1.1rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-top: 0.15rem;
+        }
+        .history-detail .hd-notes {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 1rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .history-detail .hd-notes h4 {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin: 0 0 0.5rem 0;
+        }
+        .history-detail .hd-notes p {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text);
+            margin: 0;
+            white-space: pre-wrap;
+        }
+        .history-detail .hd-phases {
+            background: var(--surface);
+            border: 3px solid var(--stroke);
+            border-radius: var(--element-radius);
+            padding: 1rem;
+            box-shadow: 3px 3px 0px var(--shadow-color);
+        }
+        .history-detail .hd-phases h4 {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+            margin: 0 0 0.5rem 0;
+        }
+        .history-detail .hd-phases .hd-phase {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.35rem 0;
+            border-bottom: 1px solid var(--stroke);
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+        .history-detail .hd-phases .hd-phase:last-child {
+            border-bottom: none;
+        }
+        .history-detail .hd-phases .hd-phase .hd-phase-type {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .history-detail .hd-phases .hd-phase .hd-phase-type .focus-dot {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+        }
+        .history-detail .hd-phases .hd-phase .hd-phase-type .break-dot {
+            display: inline-block;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--muted);
+        }
+        .history-detail .hd-phases .hd-phase .hd-phase-dur {
+            color: var(--accent);
+            font-weight: 900;
+        }
+    </style>
+  <script type="module" crossorigin src="/estudos-recompensas/assets/study-Db89YIne.js"></script>
+  <link rel="modulepreload" crossorigin href="/estudos-recompensas/assets/router-BBePKEXI.js">
+  <link rel="stylesheet" crossorigin href="/estudos-recompensas/assets/router-BaY2t2C6.css">
+</head>
+
+<body data-theme="light" class="guest-mode">
+
+    <div class="container">
+
+        <!-- AUTH LOADING -->
+        <div id="auth-loading">
+            <div class="pulse"></div>
+            <span>Carregando...</span>
+        </div>
+
+        <div id="study-content" style="display:none">
+
+            <div class="top-bar">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <button class="btn-theme" id="btnBack" onclick="studyTimer.goBack()" title="Voltar">⬅ Voltar</button>
+                    <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Modo Visitante</span>
+                    <div id="auth-panel" class="auth-panel">
+                        <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+                            <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
+                            <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
+                        </div>
+                        <div id="user-profile" class="user-profile" style="display: none;">
+                            <img id="user-photo" src="" alt="Foto" referrerpolicy="no-referrer">
+                            <span id="user-name">Carregando...</span>
+                            <button class="btn-logout" onclick="logoutGoogle()">Sair</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <div class="notif-btn-wrap">
+                        <button class="btn-theme" id="notif-bell-btn" onclick="openNotificationPanel()">🔔</button>
+                        <span class="notif-badge" id="notif-badge">0</span>
+                        <span class="notif-prompt-dot" id="notif-prompt-dot"></span>
+                    </div>
+                    <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+                    <button class="btn-theme admin-btn" id="admin-btn" onclick="openAdminPanel()" style="display:none;">🛠️</button>
+                </div>
+            </div>
+
+            <div class="bento-layout">
+
+                <!-- Timer Card -->
+                <div class="bento-card col-span-3">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;">
+                        <h2 style="margin-bottom:0;">Cronômetro de Foco</h2>
+                        <div style="display:flex;align-items:center;gap:0.5rem;">
+                            <div class="mode-toggle">
+                                <button class="mode-btn active" id="modeSimple" onclick="studyTimer.switchMode('simple')">⏱ Simples</button>
+                                <button class="mode-btn" id="modePomo" onclick="studyTimer.switchMode('pomodoro')">🍅 Pomodoro</button>
+                            </div>
+                            <button class="btn-sound-settings" onclick="openSoundDialog()" title="Configurar sons">🔔</button>
+                        </div>
+                    </div>
+                    <div class="study-timer-wrap">
+                        <div class="timer-display" id="timerDisplay">00:00</div>
+                        <div id="pomoStatus" class="pomo-status" style="display:none;">
+                            <div class="stat">
+                                <span>Ciclo</span>
+                                <span id="pomoCycle">0/0</span>
+                            </div>
+                            <div class="stat">
+                                <span>Fase</span>
+                                <span id="pomoPhase">—</span>
+                            </div>
+                            <div class="stat">
+                                <span>Foco Total</span>
+                                <span id="pomoFocusTotal">00:00</span>
+                            </div>
+                            <div class="stat">
+                                <span>Descanso Total</span>
+                                <span id="pomoBreakTotal">00:00</span>
+                            </div>
+                        </div>
+                        <div id="pomoConfig" class="pomo-config" style="display:none;">
+                            <div class="config-item">
+                                <label for="pomoFocusMin">Foco (min)</label>
+                                <input type="number" id="pomoFocusMin" value="25" min="1" max="180">
+                            </div>
+                            <div class="config-item">
+                                <label for="pomoBreakMin">Descanso (min)</label>
+                                <input type="number" id="pomoBreakMin" value="5" min="1" max="60">
+                            </div>
+                            <div class="config-item">
+                                <label for="pomoCycles">Ciclos</label>
+                                <input type="number" id="pomoCycles" value="4" min="1" max="50">
+                            </div>
+                        </div>
+                        <div class="form-group" style="width:100%;max-width:320px;">
+                            <label for="subjectInput">Assunto / Matéria</label>
+                            <input type="text" id="subjectInput" placeholder="Ex: Matemática, Compiladores..." autocomplete="off">
+                            <button id="btnToggleNotes" class="btn-notes-toggle" onclick="toggleNotes()" type="button" style="margin-top:0.4rem;">📝 Anotações</button>
+                            <textarea id="sessionNotes" class="session-notes" placeholder="Detalhes sobre esta sessão..." style="display:none;"></textarea>
+                        </div>
+                        <div class="timer-controls">
+                            <button class="btn-timer start" id="btnStart" onclick="studyTimer.start()">▶ Iniciar Foco</button>
+                            <button class="btn-timer pause" id="btnPause" onclick="studyTimer.pause()" disabled>⏸ Pausar</button>
+                            <button class="btn-timer skip" id="btnSkip" onclick="studyTimer.skip()" disabled>⏭ Pular</button>
+                            <button class="btn-timer stop" id="btnStop" onclick="studyTimer.stop()" disabled>⏹ Concluir Sessão</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Card -->
+                <div class="bento-card col-span-3">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+                        <div style="display:flex;align-items:center;gap:0.6rem;">
+                            <h2 style="margin-bottom:0;">Histórico de Sessões</h2>
+                            <button class="history-expand-btn" onclick="openHistoryGrid()">Expandir</button>
+                        </div>
+                        <span class="session-count" id="sessionCount">0 sessões</span>
+                    </div>
+                    <div id="historyBody" style="overflow-x:auto;">
+                        <div class="history-empty">Nenhuma sessão registrada ainda. Complete seu primeiro foco!</div>
+                    </div>
+                    <div class="clear-btn-wrap">
+                        <button class="btn-clear" onclick="studyTimer.clearHistory()">🗑 Limpar Histórico</button>
+                    </div>
+                </div>
+
+            </div>
+
+        </div> <!-- /study-content -->
+    </div>
+
+    <!-- MODAL: Autenticação -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Entrar na Conta</h3>
+                <button class="modal-close" onclick="closeAuthModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="auth-form">
+                    <div class="form-group">
+                        <label for="auth-email">E-mail</label>
+                        <input type="email" id="auth-email" placeholder="seu@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group" id="auth-password-group">
+                        <label for="auth-password">Senha</label>
+                        <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" minlength="6"
+                            autocomplete="current-password">
+                        <a href="#" id="btn-forgot-password" onclick="openForgotPassword(event)"
+                            style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 0.35rem; display: inline-block;">Esqueceu
+                            sua senha?</a>
+                    </div>
+                    <button class="btn-theme btn-submit" id="btn-auth-submit" onclick="handleAuthSubmit()"
+                        style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+                </div>
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem;">
+                    <span id="toggle-text" style="color: var(--muted);">Não tem uma conta?</span>
+                    <a href="#" id="btn-toggle-auth-mode" onclick="toggleAuthMode(event)"
+                        style="color: var(--accent); font-weight: 700; text-decoration: none; margin-left: 0.25rem;">Criar
+                        Conta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="tBox"></div>
+
+    <!-- SOUND SETTINGS DIALOG -->
+    <dialog id="sound-dialog" class="theme-bento-dialog sound-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>🔔 Configurar Sons</h3>
+                <button class="dialog-close-btn" onclick="closeSoundDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll" id="soundDialogBody">
+                    <!-- gerado via JS -->
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="theme-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>Galeria de Temas</h3>
+                <button class="dialog-close-btn" onclick="closeThemeDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <h4 class="grid-section-title">☀️ Modos Claros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-light" onclick="selectTheme('light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Padrão Claro</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-brown" onclick="selectTheme('pastel-brown')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Café com Leite</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-pink" onclick="selectTheme('pastel-pink')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Flor de Cerejeira</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-blue" onclick="selectTheme('pastel-blue')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Brisa do Mar</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-purple" onclick="selectTheme('pastel-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lavanda Suave</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-mint" onclick="selectTheme('pastel-mint')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Menta Fresca</span></button>
+                        <button class="theme-bento-item theme-preview-solarized-light" onclick="selectTheme('solarized-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Solarized Light</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-light" onclick="selectTheme('outerwilds-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lareira Gentil</span></button>
+                    </div>
+                    <h4 class="grid-section-title" style="margin-top: 1.5rem;">🌙 Modos Escuros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-dark" onclick="selectTheme('dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dark Industrial</span></button>
+                        <button class="theme-bento-item theme-preview-dark-chocolate" onclick="selectTheme('dark-chocolate')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Cacau Intenso</span></button>
+                        <button class="theme-bento-item theme-preview-dark-forest" onclick="selectTheme('dark-forest')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Floresta Noturna</span></button>
+                        <button class="theme-bento-item theme-preview-dark-amber" onclick="selectTheme('dark-amber')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Âmbar Profundo</span></button>
+                        <button class="theme-bento-item theme-preview-dark-purple" onclick="selectTheme('dark-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Noite de Vampiro</span></button>
+                        <button class="theme-bento-item theme-preview-catppuccin" onclick="selectTheme('catppuccin')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Catppuccin Mocha</span></button>
+                        <button class="theme-bento-item theme-preview-nord" onclick="selectTheme('nord')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Nordic Ice</span></button>
+                        <button class="theme-bento-item theme-preview-dracula" onclick="selectTheme('dracula')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dracula Sync</span></button>
+                        <button class="theme-bento-item theme-preview-github-dark" onclick="selectTheme('github-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">GitHub Premium</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-dark" onclick="selectTheme('outerwilds-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Fogueira Cósmica</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- DIALOG: Transição de fase (Pomodoro) -->
+    <dialog id="phase-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3 id="phaseDialogTitle">🎯 Foco Concluído!</h3>
+                <button class="dialog-close-btn" onclick="closePhaseDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll" style="text-align:center;">
+                    <p style="font-size:0.85rem;font-weight:700;color:var(--muted);">O que deseja fazer?</p>
+                    <div class="phase-dialog-actions">
+                        <button class="btn-theme" id="phaseBtnPrimary">▶ Começar Descanso</button>
+                        <button class="btn-theme" id="phaseBtnWait">⏸ Esperar</button>
+                        <button class="btn-theme skip" id="phaseBtnSkip">⏭ Pular Descanso</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- DIALOG: Ordenar Histórico -->
+    <dialog id="history-sort-dialog" class="theme-bento-dialog" style="max-width:320px;">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>📌 Ordenar</h3>
+                <button class="dialog-close-btn" onclick="closeHistorySortDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <div class="sort-dialog-grid" id="historySortOptions">
+                        <!-- gerado via JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <!-- DIALOG: Histórico Bento -->
+    <dialog id="history-bento-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3 id="historyDialogTitle">📋 Histórico de Sessões</h3>
+                <div style="display:flex;gap:0.5rem;align-items:center;">
+                    <button class="dialog-close-btn" id="historyDialogBackBtn" style="display:none;" onclick="historyBackToGrid()">←</button>
+                    <button class="dialog-close-btn" onclick="closeHistoryDialog()">×</button>
+                </div>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll" id="historyDialogContent">
+                    <!-- grid ou detalhe gerado via JS -->
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <script>document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('admin-btn');if(b&&window.isAdmin)b.style.display='';});</script>
+</body>
+
+</html>

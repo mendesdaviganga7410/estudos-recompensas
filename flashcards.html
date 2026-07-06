@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NeuroFlow // Flashcards</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
+  <script type="module" crossorigin src="/estudos-recompensas/assets/flashcards-BMaIDRlV.js"></script>
+  <link rel="modulepreload" crossorigin href="/estudos-recompensas/assets/router-BBePKEXI.js">
+  <link rel="stylesheet" crossorigin href="/estudos-recompensas/assets/router-BaY2t2C6.css">
+  <link rel="stylesheet" crossorigin href="/estudos-recompensas/assets/flashcards-DrlCth4U.css">
+  <link rel="stylesheet" crossorigin href="/estudos-recompensas/assets/hero-B01Prlm3.css">
+</head>
+
+<body data-theme="light" class="guest-mode">
+
+    <div class="container">
+
+        <!-- AUTH LOADING -->
+        <div id="auth-loading">
+            <div class="pulse"></div>
+            <span>Carregando...</span>
+        </div>
+
+        <div id="flashcards-content" style="display:none">
+
+            <div class="top-bar">
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <button class="btn-theme auth-only" onclick="navigateTo('index.html')" title="Voltar ao Hub">🏠 Hub</button>
+                    <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Modo Visitante</span>
+                    <div id="auth-panel" class="auth-panel">
+                        <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
+                            <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
+                            <button class="btn-theme" onclick="openAuthModal()">✉️ E-mail</button>
+                        </div>
+                        <div id="user-profile" class="user-profile" style="display: none;">
+                            <img id="user-photo" src="" alt="Foto" referrerpolicy="no-referrer">
+                            <span id="user-name">Carregando...</span>
+                            <button class="btn-logout" onclick="logoutGoogle()">Sair</button>
+                        </div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:0.5rem;">
+                    <div class="notif-btn-wrap">
+                        <button class="btn-theme" id="notif-bell-btn" onclick="openNotificationPanel()">🔔</button>
+                        <span class="notif-badge" id="notif-badge">0</span>
+                        <span class="notif-prompt-dot" id="notif-prompt-dot"></span>
+                    </div>
+                    <button class="btn-theme" onclick="openSettingsModal()">⚙️ Configurações</button>
+                    <button class="btn-theme admin-btn" id="admin-btn" onclick="openAdminPanel()" style="display:none;">🛠️</button>
+                </div>
+            </div>
+
+            <!-- Conteúdo renderizado por flashcards.ts -->
+            <div id="flashcards-page-content"></div>
+
+        </div>
+    </div>
+
+    <!-- MODAL: Autenticação -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Entrar na Conta</h3>
+                <button class="modal-close" onclick="closeAuthModal()">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="auth-form">
+                    <div class="form-group">
+                        <label for="auth-email">E-mail</label>
+                        <input type="email" id="auth-email" placeholder="seu@email.com" autocomplete="email">
+                    </div>
+                    <div class="form-group" id="auth-password-group">
+                        <label for="auth-password">Senha</label>
+                        <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="current-password">
+                        <a href="#" id="btn-forgot-password" onclick="openForgotPassword(event)"
+                            style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 0.35rem; display: inline-block;">Esqueceu sua senha?</a>
+                    </div>
+                    <button class="btn-theme btn-submit" id="btn-auth-submit" onclick="handleAuthSubmit()"
+                        style="width: 100%; margin-top: 1.5rem;">Entrar</button>
+                </div>
+                <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem;">
+                    <span id="toggle-text" style="color: var(--muted);">Não tem uma conta?</span>
+                    <a href="#" id="btn-toggle-auth-mode" onclick="toggleAuthMode(event)"
+                        style="color: var(--accent); font-weight: 700; text-decoration: none; margin-left: 0.25rem;">Criar Conta</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-box" id="tBox"></div>
+
+    <dialog id="theme-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card">
+            <div class="dialog-header-block">
+                <h3>Galeria de Temas</h3>
+                <button class="dialog-close-btn" onclick="closeThemeDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <h4 class="grid-section-title">☀️ Modos Claros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-light" onclick="selectTheme('light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Padrão Claro</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-brown" onclick="selectTheme('pastel-brown')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Café com Leite</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-pink" onclick="selectTheme('pastel-pink')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Flor de Cerejeira</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-blue" onclick="selectTheme('pastel-blue')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Brisa do Mar</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-purple" onclick="selectTheme('pastel-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lavanda Suave</span></button>
+                        <button class="theme-bento-item theme-preview-pastel-mint" onclick="selectTheme('pastel-mint')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Menta Fresca</span></button>
+                        <button class="theme-bento-item theme-preview-solarized-light" onclick="selectTheme('solarized-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Solarized Light</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-light" onclick="selectTheme('outerwilds-light')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Lareira Gentil</span></button>
+                    </div>
+                    <h4 class="grid-section-title" style="margin-top: 1.5rem;">🌙 Modos Escuros</h4>
+                    <div class="theme-bento-grid">
+                        <button class="theme-bento-item theme-preview-dark" onclick="selectTheme('dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dark Industrial</span></button>
+                        <button class="theme-bento-item theme-preview-dark-chocolate" onclick="selectTheme('dark-chocolate')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Cacau Intenso</span></button>
+                        <button class="theme-bento-item theme-preview-dark-forest" onclick="selectTheme('dark-forest')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Floresta Noturna</span></button>
+                        <button class="theme-bento-item theme-preview-dark-amber" onclick="selectTheme('dark-amber')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Âmbar Profundo</span></button>
+                        <button class="theme-bento-item theme-preview-dark-purple" onclick="selectTheme('dark-purple')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Noite de Vampiro</span></button>
+                        <button class="theme-bento-item theme-preview-catppuccin" onclick="selectTheme('catppuccin')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Catppuccin Mocha</span></button>
+                        <button class="theme-bento-item theme-preview-nord" onclick="selectTheme('nord')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Nordic Ice</span></button>
+                        <button class="theme-bento-item theme-preview-dracula" onclick="selectTheme('dracula')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Dracula Sync</span></button>
+                        <button class="theme-bento-item theme-preview-github-dark" onclick="selectTheme('github-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">GitHub Premium</span></button>
+                        <button class="theme-bento-item theme-preview-outerwilds-dark" onclick="selectTheme('outerwilds-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Fogueira Cósmica</span></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="add-flashcard-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card" style="max-width:500px;">
+            <div class="dialog-header-block">
+                <h3>➕ Novo Flashcard</h3>
+                <button class="dialog-close-btn" onclick="window.closeAddFlashcardDialog()">×</button>
+            </div>
+            <div class="dialog-body">
+                <div class="dialog-scroll">
+                    <div class="form-group">
+                        <label for="flashcardFrontInput">Frente (Pergunta)</label>
+                        <textarea id="flashcardFrontInput" placeholder="Digite a pergunta..." rows="3" style="width:100%;background:var(--panel);border:3px solid var(--stroke);border-radius:var(--element-radius);padding:0.65rem 1rem;font-size:0.85rem;color:var(--text);font-weight:800;outline:none;font-family:inherit;resize:vertical;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="flashcardBackInput">Verso (Resposta)</label>
+                        <textarea id="flashcardBackInput" placeholder="Digite a resposta..." rows="3" style="width:100%;background:var(--panel);border:3px solid var(--stroke);border-radius:var(--element-radius);padding:0.65rem 1rem;font-size:0.85rem;color:var(--text);font-weight:800;outline:none;font-family:inherit;resize:vertical;"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="flashcardMateriaInput">Matéria (opcional)</label>
+                        <input type="text" id="flashcardMateriaInput" placeholder="Ex: Matemática, História" autocomplete="off">
+                    </div>
+                    <div class="form-group">
+                        <label for="flashcardColorInput">Cor</label>
+                        <input type="color" id="flashcardColorInput" value="#6a6a6a">
+                    </div>
+                </div>
+                <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;padding-bottom:1rem;">
+                    <button class="btn-theme" onclick="window.closeAddFlashcardDialog()" style="background:var(--panel);width:auto;">Cancelar</button>
+                    <button class="btn-theme" onclick="window.addFlashcard()" style="width:auto;">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="flashcard-study-dialog" class="theme-bento-dialog">
+        <div class="bento-card dialog-theme-card" style="max-width:500px;">
+            <div class="dialog-header-block">
+                <h3>🃏 Estudar</h3>
+                <button class="dialog-close-btn" onclick="window.closeFlashcardStudy()">×</button>
+            </div>
+            <div class="dialog-body" style="padding:1.5rem;">
+                <div id="flashcardStudyContent" style="text-align:center;min-height:200px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.5rem;"></div>
+                <div style="display:flex;gap:0.5rem;justify-content:center;margin-top:1.5rem;">
+                    <button class="btn-theme" id="flashcardFlipBtn" onclick="window.flipFlashcard()" style="width:auto;">👁️ Virar</button>
+                    <button class="btn-theme" id="flashcardNextBtn" onclick="window.nextFlashcardStudy()" style="width:auto;display:none;">⏭️ Próximo</button>
+                </div>
+            </div>
+        </div>
+    </dialog>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js"></script>
+    <script>document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('admin-btn');if(b&&window.isAdmin)b.style.display='';});</script>
+</body>
+
+</html>
