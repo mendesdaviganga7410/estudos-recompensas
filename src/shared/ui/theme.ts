@@ -1,3 +1,5 @@
+// @ts-nocheck
+const $ = (id) => document.getElementById(id);
 const THEME_LABELS = {
     "light":           "Padrão Claro",
     "pastel-brown":    "Café com Leite",

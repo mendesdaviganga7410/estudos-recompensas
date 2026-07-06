@@ -65,7 +65,7 @@ function renderNotifItem(n) {
 function onNotifDiagClick() {
     markPersistentDiagSeen();
     closeNotificationPanel();
-    setTimeout(openDiagnosticDialog, 150);
+    setTimeout(() => window.openDiagnosticDialog?.(), 150);
 }
 
 function onNotifClick(uid, nid) {
@@ -118,7 +118,7 @@ function openNotificationPanel() {
                 content += renderNotifItem(n);
             });
         } else {
-            content += `<div class="notif-prompt" onclick="closeNotificationPanel();setTimeout(openDiagnosticDialog,100)">
+            content += `<div class="notif-prompt" onclick="closeNotificationPanel();setTimeout(()=>window.openDiagnosticDialog?.(),100)">
                 <div class="notif-prompt-icon">📋</div>
                 <div class="notif-prompt-text">
                     <strong>Responda ao Diagnóstico de Perfil</strong>

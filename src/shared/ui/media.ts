@@ -1,3 +1,5 @@
+// @ts-nocheck
+const $ = (id) => document.getElementById(id);
 let cropperInstance = null;
 let bannerCropperInstance = null;
 

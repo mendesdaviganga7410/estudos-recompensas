@@ -1,3 +1,4 @@
+// @ts-nocheck
 const $ = (id: string) => document.getElementById(id);
 
 function toast(msg: string, fail = false, duration = 3000) {

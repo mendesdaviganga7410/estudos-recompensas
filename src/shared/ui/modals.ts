@@ -1,3 +1,5 @@
+// @ts-nocheck
+const $ = (id) => document.getElementById(id);
 let authMode = "login";
 
 function openAuthModal() {

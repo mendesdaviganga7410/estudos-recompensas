@@ -1,4 +1,5 @@
 // @ts-nocheck
+const $ = (id) => document.getElementById(id);
 function getTier(xp) {
     return TIERS.find(t => xp >= t.min && xp <= t.max) || TIERS[0];
 }
