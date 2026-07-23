@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { DIAGNOSTIC_VERSION } from './diagnostic-data.ts';
 import { hasDiagnostic, openDiagnosticDialog, closeDiagnosticDialog, submitDiagnostic, diagNext, diagPrev, goToStep, selectDiagOption, toggleDiagOption, resetDiagAnswers } from './diagnostic-ui.ts';
-import { notifState, initPersistentDiagNotif, refreshNotifications, generateOneNotification, generateReviewNotif, __saveNotifs, __loadNotifs } from './engine.ts';
+import { notifState, initPersistentDiagNotif, refreshNotifications, generateOneNotification, generateReviewNotif, __saveNotifs, __loadNotifs, getPersistentDiagNotif, markPersistentDiagSeen, clearAllNotifications, onReviewNotifClick } from './engine.ts';
 import { renderNotificationBadge, renderNotifItem, onNotifDiagClick, openNotificationPanel, closeNotificationPanel, openProfileModal, closeProfileModal, showDiagnosticPrompt, scheduleDiagnosticPrompt, deleteAllNotifications } from './ui.ts';
 
 let __initTimer = null;

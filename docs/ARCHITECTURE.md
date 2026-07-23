@@ -539,5 +539,15 @@ new Date().toISOString().slice(0, 10)  // UTC — quebra streak em outros fusos
 
 ---
 
+## 18. Regra Crítica — Imports em `notifications/init.ts`
+
+`init.ts` é o **ponto de exposição global** (`window.*`) de todas as funções do subsistema de notificações. Ele agrega exports de `diagnostic-ui.ts`, `engine.ts` e `ui.ts`.
+
+**Regra:** toda função exposta via `window.nomeFuncao = nomeFuncao` em `init.ts` deve estar **explicitamente importada** no mesmo arquivo. A omissão causa `ReferenceError` no bundle de produção — o Vite em modo `dev` pode mascarar o erro por resolver módulos de forma diferente do bundle otimizado.
+
+**Bug corrigido (2026-07-23):** `getPersistentDiagNotif`, `markPersistentDiagSeen`, `clearAllNotifications` e `onReviewNotifClick` eram expostas via `window.*` em `init.ts` mas não estavam importadas de `engine.ts`. Isso causava `ReferenceError: openDiagnosticDialog is not defined` em produção (GitHub Pages) e a tela de loading travava indefinidamente.
+
+---
+
 *Este documento é vivo — atualize ao realizar mudanças arquiteturais reais.*
 

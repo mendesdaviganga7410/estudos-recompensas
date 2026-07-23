@@ -319,6 +319,11 @@ Consulte [`docs/ROADMAP.md`](docs/ROADMAP.md) para funcionalidades implementadas
 
 ## 9. Histórico de Versões
 
+### 2026-07-23 — v4.1 (Correção de Imports do Subsistema de Notificações)
+
+- **Bug crítico corrigido:** `init.ts` não importava 4 funções (`getPersistentDiagNotif`, `markPersistentDiagSeen`, `clearAllNotifications`, `onReviewNotifClick`) de `engine.ts`, causando `ReferenceError` no bundle de produção (GitHub Pages) e tela de loading travada eternamente
+- **Nova regra documentada** em `ARCHITECTURE.md` (seção 18): toda função exposta via `window.*` em `init.ts` deve estar explicitamente importada no mesmo arquivo
+
 ### 2026-07-02 — Documentação v2 (auditoria completa)
 
 - `docs/AI_CONSTITUTION.md` criado a partir de auditoria total do repositório
