@@ -1,4 +1,4 @@
-import"./router-Db8uDmXq.js";/* empty css             */var e=e=>document.getElementById(e),t=[],n=0,r=!1,i=null;function a(){return typeof crypto<`u`&&crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,10)}function o(){let t=e(`auth-loading`);t&&(t.style.display=`none`);let n=e(`flashcards-content`);n&&(n.style.display=``);let r=e(`flashcards-page-content`);if(!r)return;let i=window.state.flashcards||[],a=[...new Set(i.map(e=>e.materia).filter(Boolean))];r.innerHTML=`
+import"./router-D--VN4K0.js";/* empty css             */var e=e=>document.getElementById(e),t=[],n=0,r=!1,i=null;function a(){return typeof crypto<`u`&&crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2,10)}function o(){let t=e(`auth-loading`);t&&(t.style.display=`none`);let n=e(`flashcards-content`);n&&(n.style.display=``);let r=e(`flashcards-page-content`);if(!r)return;let i=window.state.flashcards||[],a=[...new Set(i.map(e=>e.materia).filter(Boolean))];r.innerHTML=`
         <div class="bento-layout">
             <div class="bento-card col-span-3">
                 <div class="status-header-block">
