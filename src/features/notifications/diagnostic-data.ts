@@ -1,5 +1,5 @@
 /* ---- PERGUNTA 1: ROUTER (multi-select) ---- */
-const Q_FOCUS_AREAS = {
+export const Q_FOCUS_AREAS = {
     id: "focusAreas",
     icon: "🎯",
     label: "O que faz parte da sua vida? (marque um ou mais)",
@@ -15,7 +15,7 @@ const Q_FOCUS_AREAS = {
 };
 
 /* ---- PERGUNTAS GLOBAIS ---- */
-const Q_BIRTH_YEAR = {
+export const Q_BIRTH_YEAR = {
     id: "birthYear",
     icon: "🎂",
     label: "Qual o seu ano de nascimento?",
@@ -26,7 +26,7 @@ const Q_BIRTH_YEAR = {
     track: "global"
 };
 
-const Q_CHALLENGE = {
+export const Q_CHALLENGE = {
     id: "mainChallenge",
     icon: "🧗",
     label: "Qual desafio mais atrapalha sua rotina?",
@@ -43,7 +43,7 @@ const Q_CHALLENGE = {
     ]
 };
 
-const Q_STUDY_PERIOD = {
+export const Q_STUDY_PERIOD = {
     id: "studyPeriod",
     icon: "🌙",
     label: "Em qual período do dia você rende mais?",
@@ -58,7 +58,7 @@ const Q_STUDY_PERIOD = {
     ]
 };
 
-const Q_EDU_LEVEL = {
+export const Q_EDU_LEVEL = {
     id: "eduLevel",
     icon: "📖",
     label: "Qual seu nível de escolaridade atual?",
@@ -76,7 +76,7 @@ const Q_EDU_LEVEL = {
 };
 
 /* ---- TRACK VESTIBULAR ---- */
-const Q_COURSE_AREA = {
+export const Q_COURSE_AREA = {
     id: "courseArea",
     icon: "📚",
     label: "Qual área de conhecimento você mais se identifica?",
@@ -93,7 +93,7 @@ const Q_COURSE_AREA = {
     ]
 };
 
-const Q_TARGET_COURSE = {
+export const Q_TARGET_COURSE = {
     id: "targetCourse",
     icon: "🎯",
     label: "Qual curso você mais quer?",
@@ -102,7 +102,7 @@ const Q_TARGET_COURSE = {
     dependsOn: { field: "courseArea", source: "COURSES_BY_AREA" }
 };
 
-const Q_UNI_TYPE = {
+export const Q_UNI_TYPE = {
     id: "uniType",
     icon: "🏛️",
     label: "Qual tipo de universidade você almeja?",
@@ -120,7 +120,7 @@ const Q_UNI_TYPE = {
     ]
 };
 
-const Q_STUDY_HOURS = {
+export const Q_STUDY_HOURS = {
     id: "studyHours",
     icon: "⏰",
     label: "Quanto tempo você estuda por dia?",
@@ -135,7 +135,7 @@ const Q_STUDY_HOURS = {
     ]
 };
 
-const Q_STUDY_METHOD = {
+export const Q_STUDY_METHOD = {
     id: "studyMethod",
     icon: "✏️",
     label: "Qual método de estudo você mais usa?",
@@ -152,7 +152,7 @@ const Q_STUDY_METHOD = {
     ]
 };
 
-const Q_EXAM_ATTEMPTED = {
+export const Q_EXAM_ATTEMPTED = {
     id: "examAttempted",
     icon: "🔄",
     label: "Já prestou vestibular / ENEM antes?",
@@ -166,7 +166,7 @@ const Q_EXAM_ATTEMPTED = {
 };
 
 /* ---- TRACK CONCURSO ---- */
-const Q_CONTEST_LEVEL = {
+export const Q_CONTEST_LEVEL = {
     id: "contestLevel",
     icon: "📋",
     label: "Qual nível de concurso você busca?",
@@ -181,7 +181,7 @@ const Q_CONTEST_LEVEL = {
     ]
 };
 
-const Q_CONTEST_AREA = {
+export const Q_CONTEST_AREA = {
     id: "contestArea",
     icon: "📂",
     label: "Qual área de concurso mais te interessa?",
@@ -200,7 +200,7 @@ const Q_CONTEST_AREA = {
     ]
 };
 
-const Q_ALREADY_CIVIL = {
+export const Q_ALREADY_CIVIL = {
     id: "alreadyCivilServant",
     icon: "🏅",
     label: "Você já é concursado?",
@@ -214,7 +214,7 @@ const Q_ALREADY_CIVIL = {
 };
 
 /* ---- TRACK MERCADO DE TRABALHO ---- */
-const Q_WORK_SECTOR = {
+export const Q_WORK_SECTOR = {
     id: "workSector",
     icon: "💼",
     label: "Qual seu ramo de atuação?",
@@ -236,7 +236,7 @@ const Q_WORK_SECTOR = {
     ]
 };
 
-const Q_TARGET_PROFESSION = {
+export const Q_TARGET_PROFESSION = {
     id: "targetProfession",
     icon: "🆔",
     label: "Qual sua profissão ou cargo atual?",
@@ -245,7 +245,7 @@ const Q_TARGET_PROFESSION = {
     dependsOn: { field: "workSector", source: "PROFESSIONS_BY_SECTOR" }
 };
 
-const Q_CAREER_GOAL = {
+export const Q_CAREER_GOAL = {
     id: "careerGoal",
     icon: "🚀",
     label: "Qual sua meta profissional agora?",
@@ -262,7 +262,7 @@ const Q_CAREER_GOAL = {
 };
 
 /* ---- TRACK FIT ---- */
-const Q_BODY_GOAL = {
+export const Q_BODY_GOAL = {
     id: "bodyGoal",
     icon: "💪",
     label: "Qual sua meta de shape?",
@@ -284,7 +284,7 @@ const Q_BODY_GOAL = {
     ]
 };
 
-const Q_TRAINING_FREQ = {
+export const Q_TRAINING_FREQ = {
     id: "trainingFreq",
     icon: "📅",
     label: "Com que frequência você treina?",
@@ -299,7 +299,7 @@ const Q_TRAINING_FREQ = {
     ]
 };
 
-const Q_TRAINING_TYPE = {
+export const Q_TRAINING_TYPE = {
     id: "trainingType",
     icon: "🏋️",
     label: "Qual tipo de treino é sua praia?",
@@ -319,7 +319,7 @@ const Q_TRAINING_TYPE = {
 };
 
 /* ---- TRACK APRENDIZADO PESSOAL ---- */
-const Q_PERSONAL_INTEREST = {
+export const Q_PERSONAL_INTEREST = {
     id: "personalInterest",
     icon: "📚",
     label: "O que você quer aprender por prazer?",
@@ -341,10 +341,10 @@ const Q_PERSONAL_INTEREST = {
 };
 
 /* ---- VERSÃO DO DIAGNÓSTICO ---- */
-const DIAGNOSTIC_VERSION = 2;
+export const DIAGNOSTIC_VERSION = 2;
 
 /* ---- LISTA MESTRA ---- */
-const DIAGNOSTIC_QUESTIONS = [
+export const DIAGNOSTIC_QUESTIONS = [
     Q_FOCUS_AREAS,
     Q_BIRTH_YEAR,
     Q_CHALLENGE,
@@ -369,7 +369,7 @@ const DIAGNOSTIC_QUESTIONS = [
 ];
 
 /* ---- ÁRVORE DE CURSOS ---- */
-const COURSES_BY_AREA = {
+export const COURSES_BY_AREA = {
     saude: [
         { v: "medicina",         l: "Medicina", i: "🩺" },
         { v: "enfermagem",       l: "Enfermagem", i: "🏥" },
@@ -451,7 +451,7 @@ const COURSES_BY_AREA = {
 };
 
 /* ---- ÁRVORE DE PROFISSÕES ---- */
-const PROFESSIONS_BY_SECTOR = {
+export const PROFESSIONS_BY_SECTOR = {
     tecnologia: [
         { v: "dev-frontend",    l: "Desenvolvedor Frontend", i: "🎨" },
         { v: "dev-backend",     l: "Desenvolvedor Backend", i: "⚙️" },
@@ -553,29 +553,29 @@ const PROFESSIONS_BY_SECTOR = {
 };
 
 /* ---- LABELS ---- */
-const FOCUS_AREA_LABELS = {
+export const FOCUS_AREA_LABELS = {
     vest: "Vestibular / ENEM", conc: "Concurso Público",
     work: "Mercado de Trabalho", fit: "Fit & Saúde", learn: "Aprendizado Pessoal"
 };
 
-const COURSE_AREA_LABELS = {
+export const COURSE_AREA_LABELS = {
     saude: "Saúde", engenharias: "Engenharias", "exatas-ti": "Exatas & TI",
     humanas: "Humanas & Sociais", artes: "Artes & Design",
     biologicas: "Biológicas & Agrárias", militar: "Militar & Policial"
 };
 
-const COURSE_LABELS = {};
+export const COURSE_LABELS = {};
 for (const arr of Object.values(COURSES_BY_AREA)) {
     for (const c of arr) COURSE_LABELS[c.v] = c.l;
 }
 
-const UNI_TYPE_LABELS = {
+export const UNI_TYPE_LABELS = {
     federal: "Federal", estadual: "Estadual", municipal: "Municipal",
     privada: "Privada", militar: "Militar", if: "IF / Tecnológica",
     exterior: "Exterior", indeciso: "Indeciso"
 };
 
-const WORK_SECTOR_LABELS = {
+export const WORK_SECTOR_LABELS = {
     tecnologia: "Tecnologia", saude: "Saúde", educacao: "Educação",
     engenharia: "Engenharia & Indústria", "adm-financas": "ADM & Finanças",
     direito: "Direito", comunicacao: "Comunicação & Artes",
@@ -584,12 +584,12 @@ const WORK_SECTOR_LABELS = {
     "nao-trabalho": "Não trabalho"
 };
 
-const PROFESSION_LABELS = {};
+export const PROFESSION_LABELS = {};
 for (const arr of Object.values(PROFESSIONS_BY_SECTOR)) {
     for (const p of arr) PROFESSION_LABELS[p.v] = p.l;
 }
 
-const BODY_GOAL_LABELS = {
+export const BODY_GOAL_LABELS = {
     "seco-definido": "Seco / Definido", musculoso: "Musculoso",
     atletico: "Atlético", hipertrofia: "Hipertrofia",
     "magro-natural": "Magro natural", emagrecer: "Emagrecimento",
@@ -598,64 +598,64 @@ const BODY_GOAL_LABELS = {
     "saude-bemestar": "Saúde e bem-estar", nenhuma: "Sem meta"
 };
 
-const TRAINING_FREQ_LABELS = {
+export const TRAINING_FREQ_LABELS = {
     nunca: "Não treina", leve: "1-2x/sem", medio: "3-4x/sem",
     intenso: "5+x/sem", diario: "Todo dia"
 };
 
-const TRAINING_TYPE_LABELS = {
+export const TRAINING_TYPE_LABELS = {
     musculacao: "Musculação", calistenia: "Calistenia", crossfit: "Crossfit",
     corrida: "Corrida", natacao: "Natação", lutas: "Lutas / Artes Marciais",
     coletivos: "Esportes Coletivos", yoga: "Yoga / Pilates", outro: "Outro"
 };
 
-const EDU_LEVEL_LABELS = {
+export const EDU_LEVEL_LABELS = {
     fundamental: "Ensino Fundamental", "medio-cursando": "Ensino Médio (cursando)",
     "medio-completo": "Ensino Médio (completo)", cursinho: "Cursinho",
     "superior-cursando": "Superior (cursando)", "superior-completo": "Superior (completo)",
     "pos-graduacao": "Pós / Mestrado / Doutorado"
 };
 
-const CHALLENGE_LABELS = {
+export const CHALLENGE_LABELS = {
     inercia: "inércia inicial", distracao: "distrações",
     consistencia: "consistência", ansiedade: "ansiedade",
     "cansaço": "cansaço", organizacao: "organização", comparacao: "comparação"
 };
 
-const STUDY_HOURS_LABELS = {
+export const STUDY_HOURS_LABELS = {
     leve: "até 1h/dia", moderado: "1-2h/dia", padrao: "2-4h/dia",
     intenso: "4-6h/dia", extremo: "mais de 6h/dia"
 };
 
-const STUDY_METHOD_LABELS = {
+export const STUDY_METHOD_LABELS = {
     exercicios: "Exercícios", leitura: "Leitura", mapas: "Mapas mentais",
     flashcards: "Flashcards", video: "Videoaulas", pratico: "Prático",
     questoes: "Provas anteriores"
 };
 
-const STUDY_PERIOD_LABELS = {
+export const STUDY_PERIOD_LABELS = {
     manha: "Manhã", tarde: "Tarde", noite: "Noite",
     madrugada: "Madrugada", flexivel: "Flexível"
 };
 
-const CONTEST_LEVEL_LABELS = {
+export const CONTEST_LEVEL_LABELS = {
     municipal: "Municipal", estadual: "Estadual", federal: "Federal",
     legislativo: "Legislativo", tribunais: "Tribunais"
 };
 
-const CONTEST_AREA_LABELS = {
+export const CONTEST_AREA_LABELS = {
     administrativa: "Administrativa", fiscal: "Fiscal / Tributária",
     policial: "Policial", militar: "Militar", juridica: "Jurídica",
     bancaria: "Bancária", saude: "Saúde", educacao: "Educação", tecnologia: "TI"
 };
 
-const CAREER_GOAL_LABELS = {
+export const CAREER_GOAL_LABELS = {
     emprego: "Primeiro emprego", promocao: "Promoção",
     transicao: "Transição de carreira", estabilidade: "Estabilidade",
     empreender: "Empreender", aprender: "Novas habilidades"
 };
 
-const PERSONAL_INTEREST_LABELS = {
+export const PERSONAL_INTEREST_LABELS = {
     idiomas: "Idiomas", musica: "Música", artes: "Artes / Design",
     filosofia: "Filosofia / Autoconhecimento", programacao: "Programação",
     "foto-video": "Fotografia / Vídeo", escrita: "Escrita",
@@ -663,10 +663,10 @@ const PERSONAL_INTEREST_LABELS = {
     gastronomia: "Gastronomia", outro: "Outro"
 };
 
-const EXAM_ATTEMPTED_LABELS = {
+export const EXAM_ATTEMPTED_LABELS = {
     nunca: "Nunca prestou", sim: "Já tentou antes", passei: "Já passou"
 };
 
-const ALREADY_CIVIL_LABELS = {
+export const ALREADY_CIVIL_LABELS = {
     nao: "Não concursado", estudo: "Estuda há +1 ano", sim: "Já concursado"
 };

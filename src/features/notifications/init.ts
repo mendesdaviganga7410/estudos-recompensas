@@ -1,12 +1,17 @@
 // @ts-nocheck
+import { DIAGNOSTIC_VERSION } from './diagnostic-data.ts';
+import { hasDiagnostic, openDiagnosticDialog, closeDiagnosticDialog, submitDiagnostic, diagNext, diagPrev, goToStep, selectDiagOption, toggleDiagOption, resetDiagAnswers } from './diagnostic-ui.ts';
+import { notifState, initPersistentDiagNotif, refreshNotifications, generateOneNotification, generateReviewNotif, __saveNotifs, __loadNotifs } from './engine.ts';
+import { renderNotificationBadge, renderNotifItem, onNotifDiagClick, openNotificationPanel, closeNotificationPanel, openProfileModal, closeProfileModal, showDiagnosticPrompt, scheduleDiagnosticPrompt, deleteAllNotifications } from './ui.ts';
+
 let __initTimer = null;
 let __diagReminderTimer = null;
 
-function getDiagInterval() {
+export function getDiagInterval() {
     return 12 * 60 * 60 * 1000;
 }
 
-function scheduleDiagReminder() {
+export function scheduleDiagReminder() {
     if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
     if (!window.currentUser || !hasDiagnostic()) return;
 
@@ -25,13 +30,13 @@ function scheduleDiagReminder() {
     }, delay);
 }
 
-async function initNotifications() {
+export async function initNotifications() {
     if (__initTimer) clearTimeout(__initTimer);
 
     if (!window.currentUser) {
-        __diagnosticAnswered = false;
-        __persistentDiagNotif = null;
-        __cachedMatches = [];
+        notifState.__diagnosticAnswered = false;
+        notifState.__persistentDiagNotif = null;
+        notifState.__cachedMatches = [];
         renderNotificationBadge();
         if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
         return;
@@ -40,13 +45,13 @@ async function initNotifications() {
     const oldDiag = window.state && window.state.diagnostic;
     if (oldDiag && oldDiag.diagnosticVersion !== DIAGNOSTIC_VERSION) {
         window.state.diagnostic = undefined;
-        __diagnosticAnswered = false;
-        __persistentDiagNotif = null;
-        __notifications = [];
-        __unreadCount = 0;
-        __lastGenTime = 0;
-        __cachedMatches = [];
-        __diagAnswers = {};
+        notifState.__diagnosticAnswered = false;
+        notifState.__persistentDiagNotif = null;
+        notifState.__notifications = [];
+        notifState.__unreadCount = 0;
+        notifState.__lastGenTime = 0;
+        notifState.__cachedMatches = [];
+        resetDiagAnswers();
         __saveNotifs();
         renderNotificationBadge();
         setTimeout(showDiagnosticPrompt, 1500);
@@ -54,7 +59,7 @@ async function initNotifications() {
         return;
     }
 
-    __diagnosticAnswered = hasDiagnostic();
+    notifState.__diagnosticAnswered = hasDiagnostic();
 
     // Restaura notificações salvas para não perdê-las entre páginas
     const hadSaved = __loadNotifs();
@@ -64,18 +69,18 @@ async function initNotifications() {
         await refreshNotifications();
 
         // Gera no máximo 1 notificação, só se não houver nenhuma salva e já passaram 12h
-        if (!hadSaved && !__notifications.some(n => !n.persistent) && Date.now() - __lastGenTime > 12 * 60 * 60 * 1000) {
+        if (!hadSaved && !notifState.__notifications.some(n => !n.persistent) && Date.now() - notifState.__lastGenTime > 12 * 60 * 60 * 1000) {
             generateOneNotification();
         } else {
             // Mantém o seen state salvo e atualiza o badge
-            __unreadCount = __notifications.filter(n => !n.seen).length;
+            notifState.__unreadCount = notifState.__notifications.filter(n => !n.seen).length;
             renderNotificationBadge();
         }
 
         scheduleDiagReminder();
     } else {
-        __persistentDiagNotif = null;
-        __notifications = __notifications.filter(n => n.id !== 'diag-persistent');
+        notifState.__persistentDiagNotif = null;
+        notifState.__notifications = notifState.__notifications.filter(n => n.id !== 'diag-persistent');
         renderNotificationBadge();
         setTimeout(showDiagnosticPrompt, 3000);
     }
@@ -85,8 +90,8 @@ async function initNotifications() {
     // Notificação de revisão periódica
     generateReviewNotif();
 
-    if (__refreshTimer) clearInterval(__refreshTimer);
-    __refreshTimer = setInterval(() => {
+    if (notifState.__refreshTimer) clearInterval(notifState.__refreshTimer);
+    notifState.__refreshTimer = setInterval(() => {
         if (window.currentUser && hasDiagnostic()) {
             refreshNotifications();
         }
@@ -96,7 +101,7 @@ async function initNotifications() {
     }, 300000);
 }
 
-async function resetAllDiagnostics() {
+export async function resetAllDiagnostics() {
     if (!window.currentUser || !window.saveStateToFirestore) {
         console.warn("Usuário não logado ou Firestore indisponível.");
         return;
@@ -109,13 +114,13 @@ async function resetAllDiagnostics() {
     }
 
     window.state.diagnostic = undefined;
-    __diagnosticAnswered = false;
-    __persistentDiagNotif = null;
-    __notifications = [];
-    __unreadCount = 0;
-    __lastGenTime = 0;
-    __cachedMatches = [];
-    __diagAnswers = {};
+    notifState.__diagnosticAnswered = false;
+    notifState.__persistentDiagNotif = null;
+    notifState.__notifications = [];
+    notifState.__unreadCount = 0;
+    notifState.__lastGenTime = 0;
+    notifState.__cachedMatches = [];
+    resetDiagAnswers();
     __saveNotifs();
     if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
 
@@ -171,12 +176,12 @@ window.onReviewNotifClick       = onReviewNotifClick;
             lastUid = uid;
             if (uid) initNotifications();
             else {
-                __diagnosticAnswered = false;
-                __persistentDiagNotif = null;
-                __cachedMatches = [];
-                __notifications = [];
-                __unreadCount = 0;
-                __lastGenTime = 0;
+                notifState.__diagnosticAnswered = false;
+                notifState.__persistentDiagNotif = null;
+                notifState.__cachedMatches = [];
+                notifState.__notifications = [];
+                notifState.__unreadCount = 0;
+                notifState.__lastGenTime = 0;
                 localStorage.removeItem('neuroflow_notifs_v1');
                 if (__diagReminderTimer) clearTimeout(__diagReminderTimer);
                 renderNotificationBadge();

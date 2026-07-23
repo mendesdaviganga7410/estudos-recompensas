@@ -392,3 +392,41 @@ Consulte [`docs/ROADMAP.md`](docs/ROADMAP.md) para funcionalidades implementadas
 - Scripts legados removidos (`refactor.cjs`, `config.js`, `notifications.js` antigo)
 - Correções gerais: `escapeHtml` consolidado, ordem de carregamento corrigida, `dailyReward` key corrigida
 - Loja estendida (pool de itens customizáveis com pinning) removida completamente (v2.2)
+
+---
+
+## 10. Planejamento Aprovado (Roadmap)
+
+### Funcionalidades Implementadas
+- [x] Revisão Espaçada com SM-2 adaptado (v4.0)
+- [x] Testes unitários com Vitest para funções puras (v3.2)
+- [x] Modo Momentum (v2.5)
+- [x] Correção de fuso horário e persistência Firestore (v2.4)
+- [x] Sistema de streaks e limites diários/semanais (v2.3)
+- [x] Onboarding gamificado em 3 etapas (v2.x)
+- [x] Diagnóstico de perfil com matching (v2.x)
+- [x] 22 temas com neomorfismo flat (v2.x)
+- [x] Timer Pomodoro com histórico (v2.x)
+
+### Marcos Concluídos
+| Marco | Data | Status |
+|---|---|---|
+| v4.0 — Revisão Espaçada | 2026-06-28 | ✅ Entregue |
+| v3.2 — Testes Automatizados | 2026-06-25 | ✅ Entregue |
+| v3.1 — Type Safety | 2026-06-25 | ✅ Entregue |
+| v3.0 — Migração TS + ESLint | 2026-06-25 | ✅ Entregue |
+
+---
+
+## 11. Banco de Ideias e Oportunidades (Backlog Opcional)
+
+Estas ideias **não representam planejamento oficial** e necessitam de aprovação antes de qualquer implementação.
+
+*   **Sistema de Conquistas (Badges):** Medalhas e conquistas por marcos atingidos.
+*   **Notificações Push (Firebase Cloud Messaging):** Notificações para lembretes diários e de revisão fora do app.
+*   **Exportação de Histórico (CSV/PDF):** Permitir baixar os registros de estudo.
+*   **Ranking Global na Comunidade:** Leaderboard ordenado por XP acumulado.
+*   **Chat entre Usuários Compatíveis:** Comunicação direta com parceiros de estudo sugeridos no matching.
+*   **Perfis de Tema Compartilháveis:** Customização e importação/exportação de temas criados por usuários.
+*   **Integração com Calendário Externo:** Sincronizar sessões com Google Calendar ou outros.
+

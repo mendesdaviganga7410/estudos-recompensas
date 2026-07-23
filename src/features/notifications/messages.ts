@@ -1,4 +1,11 @@
-const MESSAGE_GENERATORS = [
+import {
+  COURSE_LABELS, PROFESSION_LABELS, CONTEST_AREA_LABELS, CONTEST_LEVEL_LABELS,
+  BODY_GOAL_LABELS, TRAINING_FREQ_LABELS, CHALLENGE_LABELS, STUDY_HOURS_LABELS,
+  STUDY_PERIOD_LABELS, STUDY_METHOD_LABELS, EDU_LEVEL_LABELS, WORK_SECTOR_LABELS,
+  CAREER_GOAL_LABELS, PERSONAL_INTEREST_LABELS
+} from './diagnostic-data.ts';
+
+export const MESSAGE_GENERATORS = [
   /* === MESMO CURSO === */
   (u, m) => m.sameCourse ? `${u.name} também está de olho em ${m.courseLbl}. A jornada é desafiadora, mas vocês podem ir longe juntos!` : null,
   (u, m) => m.sameCourse ? `${u.name} quer ${m.courseLbl} assim como você. Sabia que estudar em grupo pode acelerar o aprendizado?` : null,

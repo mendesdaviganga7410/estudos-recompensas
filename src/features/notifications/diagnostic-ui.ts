@@ -1,17 +1,22 @@
 // @ts-nocheck
+import { notifState, initPersistentDiagNotif, markPersistentDiagSeen, refreshNotifications, generateOneNotification } from './engine.ts';
+import { renderNotificationBadge } from './ui.ts';
+import { scheduleDiagReminder } from './init.ts';
+import { DIAGNOSTIC_VERSION, DIAGNOSTIC_QUESTIONS, COURSES_BY_AREA, PROFESSIONS_BY_SECTOR } from './diagnostic-data.ts';
+
 const $n = id => document.getElementById(id);
 
 let __diagStep = 0;
 let __diagAnswers = {};
 let _visibleQuestions = [];
 
-function getDefaultVisible() {
+export function getDefaultVisible() {
     return DIAGNOSTIC_QUESTIONS.filter(q =>
         q.id === "focusAreas" || q.track === "global"
     );
 }
 
-function recalcVisibleQuestions() {
+export function recalcVisibleQuestions() {
     const areas = Array.isArray(__diagAnswers.focusAreas) ? __diagAnswers.focusAreas : [];
     _visibleQuestions = DIAGNOSTIC_QUESTIONS.filter(q => {
         if (q.id === "focusAreas" || q.track === "global") return true;
@@ -21,7 +26,7 @@ function recalcVisibleQuestions() {
     });
 }
 
-function resolveOptions(q) {
+export function resolveOptions(q) {
     if (!q.dependsOn) return q.options;
     const parentAnswer = __diagAnswers[q.dependsOn.field];
     if (!parentAnswer) return [{ v: "", l: "Selecione a opção anterior primeiro", i: "⚠️" }];
@@ -30,17 +35,17 @@ function resolveOptions(q) {
     return source && source[parentAnswer] ? source[parentAnswer] : q.options;
 }
 
-function hasDiagnostic() {
+export function hasDiagnostic() {
     if (!window.state || !window.state.diagnostic) return false;
     return window.state.diagnostic.diagnosticVersion === DIAGNOSTIC_VERSION;
 }
 
-function saveDiagnosticLocally(answers) {
+export function saveDiagnosticLocally(answers) {
     if (!window.state) return;
     window.state.diagnostic = answers;
 }
 
-function openDiagnosticDialog() {
+export function openDiagnosticDialog() {
     const existing = $n("diagnostic-dialog");
     if (existing) { existing.showModal(); return; }
 
@@ -77,7 +82,7 @@ function openDiagnosticDialog() {
     d.showModal();
 }
 
-function renderDiagProgress() {
+export function renderDiagProgress() {
     const container = $n("diag-progress");
     if (!container) return;
     container.innerHTML = _visibleQuestions.map((q, i) =>
@@ -85,7 +90,7 @@ function renderDiagProgress() {
     ).join("");
 }
 
-function renderDiagStep() {
+export function renderDiagStep() {
     const container = $n("diag-step");
     if (!container) return;
 
@@ -159,7 +164,7 @@ function renderDiagStep() {
     renderDiagProgress();
 }
 
-function selectDiagOption(qid, val) {
+export function selectDiagOption(qid, val) {
     __diagAnswers[qid] = val;
     const options = document.querySelectorAll("#diag-step .diagnostic-option");
     options.forEach(el => {
@@ -170,7 +175,7 @@ function selectDiagOption(qid, val) {
     });
 }
 
-function toggleDiagOption(qid, val) {
+export function toggleDiagOption(qid, val) {
     if (!Array.isArray(__diagAnswers[qid])) {
         __diagAnswers[qid] = [];
     }
@@ -190,7 +195,7 @@ function toggleDiagOption(qid, val) {
     });
 }
 
-function diagNext() {
+export function diagNext() {
     const q = _visibleQuestions[__diagStep];
     if (!q) return;
 
@@ -220,14 +225,14 @@ function diagNext() {
     }
 }
 
-function diagPrev() {
+export function diagPrev() {
     if (__diagStep > 0) {
         __diagStep--;
         renderDiagStep();
     }
 }
 
-function goToStep(i) {
+export function goToStep(i) {
     if (i < 0 || i >= _visibleQuestions.length) return;
     if (i > __diagStep) {
         for (let j = __diagStep; j < i; j++) {
@@ -257,12 +262,16 @@ function goToStep(i) {
     renderDiagStep();
 }
 
-function closeDiagnosticDialog() {
+export function closeDiagnosticDialog() {
     const d = $n("diagnostic-dialog");
     if (d) d.close();
 }
 
-async function submitDiagnostic() {
+export function resetDiagAnswers() {
+  __diagAnswers = {};
+}
+
+export async function submitDiagnostic() {
     const q = _visibleQuestions[__diagStep];
     if (!q) return;
 
@@ -289,8 +298,8 @@ async function submitDiagnostic() {
 
     __diagAnswers.diagnosticVersion = DIAGNOSTIC_VERSION;
     saveDiagnosticLocally(__diagAnswers);
-    __diagnosticAnswered = true;
-    __persistentDiagNotif = null;
+    notifState.__diagnosticAnswered = true;
+    notifState.__persistentDiagNotif = null;
     closeDiagnosticDialog();
     window.toast("✅ Dados salvos com sucesso!");
 

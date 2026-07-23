@@ -993,4 +993,5 @@
         }
     }
 
+    window.studyTimer = studyTimer;
     window.renderStudy = renderStudy;

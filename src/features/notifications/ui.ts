@@ -1,24 +1,29 @@
 // @ts-nocheck
-const tierName = (xp) => {
+import { notifState, __saveNotifs, markPersistentDiagSeen, clearAllNotifications } from './engine.ts';
+import { hasDiagnostic } from './diagnostic-ui.ts';
+
+const $n = id => document.getElementById(id);
+
+export const tierName = (xp) => {
     const t = (window.TIERS || []).find(r => xp >= r.min && xp <= r.max);
     return t ? `${t.i} ${t.name}` : "🥉 Bronze";
 };
-const avatarUrl = (uid, profile) =>
+export const avatarUrl = (uid, profile) =>
     (profile && profile.avatarUrl) ||
     `https://api.dicebear.com/7.x/pixel-art/svg?seed=${encodeURIComponent(uid || "anon")}`;
-const displayName = (profile, fallback) =>
+export const displayName = (profile, fallback) =>
     (profile && profile.displayName) || fallback || "Jogador";
 
-function renderNotificationBadge() {
+export function renderNotificationBadge() {
     const badge = $n("notif-badge");
     const prompt = $n("notif-prompt-dot");
 
     if (!badge) return;
 
     const hasDiag = hasDiagnostic();
-    __diagnosticAnswered = hasDiag;
+    notifState.__diagnosticAnswered = hasDiag;
 
-    let totalUnread = __unreadCount || 0;
+    let totalUnread = notifState.__unreadCount || 0;
 
     if (!hasDiag) {
         // Mostra badge se houver notificações não-lidas (ex: revisões) mesmo sem diagnóstico
@@ -43,7 +48,7 @@ function renderNotificationBadge() {
     }
 }
 
-function formatNotifTime(ts) {
+export function formatNotifTime(ts) {
     const diff = Date.now() - ts;
     if (diff < 60000) return "agora";
     if (diff < 3600000) return `${Math.floor(diff / 60000)}m`;
@@ -51,7 +56,7 @@ function formatNotifTime(ts) {
     return `${Math.floor(diff / 86400000)}d`;
 }
 
-function renderNotifItem(n) {
+export function renderNotifItem(n) {
     const clickHandler = n.type === 'diagnosis' ? "onNotifDiagClick()" : n.type === 'review' ? "onReviewNotifClick()" : `onNotifClick('${n.uid || ''}','${n.id || ''}')`;
     return `<div class="notif-item ${n.seen ? "" : "notif-item-unread"}" onclick="${clickHandler}">
         <img class="notif-avatar" src="${n.avatar || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect fill=%22%23ccc%22 width=%22100%22 height=%22100%22/><text x=%2250%22 y=%2255%22 text-anchor=%22middle%22 fill=%22%23666%22 font-size=%2230%22>🔔</text></svg>'}" alt="" loading="lazy">
@@ -62,26 +67,26 @@ function renderNotifItem(n) {
     </div>`;
 }
 
-function onNotifDiagClick() {
+export function onNotifDiagClick() {
     markPersistentDiagSeen();
     closeNotificationPanel();
     setTimeout(() => window.openDiagnosticDialog?.(), 150);
 }
 
-function onNotifClick(uid, nid) {
+export function onNotifClick(uid, nid) {
     closeNotificationPanel();
     if (uid) openProfileModal(uid);
 
-    const n = __notifications.find(x => x.id === nid);
+    const n = notifState.__notifications.find(x => x.id === nid);
     if (n && !n.seen) {
         n.seen = true;
-        __unreadCount = __notifications.filter(x => !x.seen).length;
+        notifState.__unreadCount = notifState.__notifications.filter(x => !x.seen).length;
         __saveNotifs();
         renderNotificationBadge();
     }
 }
 
-function openNotificationPanel() {
+export function openNotificationPanel() {
     const existing = $n("notif-panel-wrap");
     if (existing) { closeNotificationPanel(); return; }
 
@@ -104,7 +109,7 @@ function openNotificationPanel() {
     let content = `<div class="notif-panel-header">
         <h3>🔔 Notificações</h3>
         <div class="notif-header-actions">
-            ${hasDiagnostic() && __notifications.some(n => !n.persistent) ? '<button class="notif-delete-all-btn" onclick="event.stopPropagation();deleteAllNotifications()" title="Limpar notificações">🗑️</button>' : ''}
+            ${hasDiagnostic() && notifState.__notifications.some(n => !n.persistent) ? '<button class="notif-delete-all-btn" onclick="event.stopPropagation();deleteAllNotifications()" title="Limpar notificações">🗑️</button>' : ''}
             <button class="dialog-close-btn" onclick="closeNotificationPanel()">×</button>
         </div>
     </div>
@@ -113,8 +118,8 @@ function openNotificationPanel() {
     if (!window.currentUser) {
         content += `<div class="notif-empty">Faça login para receber notificações.</div>`;
     } else if (!hasDiagnostic()) {
-        if (__notifications.length > 0) {
-            __notifications.forEach(n => {
+        if (notifState.__notifications.length > 0) {
+            notifState.__notifications.forEach(n => {
                 content += renderNotifItem(n);
             });
         } else {
@@ -127,7 +132,7 @@ function openNotificationPanel() {
             </div>`;
         }
     } else {
-        __notifications.forEach(n => {
+        notifState.__notifications.forEach(n => {
             content += renderNotifItem(n);
         });
     }
@@ -138,28 +143,28 @@ function openNotificationPanel() {
     document.body.appendChild(wrap);
 
     requestAnimationFrame(() => { wrap.classList.add("open"); panel.classList.add("open"); });
-    __panelOpen = true;
+    notifState.__panelOpen = true;
 
     renderNotificationBadge();
 }
 
-function deleteAllNotifications() {
+export function deleteAllNotifications() {
     clearAllNotifications();
     window.toast("🗑️ Notificações limpas!", false, 3000);
 }
 
-function closeNotificationPanel() {
+export function closeNotificationPanel() {
     const wrap = $n("notif-panel-wrap");
     if (wrap) {
         wrap.classList.remove("open");
         const p = $n("notif-panel");
         if (p) p.classList.remove("open");
         setTimeout(() => wrap.remove(), 200);
-        __panelOpen = false;
+        notifState.__panelOpen = false;
     }
 }
 
-async function openProfileModal(uid) {
+export async function openProfileModal(uid) {
     const existing = $n("notif-profile-modal");
     if (existing) existing.remove();
 
@@ -222,18 +227,18 @@ async function openProfileModal(uid) {
     }
 }
 
-function closeProfileModal() {
+export function closeProfileModal() {
     const d = $n("notif-profile-modal");
     if (d) d.close();
 }
 
-function showDiagnosticPrompt() {
+export function showDiagnosticPrompt() {
     if (hasDiagnostic() || !window.currentUser) return;
     window.toast("📋 Responda ao Diagnóstico de Perfil (8 perguntas) para se conectar a outros estudantes!", false, 8000);
 }
 
 let __promptTimer = null;
-function scheduleDiagnosticPrompt() {
+export function scheduleDiagnosticPrompt() {
     if (__promptTimer) clearInterval(__promptTimer);
     __promptTimer = setInterval(() => {
         if (hasDiagnostic() || !window.currentUser) return;

@@ -675,30 +675,29 @@ As ~120 variáveis globais estão tipadas em `src/types/globals.d.ts`. As mais c
 ---
 
 ## 17. DOCUMENTAÇÃO COMPLEMENTAR
-
+ 
 Consulte os seguintes documentos para informações não cobertas por esta constituição:
-
-- [`docs/KNOWN_ISSUES.md`](docs/KNOWN_ISSUES.md) — inventário completo de inconsistências, problemas conhecidos e débitos técnicos
-- [`docs/ROADMAP.md`](docs/ROADMAP.md) — funcionalidades implementadas e planejamento aprovado pelo proprietário
-- [`docs/IDEAS.md`](docs/IDEAS.md) — hipóteses, oportunidades e sugestões não aprovadas (sem compromisso)
-
+ 
+- [`docs/PRODUCT.md`](docs/PRODUCT.md) — contém a verdade do produto, histórico de versões, e as seções de Roadmap e Ideias
+- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — contém as especificações da arquitetura técnica e a seção de débitos técnicos e inconsistências conhecidas
+ 
 ---
-
+ 
 ## 18. PRINCÍPIO DA SOBERANIA DO PLANEJAMENTO
-
+ 
 A direção estratégica do produto pertence exclusivamente ao proprietário do projeto.
-
+ 
 **Agentes podem:**
-
+ 
 - identificar oportunidades
 - identificar funcionalidades parcialmente implementadas
 - identificar sistemas abandonados
 - identificar melhorias técnicas
 - identificar inconsistências
 - identificar possíveis evoluções
-
+ 
 **Agentes não podem:**
-
+ 
 - criar roadmap
 - definir prioridades
 - inventar funcionalidades
@@ -706,8 +705,8 @@ A direção estratégica do produto pertence exclusivamente ao proprietário do 
 - assumir visão do produto
 - promover sugestões a funcionalidades oficiais
 - alterar direção estratégica
-
-**Regra:** `docs/ROADMAP.md` representa apenas decisões já tomadas pelo proprietário. Toda sugestão não aprovada pertence exclusivamente a `docs/IDEAS.md`.
+ 
+**Regra:** A seção de Planejamento Aprovado (Roadmap) em `docs/PRODUCT.md` representa apenas decisões já tomadas pelo proprietário. Toda sugestão não aprovada pertence exclusivamente à seção de Ideias em `docs/PRODUCT.md`.
 
 ## 19. HISTÓRICO DE VERSÕES RELEVANTE
 

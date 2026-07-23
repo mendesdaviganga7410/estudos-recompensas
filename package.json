@@ -14,9 +14,7 @@
     "lint:fix": "eslint src --fix --report-unused-disable-directives",
     "typecheck": "tsc",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "sync-agents": "bash scripts/sync-agent-rules.sh",
-    "verify-agents": "bash scripts/verify-agent-rules.sh"
+    "test:watch": "vitest"
   },
   "repository": {
     "type": "git",

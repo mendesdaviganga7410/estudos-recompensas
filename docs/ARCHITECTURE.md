@@ -117,30 +117,18 @@ Não introduza nenhuma das tecnologias abaixo sem autorização explícita do do
 │
 ├── docs/
 │   ├── AI_CONSTITUTION.md     # Soberana
-│   ├── PRODUCT.md
-│   ├── ARCHITECTURE.md        # Este arquivo
-│   ├── KNOWN_ISSUES.md
-│   ├── ROADMAP.md
-│   └── IDEAS.md
+│   ├── PRODUCT.md             # Definição de Produto, Roadmap e Ideias
+│   └── ARCHITECTURE.md        # Este arquivo
 │
 ├── scripts/
-│   ├── git-enviar.sh
-│   ├── sync-agent-rules.sh
-│   └── verify-agent-rules.sh
-│
-├── agents/
-│   ├── AI.md                  # Ponto de descoberta universal
-│   ├── CLAUDE.md              # Instruções para Claude (source)
-│   ├── .cursorrules           # Config para Cursor (source)
-│   ├── .windsurfrules         # Config para Windsurf (source)
-│   └── copilot-instructions.md # Instruções para Copilot (source)
+│   └── git-enviar.sh
 │
 ├── AGENTS.md                  # Instruções universais para agentes (mestre)
-├── CLAUDE.md → agents/        # Symlink
-├── .cursorrules → agents/     # Symlink
-├── .windsurfrules → agents/   # Symlink
-├── copilot-instructions.md → agents/ # Symlink
-├── AI.md → agents/            # Symlink
+├── CLAUDE.md → AGENTS.md      # Symlink
+├── .cursorrules → AGENTS.md   # Symlink
+├── .windsurfrules → AGENTS.md # Symlink
+├── copilot-instructions.md → AGENTS.md # Symlink
+├── AI.md → AGENTS.md          # Symlink
 ├── package.json
 ├── vite.config.js
 ├── tsconfig.json
@@ -150,19 +138,17 @@ Não introduza nenhuma das tecnologias abaixo sem autorização explícita do do
 
 ---
 
-### agents/ — Réplicas de Configuração de IA
+### Configurações de IA Unificadas
 
-O diretório `agents/` contém os arquivos-fonte de configuração para ferramentas de IA. Na raiz, existem apenas symlinks que apontam para `agents/`, mantendo compatibilidade com as ferramentas que exigem nomes específicos na raiz.
+Para manter o repositório limpo e evitar redundância, todas as ferramentas de IA consomem diretamente o arquivo [AGENTS.md](file:///home/davi/Documents/estudos-recompensas-main/AGENTS.md) por meio de symlinks na raiz do projeto. Isso elimina arquivos duplicados e a necessidade de scripts de sincronização de regras.
 
-| Arquivo fonte (em agents/) | Symlink na raiz | Consumido por |
+| Symlink na Raiz | Destino Real | Consumido por |
 |---|---|---|
-| `agents/CLAUDE.md` | `CLAUDE.md` | Claude Code |
-| `agents/.cursorrules` | `.cursorrules` | Cursor |
-| `agents/.windsurfrules` | `.windsurfrules` | Windsurf |
-| `agents/copilot-instructions.md` | `copilot-instructions.md` | GitHub Copilot |
-| `agents/AI.md` | `AI.md` | Ponto de descoberta universal |
-
-O mestre de todas as regras é `AGENTS.md`. As réplicas em `agents/` devem ser mantidas consistentes com ele (use `npm run sync-agents`).
+| `CLAUDE.md` | `AGENTS.md` | Claude Code (lido automaticamente) |
+| `.cursorrules` | `AGENTS.md` | Cursor |
+| `.windsurfrules` | `AGENTS.md` | Windsurf |
+| `copilot-instructions.md` | `AGENTS.md` | GitHub Copilot |
+| `AI.md` | `AGENTS.md` | Descoberta universal |
 
 ---
 
@@ -543,5 +529,15 @@ new Date().toISOString().slice(0, 10)  // UTC — quebra streak em outros fusos
 
 ---
 
-*Última atualização: 2026-07-05*
+## 17. Débitos Técnicos e Inconsistências Conhecidas
+
+*   **Temas sem botão de preview nos HTMLs:** 4 temas (`dark-industrial`, `dark-cyberpunk`, `dark-ocean`, `dark-monochrome`) existem no CSS mas não têm botão na UI nos HTMLs.
+*   **Alias `pontos` vs `pts`:** No Firestore usa-se `pontos` (legado) e no `state` local usa-se `pts`. Tratado internamente na sincronização.
+*   **`@ts-nocheck` em arquivos legados:** Vários arquivos core ainda usam `@ts-nocheck` (devem ser tipados apropriadamente no futuro).
+*   **`auth.ts` dupla chamada de render:** Um pequeno retrabalho de renderização pós-sincronização que atua como fallback de segurança.
+*   **`review-logic.ts` — variável `lastReviewDate` não utilizada:** Declaração inútil na linha 42.
+
+---
+
 *Este documento é vivo — atualize ao realizar mudanças arquiteturais reais.*
+

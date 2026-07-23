@@ -1,39 +1,54 @@
 // @ts-nocheck
-let __notifications = [];
-let __unreadCount = 0;
-let __panelOpen = false;
-let __refreshTimer = null;
-let __diagnosticAnswered = false;
-let __persistentDiagNotif = null;
-let __cachedMatches = [];
-let __lastGenTime = 0;
-const __NOTIF_STORAGE_KEY = 'neuroflow_notifs_v1';
+import { hasDiagnostic } from './diagnostic-ui.ts';
+import {
+  COURSE_LABELS, COURSE_AREA_LABELS, UNI_TYPE_LABELS, EXAM_ATTEMPTED_LABELS,
+  CONTEST_LEVEL_LABELS, CONTEST_AREA_LABELS, ALREADY_CIVIL_LABELS, WORK_SECTOR_LABELS,
+  PROFESSION_LABELS, CAREER_GOAL_LABELS, BODY_GOAL_LABELS, TRAINING_FREQ_LABELS,
+  PERSONAL_INTEREST_LABELS, CHALLENGE_LABELS, STUDY_HOURS_LABELS, STUDY_PERIOD_LABELS,
+  STUDY_METHOD_LABELS, EDU_LEVEL_LABELS
+} from './diagnostic-data.ts';
+import { MESSAGE_GENERATORS } from './messages.ts';
+import { renderNotificationBadge, openNotificationPanel, closeNotificationPanel, tierName, displayName, avatarUrl } from './ui.ts';
 
-function __saveNotifs() {
+const $n = id => document.getElementById(id);
+
+export const notifState = {
+  __notifications: [],
+  __unreadCount: 0,
+  __panelOpen: false,
+  __refreshTimer: null,
+  __diagnosticAnswered: false,
+  __persistentDiagNotif: null,
+  __cachedMatches: [],
+  __lastGenTime: 0,
+  __NOTIF_STORAGE_KEY: 'neuroflow_notifs_v1',
+};
+
+export function __saveNotifs() {
     try {
-        localStorage.setItem(__NOTIF_STORAGE_KEY, JSON.stringify({
-            notifications: __notifications,
-            unreadCount: __unreadCount,
-            lastGenTime: __lastGenTime
+        localStorage.setItem(notifState.__NOTIF_STORAGE_KEY, JSON.stringify({
+            notifications: notifState.__notifications,
+            unreadCount: notifState.__unreadCount,
+            lastGenTime: notifState.__lastGenTime
         }));
     } catch { /* ignore */ }
 }
 
-function __loadNotifs() {
+export function __loadNotifs() {
     try {
-        const raw = localStorage.getItem(__NOTIF_STORAGE_KEY);
+        const raw = localStorage.getItem(notifState.__NOTIF_STORAGE_KEY);
         if (raw) {
             const data = JSON.parse(raw);
-            __notifications = data.notifications || [];
-            __unreadCount = data.unreadCount || 0;
-            __lastGenTime = data.lastGenTime || 0;
+            notifState.__notifications = data.notifications || [];
+            notifState.__unreadCount = data.unreadCount || 0;
+            notifState.__lastGenTime = data.lastGenTime || 0;
             return true;
         }
     } catch { /* ignore */ }
     return false;
 }
 
-function calcAgeGroup(birthYear) {
+export function calcAgeGroup(birthYear) {
     if (!birthYear) return -1;
     const age = new Date().getFullYear() - Number(birthYear);
     if (isNaN(age) || age < 0) return -1;
@@ -46,12 +61,12 @@ function calcAgeGroup(birthYear) {
     return 6;
 }
 
-function arraysIntersect(a, b) {
+export function arraysIntersect(a, b) {
     if (!Array.isArray(a) || !Array.isArray(b)) return false;
     return a.some(v => b.includes(v));
 }
 
-function calcMatch(myD, otherD) {
+export function calcMatch(myD, otherD) {
     const m = {};
     if (!myD || !otherD) return m;
 
@@ -156,7 +171,7 @@ function calcMatch(myD, otherD) {
     return m;
 }
 
-function calcProximity(myD, otherD) {
+export function calcProximity(myD, otherD) {
     let score = 0;
     if (!myD || !otherD) return score;
 
@@ -189,12 +204,12 @@ function calcProximity(myD, otherD) {
     return score;
 }
 
-async function refreshNotifications() {
+export async function refreshNotifications() {
     if (!window.currentUser || !window.fetchPublicProfiles) return;
 
     const myD = window.state && window.state.diagnostic;
     if (!myD) {
-        __cachedMatches = [];
+        notifState.__cachedMatches = [];
         return;
     }
 
@@ -249,21 +264,21 @@ async function refreshNotifications() {
             })
             .sort((a, b) => b.proximity - a.proximity);
 
-        __cachedMatches = matches;
+        notifState.__cachedMatches = matches;
     } catch (err) {
         console.warn("Notif refresh error:", err);
     }
 }
 
-function generateOneNotification() {
+export function generateOneNotification() {
     if (!window.currentUser || !hasDiagnostic()) return;
 
-    let pool = __cachedMatches;
+    let pool = notifState.__cachedMatches;
 
     if (pool.length === 0) return;
 
     // Remove notificações não-persistentes anteriores (apenas 1 por vez)
-    __notifications = __notifications.filter(n => n.persistent);
+    notifState.__notifications = notifState.__notifications.filter(n => n.persistent);
 
     const match = pool[Math.floor(Math.random() * pool.length)];
     const shuffled = Array.from({ length: MESSAGE_GENERATORS.length }, (_, i) => i)
@@ -283,7 +298,7 @@ function generateOneNotification() {
         text = `${match.name} está na comunidade focado em seus objetivos. Inspire-se!`;
     }
 
-    __notifications.unshift({
+    notifState.__notifications.unshift({
         id: `notif_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
         type: 'general',
         uid: match.user.uid,
@@ -294,27 +309,27 @@ function generateOneNotification() {
         seen: false,
         persistent: false
     });
-    __lastGenTime = Date.now();
-    __unreadCount = __notifications.filter(n => !n.seen).length;
+    notifState.__lastGenTime = Date.now();
+    notifState.__unreadCount = notifState.__notifications.filter(n => !n.seen).length;
     renderNotificationBadge();
     __saveNotifs();
-    if (__panelOpen && $n("notif-panel")) { $n("notif-panel").remove(); openNotificationPanel(); }
+    if (notifState.__panelOpen && $n("notif-panel")) { $n("notif-panel").remove(); openNotificationPanel(); }
 }
 
 /* ---- PERSISTENT DIAGNOSTIC NOTIFICATION ---- */
 
-function initPersistentDiagNotif() {
+export function initPersistentDiagNotif() {
     if (!hasDiagnostic() || !window.currentUser) {
-        __persistentDiagNotif = null;
-        __notifications = __notifications.filter(n => n.id !== 'diag-persistent');
+        notifState.__persistentDiagNotif = null;
+        notifState.__notifications = notifState.__notifications.filter(n => n.id !== 'diag-persistent');
         return;
     }
-    const existing = __notifications.find(n => n.id === 'diag-persistent');
+    const existing = notifState.__notifications.find(n => n.id === 'diag-persistent');
     if (existing) {
-        __persistentDiagNotif = existing;
+        notifState.__persistentDiagNotif = existing;
         return;
     }
-    __persistentDiagNotif = {
+    notifState.__persistentDiagNotif = {
         id: 'diag-persistent',
         type: 'diagnosis',
         avatar: '',
@@ -323,28 +338,28 @@ function initPersistentDiagNotif() {
         seen: true,
         persistent: true
     };
-    __notifications.push(__persistentDiagNotif);
+    notifState.__notifications.push(notifState.__persistentDiagNotif);
 }
 
-function getPersistentDiagNotif() {
-    return __notifications.find(n => n.id === 'diag-persistent') || null;
+export function getPersistentDiagNotif() {
+    return notifState.__notifications.find(n => n.id === 'diag-persistent') || null;
 }
 
-function markPersistentDiagSeen() {
-    const diag = __notifications.find(n => n.id === 'diag-persistent');
+export function markPersistentDiagSeen() {
+    const diag = notifState.__notifications.find(n => n.id === 'diag-persistent');
     if (diag) {
         diag.seen = true;
         renderNotificationBadge();
     }
 }
 
-function clearAllNotifications() {
-    __notifications = __notifications.filter(n => n.persistent);
-    __unreadCount = __notifications.filter(n => !n.seen).length;
-    __lastGenTime = 0;
+export function clearAllNotifications() {
+    notifState.__notifications = notifState.__notifications.filter(n => n.persistent);
+    notifState.__unreadCount = notifState.__notifications.filter(n => !n.seen).length;
+    notifState.__lastGenTime = 0;
     __saveNotifs();
     renderNotificationBadge();
-    if (__panelOpen && $n("notif-panel")) {
+    if (notifState.__panelOpen && $n("notif-panel")) {
         $n("notif-panel").remove();
         openNotificationPanel();
     }
@@ -352,15 +367,15 @@ function clearAllNotifications() {
 
 /* ---- PERSISTENT REVIEW NOTIFICATION ---- */
 
-function generateReviewNotif() {
-    __notifications = __notifications.filter(n => n.id !== 'review-persistent');
+export function generateReviewNotif() {
+    notifState.__notifications = notifState.__notifications.filter(n => n.id !== 'review-persistent');
 
     const blocks = window.state?.studyBlocks || [];
     const overdue = blocks.filter(b => b.status === 'overdue');
     const due = blocks.filter(b => b.status === 'due');
 
     if (overdue.length === 0 && due.length === 0) {
-        __unreadCount = __notifications.filter(n => !n.seen).length;
+        notifState.__unreadCount = notifState.__notifications.filter(n => !n.seen).length;
         renderNotificationBadge();
         __saveNotifs();
         return;
@@ -376,7 +391,7 @@ function generateReviewNotif() {
         text = `🟠 ${due.length} bloco${due.length > 1 ? 's' : ''} para revisar hoje.`;
     }
 
-    __notifications.unshift({
+    notifState.__notifications.unshift({
         id: 'review-persistent',
         type: 'review',
         avatar: '',
@@ -386,12 +401,12 @@ function generateReviewNotif() {
         persistent: true
     });
 
-    __unreadCount = __notifications.filter(n => !n.seen).length;
+    notifState.__unreadCount = notifState.__notifications.filter(n => !n.seen).length;
     renderNotificationBadge();
     __saveNotifs();
 }
 
-function onReviewNotifClick() {
+export function onReviewNotifClick() {
     closeNotificationPanel();
     const page = window.getCurrentPage ? window.getCurrentPage() : '';
     if (page !== 'review') {
