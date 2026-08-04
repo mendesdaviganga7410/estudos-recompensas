@@ -1,88 +1,100 @@
-# AGENTS.md — Protocolo Universal para Agentes de IA
- 
-> **LEIA ESTE ARQUIVO PRIMEIRO.** Este é o ponto de entrada mestre.
-> Ferramentas: Claude, GPT, Gemini, Cursor, Copilot, Codex, Aider, Roo, Windsurf — qualquer agente futuro.
- 
+# AGENTS.md — Regras do NeuroFlow para Agentes de IA
+
+> **LEIA ESTE ARQUIVO POR INTEIRO ANTES DE QUALQUER TAREFA.**
+> Este é o único arquivo de regras do projeto.
+> Ferramentas: Claude, GPT, Gemini, Cursor, Copilot, Codex, Aider, Roo, Windsurf — qualquer agente.
+
 ---
- 
-## ETAPA 1 — LEITURA OBRIGATÓRIA (nesta ordem)
- 
-1. [`docs/AI_CONSTITUTION.md`](docs/AI_CONSTITUTION.md) — autoridade máxima, regras absolutas
-2. [`docs/PRODUCT.md`](docs/PRODUCT.md) — produto, funcionalidades, regras de negócio, roadmap e ideias
-3. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — stack, estrutura, convenções, design system, débitos técnicos e questões conhecidas
- 
+
+## 1. O QUE É O PROJETO
+
+**NeuroFlow** — gerenciador de tarefas gamificado para estudantes (RPG de produtividade: XP, pontos, tiers, missões, loja, Pomodoro, revisão espaçada, comunidade).
+
+- **Tipo:** Multi-Page App (MPA) — Vanilla TypeScript + Vite, sem frameworks
+- **Idioma do produto:** Português BR | **Idioma do código:** Inglês (exceções históricas: `pontos`, `pts`, `ofensiva`)
+
 ---
- 
-## ETAPA 2 — EXECUÇÃO REGULADA
- 
-### Stack
- 
+
+## 2. STACK
+
 | Categoria | Tecnologia |
 |---|---|
 | Build | Vite 8.x |
 | Linguagem | TypeScript 6.x (`strict: false`) |
-| Auth/DB | Firebase 10.8.0 via CDN dinâmico |
+| Auth/DB | Firebase 10.8.0 via CDN dinâmico (nunca via npm) |
 | Testes | Vitest 4.x + jsdom |
 | Estilos | Vanilla CSS com variáveis `data-theme` |
- 
-### Proibido
-React, Vue, Angular, Svelte, Solid, Tailwind, Bootstrap, lodash, axios, Redux, Jest, Webpack — qualquer biblioteca não listada como aprovada.
- 
-### Padrões Críticos
-- Comunicação: `window.*` (barramento global intencional)
-- Persistência: `window.saveState()`
-- Datas: `window.getTodayStr()` — nunca `new Date().toISOString()`
-- Cores: `var(--accent)` — nunca hardcode
-- Export: `window.funcao = funcao` no final do arquivo
-- `escapeHtml`: única instância em `modals.ts` — nunca crie outra
-- `$`: cada módulo define localmente `const $ = (id) => document.getElementById(id)` — não é jQuery
-- `@ts-nocheck`: não remova sem corrigir erros; não adicione em arquivos novos
-- `SLOT_ECONOMICS`: `Object.freeze()` em `templates.ts` — nunca alterar
-- **Menor delta**: menor mudança que resolve completamente o problema
- 
-### Soberania do Planejamento
-- **Não** crie roadmap, defina prioridades, invente funcionalidades, assuma visão do produto
-- Sugestões não aprovadas pertencem à seção de Ideias em `docs/PRODUCT.md`, nunca ao Roadmap
- 
+
+### PROIBIDO
+React, Vue, Angular, Svelte, Solid, Tailwind, Bootstrap, lodash, axios, Redux, Jest, Webpack — qualquer biblioteca fora da tabela acima. **Nunca** adicione dependência de produção ao `package.json`.
+
 ---
- 
-## ETAPA 3 — VERIFICAÇÃO PÓS-EXECUÇÃO (OBRIGATÓRIA)
- 
-- [ ] Nenhuma tecnologia proibida foi introduzida
-- [ ] Nenhuma data UTC usada para gamificação
-- [ ] Nenhuma cor hardcodada
-- [ ] `escapeHtml` não foi duplicado
-- [ ] `package.json` não recebeu dependência de produção
-- [ ] HTMLs da raiz não foram movidos
-- [ ] Build compila (`npm run typecheck && npm run lint`)
-- [ ] Testes passam (`npm run test`)
- 
+
+## 3. REGRAS RÍGIDAS (NÃO NEGOCIÁVEIS)
+
+### 3.1 Obedeça o código existente
+- **Antes de mexer em qualquer coisa, leia o arquivo-alvo e os vizinhos.** O código real é a fonte de verdade do estilo — não invente um estilo novo.
+- **Nunca re-invente:** se já existe implementação, USE-A. Exemplos de singletons que não podem ter cópia: `escapeHtml` (em `modals.ts`), `toast`, `applyPrefs`, `saveState`, `handleAuthRouting`.
+- **Nunca crie segunda implementação** de função, sistema ou componente que já exista.
+
+### 3.2 Menor delta
+- Faça a **menor mudança** que resolve completamente o problema.
+- Não reorganize, renomeie ou reformate código não relacionado à tarefa.
+
+### 3.3 Não remova nada sem autorização
+- Não apague funcionalidade, arquivo, regra ou `@ts-nocheck` existente sem permissão explícita.
+
+### 3.4 Documentação — OBRIGATÓRIA
+- Se a mudança alterou o app (funcionalidade, página, regra de negócio, economia, bug corrigido), **atualize `docs/PRODUCT.md` na mesma tarefa, antes de concluir.**
+- `docs/PRODUCT.md` é o **único** documento vivo do projeto. Ele deve refletir a realidade do app. Se você mudou o app e o doc ficou desatualizado, o trabalho não terminou.
+
+### 3.5 Verificação — OBRIGATÓRIA
+- Ao final: `npm run typecheck && npm run lint && npm run test`. Só conclua com tudo passando.
+
+### 3.6 Datas e cores
+- Datas de gamificação: **sempre data local** — `window.getTodayStr()`, `window.getLocalDateStr()`, `window.getWeekStr()`. **Nunca** `new Date().toISOString().slice(0, 10)`.
+- Cores: **sempre** `var(--accent)`, `var(--text)`, etc. Nunca hardcode.
+
+### 3.7 Padrões do projeto (siga sempre)
+- Comunicação entre módulos: `window.*` (barramento global intencional).
+- `$` = `const $ = (id) => document.getElementById(id)` — definido localmente em cada módulo (não é jQuery).
+- Exposição de funções: `window.nome = nome` no final do arquivo.
+- Persistência: `window.saveState()` — nunca localStorage direto fora de `state.ts`.
+- `SLOT_ECONOMICS` em `templates.ts` é `Object.freeze()` — nunca alterar sem revisão de balanceamento.
+- Estilo visual: neomorfismo flat (`box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color)`), `.bento-card`, `.btn-theme`.
+- HTMLs das páginas ficam **na raiz** (requisito do Vite MPA). Nunca mova.
+
 ---
- 
-## ETAPA 4 — ATUALIZAÇÃO DE DOCUMENTAÇÃO
- 
-| Se | Então |
-|---|---|
-| Funcionalidade nova ou alterada | Atualize `docs/PRODUCT.md` |
-| Roadmap atualizado ou concluído | Atualize `docs/PRODUCT.md` (seção 10) |
-| Sugestão não aprovada surgiu | Adicione em `docs/PRODUCT.md` (seção 11) |
-| Arquitetura, estrutura, stack alterada | Atualize `docs/ARCHITECTURE.md` |
-| Bug, débito ou inconsistência descoberto | Atualize `docs/ARCHITECTURE.md` (seção 17) |
- 
+
+## 4. COMO TRABALHAR
+
+- **Antes:** leia `docs/PRODUCT.md` e o arquivo-alvo + vizinhos; entenda o padrão predominante.
+- **Durante:** menor delta; termine a tarefa pedida primeiro; ao achar bugs ou inconsistências adicionais, termine a tarefa e **depois** reporte.
+- **Em dúvida:** pare e pergunte ao usuário com contexto — não improvise nem invente.
+- **Sugestões novas:** não implemente de moto próprio. Proponha ao usuário; se aprovadas, entram em `docs/PRODUCT.md`.
+- **Soberania:** não crie roadmap, prioridades ou visão de produto — isso pertence ao dono.
+
 ---
- 
-## ETAPA 5 — CONFIGURAÇÕES DE AGENTES
- 
-Este arquivo (`AGENTS.md`) é a única fonte de verdade de regras para agentes. Para evitar duplicação, os arquivos de configuração das ferramentas de IA na raiz são symlinks apontando diretamente para `AGENTS.md`:
- 
-- `CLAUDE.md` → `AGENTS.md`
-- `.cursorrules` → `AGENTS.md`
-- `.windsurfrules` → `AGENTS.md`
-- `copilot-instructions.md` → `AGENTS.md`
-- `AI.md` → `AGENTS.md`
- 
+
+## 5. RELATÓRIO DE CONFORMIDADE (informe ao final de toda tarefa)
+
+- Arquivos lidos
+- Alteração feita
+- Regras verificadas
+- `docs/PRODUCT.md` atualizado? (sim/não)
+- Violações detectadas (se houver)
+
 ---
- 
-## ETAPA 6 — RELATÓRIO DE CONFORMIDADE
- 
-Informe: arquivos lidos, alteração feita, regras verificadas, docs atualizados, violações detectadas.
+
+## 6. COMANDOS
+
+```bash
+npm run dev          # Servidor local com HMR (localhost:5173)
+npm run build        # Build de produção -> dist/
+npm run preview      # Serve dist/ localmente
+npm run test         # Testes Vitest
+npm run test:watch   # Testes em modo watch
+npm run typecheck    # Checagem de tipos (tsc)
+npm run lint         # ESLint
+npm run lint:fix     # ESLint com auto-fix
+```

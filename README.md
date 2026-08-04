@@ -24,6 +24,7 @@ Gerenciador de tarefas gamificado focado em produtividade para estudantes. Trans
 ├── study.html              # Modo Estudo / Pomodoro
 ├── review.html             # Revisão Espaçada (SM-2)
 ├── comunidade.html         # Comunidade Social
+├── flashcards.html         # Flashcards
 ├── src/
 │   ├── core/               # Estado global, roteamento, Firebase
 │   ├── features/           # Notificações, Onboarding
@@ -32,9 +33,9 @@ Gerenciador de tarefas gamificado focado em produtividade para estudantes. Trans
 │   ├── styles/             # CSS: global (temas, reset), components, pages
 │   ├── types/              # globals.d.ts (~120 globais tipados)
 │   └── __tests__/          # Testes unitários (Vitest)
-├── agents/                 # Réplicas de config para ferramentas de IA
-├── docs/                   # Documentação de produto e arquitetura
-├── scripts/                # Scripts auxiliares (sync-agents, git-enviar)
+├── docs/PRODUCT.md         # Documento vivo do produto
+├── AGENTS.md               # Regras para agentes de IA (única fonte)
+└── scripts/                # Scripts auxiliares
 ```
 
 ## Páginas
@@ -46,6 +47,11 @@ Gerenciador de tarefas gamificado focado em produtividade para estudantes. Trans
 | Estudo | `study.html` | Timer Pomodoro / Simples + histórico |
 | Revisão | `review.html` | Repetição espaçada (SM-2 adaptado) |
 | Comunidade | `comunidade.html` | Grid social de heróis |
+| Flashcards | `flashcards.html` | CRUD de flashcards + import/export |
+
+## Documentação
+
+O `AGENTS.md` na raiz é a única fonte de regras para agentes de IA. O `docs/PRODUCT.md` é o documento vivo do produto e deve ser atualizado junto com qualquer mudança no app.
 
 ## Comandos
 
@@ -57,12 +63,5 @@ npm run preview      # Servir dist/ localmente
 npm run test         # Testes unitários (Vitest)
 npm run typecheck    # TypeScript check
 npm run lint         # ESLint
-npm run sync-agents  # Sincronizar AGENTS.md → agents/
-npm run verify-agents # Verificar integridade das réplicas
+npm run lint:fix     # ESLint com auto-fix
 ```
-
-## Agentes de IA
-
-O `AGENTS.md` na raiz é o protocolo mestre. Réplicas em `agents/` com symlinks na raiz para compatibilidade com Claude Code, Cursor, Windsurf e Copilot.
-
-Ao trabalhar neste projeto com um agente de IA, inclua "LEIA E OBEDEÇA O AGENTS.md" no prompt, ou configure a ferramenta para ler `AGENTS.md` automaticamente.
