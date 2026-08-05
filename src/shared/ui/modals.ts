@@ -77,12 +77,7 @@ function handleAuthSubmit() {
 }
 
 function openSettingsModal() {
-    const savedRadius = getComputedStyle(document.documentElement).getPropertyValue('--base-radius').trim() || "16px";
-    const savedShadow = getComputedStyle(document.documentElement).getPropertyValue('--shadow-depth').trim() || "6px";
-    if ($("radiusSlider")) $("radiusSlider").value = parseInt(savedRadius);
-    if ($("shadowSlider")) $("shadowSlider").value = parseInt(savedShadow);
-    if ($("radiusValue")) $("radiusValue").textContent = savedRadius;
-    if ($("shadowValue")) $("shadowValue").textContent = savedShadow;
+    window.syncPresetButtons?.();
 
     const lockNotices   = document.querySelectorAll('.tab-lock-notice') as NodeListOf<HTMLElement>;
     const authContents  = document.querySelectorAll('.tab-auth-content') as NodeListOf<HTMLElement>;
@@ -224,9 +219,9 @@ async function renderPublicProfiles() {
         return;
     }
 
-    const tiers = window.TIERS || [];
     function getTierInfo(xp) {
-        return tiers.find(t => xp >= t.min && xp <= t.max) || tiers[0] || { i: '🥉', name: 'Bronze' };
+        const info = window.getLevelInfo ? window.getLevelInfo(xp) : null;
+        return info ? info.level : { icon: '🌱', name: 'Nível 1' };
     }
 
     grid.innerHTML = profiles.map(p => {
@@ -246,7 +241,7 @@ async function renderPublicProfiles() {
                     <div class="player-card-name">${displayName}</div>
                     ${epicGoal ? `<div class="player-card-goal">"${escapeHtml(epicGoal)}"</div>` : ''}
                     <div class="player-card-stats">
-                        <span>${tier.i} ${tier.name}</span>
+                        <span>${tier.icon} ${tier.name}</span>
                         <span>${p.xp || 0} XP</span>
                         <span>${p.pts || p.pontos || 0} Pts</span>
                     </div>

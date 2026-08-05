@@ -141,8 +141,8 @@ function applyFiltersAndRender(searchTerm) {
     }
 
     function getTierInfo(xp) {
-        const tiers = window.TIERS || [];
-        return tiers.find(t => xp >= t.min && xp <= t.max) || tiers[0] || { i: "🥉", name: "Bronze" };
+        const info = window.getLevelInfo ? window.getLevelInfo(xp) : null;
+        return info ? info.level : { icon: "🌱", name: "Nível 1" };
     }
 
     grid.innerHTML = filtered.map((p, idx) => {
@@ -164,7 +164,7 @@ function applyFiltersAndRender(searchTerm) {
                     <div class="player-card-name">${window.escapeHtml(displayName)}</div>
                     ${epicGoal ? `<div class="player-card-goal">"${window.escapeHtml(epicGoal)}"</div>` : '<div class="player-card-goal">&nbsp;</div>'}
                     <div class="player-card-stats">
-                        <span>${tier.i} ${window.escapeHtml(tier.name)}</span>
+                        <span>${tier.icon} ${window.escapeHtml(tier.name)}</span>
                         <span>${p.xp || 0} XP</span>
                         <span>${p.pts || p.pontos || 0} Pts</span>
                         <span>🔥 ${(p.stats && p.stats.currentStreak) || 0} dias</span>
@@ -206,11 +206,10 @@ function onCommunitySort() { applyFiltersAndRender(); }
    ===================================================================== */
 function openProfileDetail(data) {
     const profile = data.profile || {};
-    const tiers = window.TIERS || [];
     const xp = data.xp || 0;
-    const tier = tiers.find(t => xp >= t.min && xp <= t.max) || tiers[0] || { i: "🥉", name: "Bronze", min: 0, max: 499 };
-    const tierIdx = tiers.indexOf(tier);
-    const nextTier = (tierIdx >= 0 && tierIdx < tiers.length - 1) ? tiers[tierIdx + 1] : null;
+    const { level: tier, next: nextTier } = window.getLevelInfo
+        ? window.getLevelInfo(xp)
+        : { level: { icon: "🌱", name: "Nível 1" }, next: null };
     const progress = nextTier ? Math.min(1, (xp - tier.min) / (nextTier.min - tier.min)) : 1;
 
     const bannerUrl = profile.bannerUrl || "";
@@ -227,7 +226,7 @@ function openProfileDetail(data) {
     if ($com("pd-name")) $com("pd-name").textContent = profile.displayName || "Herói";
     if ($com("pd-goal")) $com("pd-goal").textContent = profile.epicGoal || "Sem meta épica";
 
-    if ($com("pd-rank")) $com("pd-rank").textContent = `${tier.i} ${tier.name}`;
+    if ($com("pd-rank")) $com("pd-rank").textContent = `${tier.icon} ${tier.name}`;
     if ($com("pd-xp")) $com("pd-xp").textContent = `${xp} XP`;
     if ($com("pd-pts")) $com("pd-pts").textContent = `${data.pts || data.pontos || 0} Pts`;
 
@@ -236,9 +235,9 @@ function openProfileDetail(data) {
     }
 
     // Progress card
-    if ($com("pd-tier-label")) $com("pd-tier-label").textContent = `${tier.i} ${tier.name}`;
+    if ($com("pd-tier-label")) $com("pd-tier-label").textContent = `${tier.icon} ${tier.name}`;
     if ($com("pd-next-tier-label")) {
-        $com("pd-next-tier-label").textContent = nextTier ? `${nextTier.i} ${nextTier.name}` : "MAX";
+        $com("pd-next-tier-label").textContent = nextTier ? `${nextTier.icon} ${nextTier.name}` : "MAX";
     }
     if ($com("pd-tier-fill")) {
         $com("pd-tier-fill").style.width = `${Math.round(progress * 100)}%`;

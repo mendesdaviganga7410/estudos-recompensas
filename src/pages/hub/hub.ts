@@ -11,9 +11,9 @@ function renderHeroHub() {
 
     const user = window.currentUser;
     const profile = window.state.profile || {};
-    const tier = window.TIERS
-        ? (window.TIERS.find(t => window.state.xp >= t.min && window.state.xp <= t.max) || window.TIERS[0])
-        : { i: '🥉', name: 'Bronze' };
+    const tier = window.getLevelInfo
+        ? window.getLevelInfo(window.state.xp).level
+        : { icon: '🌱', name: 'Nível 1' };
 
     const name = profile.displayName || user?.displayName || user?.email?.split('@')[0] || 'Herói';
     const epicGoal = profile.epicGoal || 'Defina sua Meta Épica';
@@ -85,7 +85,7 @@ function renderHeroHub() {
     }
 
     const rankEl = $hero('hero-rank');
-    if (rankEl) rankEl.textContent = `${tier.i} ${tier.name}`;
+    if (rankEl) rankEl.textContent = `${tier.icon} ${tier.name}`;
 
     const xpEl = $hero('hero-xp');
     if (xpEl) xpEl.textContent = `${window.state.xp} XP`;

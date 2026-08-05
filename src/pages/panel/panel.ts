@@ -1,8 +1,5 @@
 // @ts-nocheck
 const $ = (id) => document.getElementById(id);
-function getTier(xp) {
-    return TIERS.find(t => xp >= t.min && xp <= t.max) || TIERS[0];
-}
 
 function updateStatsUI() {
     const ptsEl  = $("rPts");
@@ -15,14 +12,13 @@ function updateStatsUI() {
     ptsEl.textContent = state.pts;
     xpEl.textContent  = `${state.xp} XP`;
 
-    const tier = getTier(state.xp);
-    const next = TIERS[TIERS.indexOf(tier) + 1];
+    const { level, next } = window.getLevelInfo(state.xp);
 
-    rankEl.textContent = `${tier.i} ${tier.name}`;
+    rankEl.textContent = `${level.icon} ${level.name}`;
 
     if (next) {
-        nextEl.textContent = `Próximo: ${next.min} XP`;
-        const perc = ((state.xp - tier.min) / (next.min - tier.min)) * 100;
+        nextEl.textContent = `Próximo: ${next.name} (${next.min} XP)`;
+        const perc = ((state.xp - level.min) / (next.min - level.min)) * 100;
         barEl.style.width = `${Math.min(100, Math.max(0, perc))}%`;
     } else {
         nextEl.textContent = "Nível Máximo ✨";
@@ -270,7 +266,7 @@ function task(id, type, success) {
         }
     }
 
-    const oldTier = getTier(state.xp);
+    const oldLevel = window.getLevelInfo(state.xp).level;
 
     if (success) {
         state.pts += t.pts;
@@ -294,9 +290,9 @@ function task(id, type, success) {
     if (!window.momentumActive) render();
     persistState();
 
-    const newTier = getTier(state.xp);
-    if (oldTier.name !== newTier.name && state.xp > oldTier.min) {
-        toast(`👑 Novo ranking alcançado: ${newTier.name}!`);
+    const newLevel = window.getLevelInfo(state.xp).level;
+    if (oldLevel.name !== newLevel.name && state.xp > oldLevel.min) {
+        toast(`🎉 Novo nível alcançado: ${newLevel.name}!`);
     }
 }
 

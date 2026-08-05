@@ -5,11 +5,19 @@ interface Document {
     getElementById(elementId: string): any;
 }
 
-interface Tier {
+interface Level {
   name: string;
+  rank: string;
+  icon: string;
   min: number;
   max: number;
-  i: string;
+  reward: string;
+}
+
+interface LevelInfo {
+  index: number;
+  level: Level;
+  next: Level | null;
 }
 
 interface SlotEconomicsItem {
@@ -143,7 +151,8 @@ interface MergedLists {
 
 interface Window {
   state: AppState;
-  TIERS: Tier[];
+  LEVELS: Level[];
+  getLevelInfo(xp: number): LevelInfo;
   GUEST_STORAGE_KEY: string;
   isGuestMode: boolean;
   isAdmin: boolean;
@@ -183,6 +192,7 @@ interface Window {
   openQuickBannerDialog(): void;
 
   applyPrefs(prefs: UserPrefs): void;
+  syncPresetButtons(): void;
   changeTheme(name: string): void;
   changeRadius(val: string): void;
   changeShadow(val: string): void;
@@ -245,6 +255,7 @@ interface Window {
         isComunidadePage(): boolean;
         isFlashcardsPage(): boolean;
         isReviewPage(): boolean;
+        isTrilhaPage(): boolean;
 
   renderHeroHub(): void;
   render(): void;
@@ -258,6 +269,7 @@ interface Window {
   renderComunidade(): void;
   onCommunitySearch(): void;
   onCommunitySort(): void;
+  renderTrilha(): void;
   renderFlashcardsPage(): void;
   renderReviewPage(): void;
   renderFlashcardsPage(): void;

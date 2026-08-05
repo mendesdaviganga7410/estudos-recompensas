@@ -11,7 +11,8 @@ export default defineConfig({
         study: resolve(__dirname, 'study.html'),
         comunidade: resolve(__dirname, 'comunidade.html'),
         review: resolve(__dirname, 'review.html'),
-        flashcards: resolve(__dirname, 'flashcards.html')
+        flashcards: resolve(__dirname, 'flashcards.html'),
+        trilha: resolve(__dirname, 'trilha.html')
       }
     }
   }

@@ -6,7 +6,8 @@ const ROUTES = {
     comunidade: 'comunidade.html',
     estudo:     'study.html',
     review:     'review.html',
-    flashcards: 'flashcards.html'
+    flashcards: 'flashcards.html',
+    trilha:     'trilha.html'
 };
 
 function getCurrentPage() {
@@ -21,6 +22,7 @@ function isHeroPage()    { return isHubPage(); }
 function isComunidadePage() { return getCurrentPage() === 'comunidade.html'; }
 function isReviewPage() { return getCurrentPage() === 'review.html'; }
 function isFlashcardsPage() { return getCurrentPage() === 'flashcards.html'; }
+function isTrilhaPage() { return getCurrentPage() === 'trilha.html'; }
 function isStudyPage()     { return getCurrentPage() === 'study.html'; }
 
 function setGuestMode(active) {
@@ -62,6 +64,8 @@ function handleAuthRouting() {
             if (window.renderReviewPage) window.renderReviewPage();
         } else if (isFlashcardsPage()) {
             if (window.renderFlashcardsPage) window.renderFlashcardsPage();
+        } else if (isTrilhaPage()) {
+            if (window.renderTrilha) window.renderTrilha();
         }
         return;
     }
@@ -69,7 +73,7 @@ function handleAuthRouting() {
     setGuestMode(false);
 
     if (!window.state.onboardingComplete) {
-        if (isPainelPage() || isComunidadePage() || isStudyPage()) {
+        if (isPainelPage() || isComunidadePage() || isStudyPage() || isTrilhaPage()) {
             navigateTo(ROUTES.hub);
             return;
         }
@@ -96,6 +100,10 @@ function handleAuthRouting() {
     }
     if (isFlashcardsPage()) {
         if (window.renderFlashcardsPage) window.renderFlashcardsPage();
+        return;
+    }
+    if (isTrilhaPage()) {
+        if (window.renderTrilha) window.renderTrilha();
         return;
     }
     if (isHubPage() || isInicioPage()) {
@@ -161,6 +169,7 @@ window.isStudyPage       = isStudyPage;
 window.isHeroPage        = isHeroPage;
 window.isReviewPage      = isReviewPage;
 window.isFlashcardsPage  = isFlashcardsPage;
+window.isTrilhaPage      = isTrilhaPage;
 window.setGuestMode      = setGuestMode;
 window.updateGuestUI     = updateGuestUI;
 window.navigateTo        = navigateTo;

@@ -217,7 +217,7 @@ export async function refreshNotifications() {
         const profiles = await window.fetchPublicProfiles(80);
         const myXp = window.state.xp || 0;
         const myPts = window.state.pts || 0;
-        const myTier = (window.TIERS || []).findIndex(t => myXp >= t.min && myXp <= t.max);
+        const myTier = window.getLevelInfo ? window.getLevelInfo(myXp).index : -1;
         const myUid = window.currentUser.uid;
 
         const matches = profiles
@@ -238,10 +238,7 @@ export async function refreshNotifications() {
                 const ptsDiff = Math.abs(pts - myPts);
                 const ptsAhead = pts > myPts && ptsDiff > 0;
                 const ptsBehind = myPts > pts && ptsDiff > 0;
-                const sameTier = myTier >= 0 && (() => {
-                    const ot = (window.TIERS || []).findIndex(t => xp >= t.min && xp <= t.max);
-                    return ot === myTier;
-                })();
+                const sameTier = myTier >= 0 && (window.getLevelInfo ? window.getLevelInfo(xp).index === myTier : false);
                 const higherTier = !sameTier && xp > myXp;
                 const lowerTier = !sameTier && xp < myXp;
                 const tierLbl = tierName(xp);

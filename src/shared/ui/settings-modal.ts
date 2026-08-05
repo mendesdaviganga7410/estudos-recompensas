@@ -615,21 +615,23 @@ function getSettingsModalHTML() {
                             <button type="button" class="btn-theme w-full" onclick="openThemeDialog()"
                                 style="display: flex; justify-content: space-between; align-items: center; text-align: left;">
                                 <span>\ud83c\udfa8 Customizar Visual de Tela</span>
-                                <span id="current-theme-label" class="theme-pill">Padr\u00e3o Claro</span>
+                                <span id="current-theme-label" class="theme-pill">Modo Claro</span>
                             </button>
                         </div>
                         <div class="form-group">
-                            <label>Arredondamento Geral</label>
-                            <div class="range-widget">
-                                <input type="range" id="radiusSlider" min="0" max="50" value="16" oninput="changeRadius(this.value+'px')">
-                                <span id="radiusValue" class="range-value">16px</span>
+                            <label>Arredondamento</label>
+                            <div class="style-preset-group">
+                                <button type="button" id="radiusPresetFlat" class="style-preset-btn" onclick="changeRadius('0px')">Plano</button>
+                                <button type="button" id="radiusPresetBalanced" class="style-preset-btn" onclick="changeRadius('16px')">Equilibrado</button>
+                                <button type="button" id="radiusPresetCozy" class="style-preset-btn" onclick="changeRadius('22px')">Confort\u00e1vel</button>
                             </div>
                         </div>
                         <div class="form-group">
-                            <label>Intensidade do Relevo (Sombras)</label>
-                            <div class="range-widget">
-                                <input type="range" id="shadowSlider" min="2" max="14" value="6" oninput="changeShadow(this.value+'px')">
-                                <span id="shadowValue" class="range-value">6px</span>
+                            <label>Sombra (Relevo)</label>
+                            <div class="style-preset-group">
+                                <button type="button" id="shadowPresetFlat" class="style-preset-btn" onclick="changeShadow('0px')">Plano</button>
+                                <button type="button" id="shadowPresetBalanced" class="style-preset-btn" onclick="changeShadow('6px')">Equilibrado</button>
+                                <button type="button" id="shadowPresetCozy" class="style-preset-btn" onclick="changeShadow('10px')">Confort\u00e1vel</button>
                             </div>
                         </div>
                         <div class="form-group" style="margin-top: 0.5rem; border-top: 2px dashed var(--stroke); padding-top: 1.25rem;">

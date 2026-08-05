@@ -86,6 +86,42 @@
     border-radius: var(--card-radius);
     background: var(--panel); line-height: 1.5;
 }
+.style-preset-group {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+}
+.style-preset-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    background: var(--surface);
+    border: 3px solid var(--stroke);
+    color: var(--text);
+    padding: 0.65rem 1.25rem;
+    border-radius: var(--element-radius);
+    font-family: inherit;
+    font-size: 0.85rem;
+    font-weight: 800;
+    cursor: pointer;
+    box-shadow: 3px 3px 0px var(--shadow-color);
+    transition: transform 0.1s ease, box-shadow 0.1s ease, border-color 0.1s ease;
+}
+.style-preset-btn:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 4px 4px 0px var(--shadow-color);
+}
+.style-preset-btn:active {
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0px var(--shadow-color);
+}
+.style-preset-btn.active {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 2px var(--accent), 3px 3px 0 var(--shadow-color);
+}
 
 /* Sound tab (settings modal) */
 .sound-group {
@@ -260,27 +296,8 @@
 }
 .theme-swatch span { flex: 1; }
 
-.theme-preview-light .sw-bg { background: #ffffff; } .theme-preview-light .sw-accent { background: #2563eb; } .theme-preview-light .sw-card { background: #f3f4f6; }
-.theme-preview-pastel-brown .sw-bg { background: #f5efe6; } .theme-preview-pastel-brown .sw-accent { background: #a1887f; } .theme-preview-pastel-brown .sw-card { background: #ebd8c3; }
-.theme-preview-pastel-pink .sw-bg { background: #fff0f5; } .theme-preview-pastel-pink .sw-accent { background: #ff8da1; } .theme-preview-pastel-pink .sw-card { background: #fae1e4; }
 .theme-preview-pastel-blue .sw-bg { background: #e0f2fe; } .theme-preview-pastel-blue .sw-accent { background: #0ea5e9; } .theme-preview-pastel-blue .sw-card { background: #bae6fd; }
-.theme-preview-pastel-purple .sw-bg { background: #f3e8ff; } .theme-preview-pastel-purple .sw-accent { background: #a855f7; } .theme-preview-pastel-purple .sw-card { background: #e9d5ff; }
-.theme-preview-pastel-mint .sw-bg { background: #ecfdf5; } .theme-preview-pastel-mint .sw-accent { background: #10b981; } .theme-preview-pastel-mint .sw-card { background: #a7f3d0; }
-.theme-preview-solarized-light .sw-bg { background: #fdf6e3; } .theme-preview-solarized-light .sw-accent { background: #b58900; } .theme-preview-solarized-light .sw-card { background: #eee8d5; }
-.theme-preview-dark .sw-bg { background: #0f172a; } .theme-preview-dark .sw-accent { background: #38bdf8; } .theme-preview-dark .sw-card { background: #1e293b; }
-.theme-preview-dark-chocolate .sw-bg { background: #1c1310; } .theme-preview-dark-chocolate .sw-accent { background: #d4a373; } .theme-preview-dark-chocolate .sw-card { background: #2c1e19; }
-.theme-preview-dark-forest .sw-bg { background: #0b1a10; } .theme-preview-dark-forest .sw-accent { background: #4ade80; } .theme-preview-dark-forest .sw-card { background: #142b1d; }
-.theme-preview-dark-amber .sw-bg { background: #14100a; } .theme-preview-dark-amber .sw-accent { background: #f59e0b; } .theme-preview-dark-amber .sw-card { background: #221a10; }
-.theme-preview-dark-cyberpunk .sw-bg { background: #0b0c10; } .theme-preview-dark-cyberpunk .sw-accent { background: #ff007f; } .theme-preview-dark-cyberpunk .sw-card { background: #1f2833; }
-.theme-preview-dark-ocean .sw-bg { background: #030712; } .theme-preview-dark-ocean .sw-accent { background: #06b6d4; } .theme-preview-dark-ocean .sw-card { background: #111827; }
-.theme-preview-dark-purple .sw-bg { background: #0f051d; } .theme-preview-dark-purple .sw-accent { background: #e9d5ff; } .theme-preview-dark-purple .sw-card { background: #1a0b2e; }
-.theme-preview-dark-monochrome .sw-bg { background: #121212; } .theme-preview-dark-monochrome .sw-accent { background: #888888; } .theme-preview-dark-monochrome .sw-card { background: #1e1e1e; }
-.theme-preview-catppuccin .sw-bg { background: #11111b; } .theme-preview-catppuccin .sw-accent { background: #cba6f7; } .theme-preview-catppuccin .sw-card { background: #1e1e2e; }
-.theme-preview-nord .sw-bg { background: #2e3440; } .theme-preview-nord .sw-accent { background: #88c0d0; } .theme-preview-nord .sw-card { background: #3b4252; }
-.theme-preview-dracula .sw-bg { background: #1e1f29; } .theme-preview-dracula .sw-accent { background: #ff79c6; } .theme-preview-dracula .sw-card { background: #282a36; }
-.theme-preview-github-dark .sw-bg { background: #070a0e; } .theme-preview-github-dark .sw-accent { background: #58a6ff; } .theme-preview-github-dark .sw-card { background: #0d1117; }
-.theme-preview-outerwilds-dark .sw-bg { background: #050914; } .theme-preview-outerwilds-dark .sw-accent { background: #f39c12; } .theme-preview-outerwilds-dark .sw-card { background: #111b2e; }
-.theme-preview-outerwilds-light .sw-bg { background: #f4ebd9; } .theme-preview-outerwilds-light .sw-accent { background: #2a6f97; } .theme-preview-outerwilds-light .sw-card { background: #fbf5eb; }
+.theme-preview-pastel-blue-dark .sw-bg { background: #0b1b2b; } .theme-preview-pastel-blue-dark .sw-accent { background: #38bdf8; } .theme-preview-pastel-blue-dark .sw-card { background: #102a3c; }
 
 .community-modal {
     max-width: 750px !important;

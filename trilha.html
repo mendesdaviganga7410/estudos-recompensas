@@ -4,18 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeuroFlow // Comunidade</title>
+    <title>NeuroFlow // Trilha</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
     <link rel="stylesheet" href="src/styles/global/base.css">
     <link rel="stylesheet" href="src/styles/components/components.css">
     <link rel="stylesheet" href="src/styles/global/layout.css">
     <link rel="stylesheet" href="src/styles/components/modals.css">
-    <link rel="stylesheet" href="src/styles/pages/comunidade.css">
+    <link rel="stylesheet" href="src/styles/pages/hero.css">
+    <link rel="stylesheet" href="src/styles/pages/trilha.css">
 </head>
 
 <body data-theme="pastel-blue" class="guest-mode">
@@ -28,13 +28,13 @@
             <span>Carregando...</span>
         </div>
 
-        <!-- ===== CONTEUDO DA COMUNIDADE (oculto durante carregamento) ===== -->
-        <div id="comunidade-content" style="display:none;">
+        <div id="trilha-content" style="display:none">
 
             <div class="top-bar">
                 <div style="display:flex;align-items:center;gap:0.75rem;">
-                    <button class="btn-theme" id="pd-back-btn" onclick="closeProfileDetail()" title="Voltar">🌐 Comunidade</button>
-                    <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Convidado</span>
+                    <button class="btn-theme auth-only" onclick="navigateTo('index.html')" title="Voltar ao Hub">🏠 Hub</button>
+                    <button class="btn-theme" onclick="navigateTo('panel.html')" title="Painel de Controle">⚙️ Painel</button>
+                    <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Modo Visitante</span>
                     <div id="auth-panel" class="auth-panel">
                         <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
                             <button class="btn-theme" onclick="loginGoogle()">🔑 Google</button>
@@ -58,111 +58,10 @@
                 </div>
             </div>
 
-            <!-- ===== LISTA DA COMUNIDADE ===== -->
-            <div id="community-list" style="display:none;">
-
-                <div class="community-hero">
-                    <div class="community-hero-banner">
-                        <span style="font-size:3.5rem;opacity:0.2;user-select:none;">🌐</span>
-                    </div>
-                    <div class="community-hero-content">
-                        <h1>Comunidade NeuroFlow</h1>
-                        <p>Descubra outros heróis, suas metas épicas e jornadas de evolução.</p>
-                        <div class="community-stats-row">
-                            <span class="community-stat-pill">👥 <strong id="hero-count">—</strong> Heróis</span>
-                            <span class="community-stat-pill">⚡ <strong id="xp-total">—</strong> Total</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="community-controls-bar" class="community-controls" style="display:none;">
-                    <input type="text" id="community-search" class="community-search" placeholder="Buscar herói..." oninput="onCommunitySearch()" autocomplete="off">
-                    <select id="community-sort" class="community-sort" onchange="onCommunitySort()">
-                        <option value="xp">🔥 Por XP</option>
-                        <option value="name">🔤 Por Nome</option>
-                    </select>
-                </div>
-
-                <div id="community-grid" class="community-grid">
-                    <div class="community-empty">
-                        <span class="empty-icon">🌐</span>
-                        <strong>Carregando comunidade...</strong>
-                    </div>
-                </div>
-
-            </div>
-
-            <!-- ===== VISUALIZADOR DE PERFIL (página cheia, idêntica ao Hub) ===== -->
-            <div id="profile-detail" style="display:none;">
-
-            <div class="pd-epic-header">
-                <div id="pd-banner" class="pd-banner"></div>
-                <div class="pd-identity">
-                    <div id="pd-avatar-wrap" class="pd-avatar-wrap">
-                        <div class="pd-avatar-inner">
-                            <img id="pd-avatar" src="" alt="Avatar">
-                        </div>
-                    </div>
-                    <div class="pd-meta">
-                        <div id="pd-name" class="pd-name">Herói</div>
-                        <div id="pd-goal" class="pd-goal">Meta Épica</div>
-                    </div>
-                </div>
-                <div class="pd-stats-row">
-                    <span id="pd-rank" class="hero-stat-pill">🌱 Nível 1</span>
-                    <span id="pd-xp" class="hero-stat-pill">0 XP</span>
-                    <span id="pd-pts" class="hero-stat-pill">0 Pts</span>
-                </div>
-                <div id="pd-desc" class="pd-desc"></div>
-            </div>
-
-            <div id="pd-bento" class="pd-bento">
-                <div class="pd-card">
-                    <span class="pd-card-icon">📊</span>
-                    <span class="pd-card-title">Progresso</span>
-                    <div class="pd-progress-wrap">
-                        <div class="pd-progress-labels">
-                            <span id="pd-tier-label">🌱 Nível 1</span>
-                            <span id="pd-next-tier-label">🥈 Prata</span>
-                        </div>
-                        <div class="pd-progress-track">
-                            <div id="pd-tier-fill" class="pd-progress-fill"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="pd-card">
-                    <span class="pd-card-icon">🏆</span>
-                    <span class="pd-card-title">Ranking</span>
-                    <span class="pd-card-desc" id="pd-rank-desc">Posição —</span>
-                </div>
-                <div class="pd-card">
-                    <span class="pd-card-icon">📊</span>
-                    <span class="pd-card-title">Estatísticas</span>
-                    <div class="pd-stats-grid">
-                        <div class="pd-stat-item">
-                            <span class="pd-stat-value" id="pd-stat-dailies">0</span>
-                            <span class="pd-stat-label">Missões</span>
-                        </div>
-                        <div class="pd-stat-item">
-                            <span class="pd-stat-value" id="pd-stat-epics">0</span>
-                            <span class="pd-stat-label">Missões Sem.</span>
-                        </div>
-                        <div class="pd-stat-item">
-                            <span class="pd-stat-value" id="pd-stat-purchases">0</span>
-                            <span class="pd-stat-label">Compras</span>
-                        </div>
-                        <div class="pd-stat-item">
-                            <span class="pd-stat-value" id="pd-stat-streak">0</span>
-                            <span class="pd-stat-label">🔥 Ofensiva</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            <!-- Conteúdo renderizado por trilha.ts -->
+            <div id="trilha-page-content"></div>
 
         </div>
-
-        </div> <!-- /comunidade-content -->
-
     </div>
 
     <!-- MODAL: Autenticação -->
@@ -180,11 +79,9 @@
                     </div>
                     <div class="form-group" id="auth-password-group">
                         <label for="auth-password">Senha</label>
-                        <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" minlength="6"
-                            autocomplete="current-password">
+                        <input type="password" id="auth-password" placeholder="Mínimo 6 caracteres" minlength="6" autocomplete="current-password">
                         <a href="#" id="btn-forgot-password" onclick="openForgotPassword(event)"
-                            style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 0.35rem; display: inline-block;">Esqueceu
-                            sua senha?</a>
+                            style="font-size: 0.75rem; color: var(--accent); font-weight: 700; text-decoration: none; margin-top: 0.35rem; display: inline-block;">Esqueceu sua senha?</a>
                     </div>
                     <button class="btn-theme btn-submit" id="btn-auth-submit" onclick="handleAuthSubmit()"
                         style="width: 100%; margin-top: 1.5rem;">Entrar</button>
@@ -192,8 +89,7 @@
                 <div style="margin-top: 1rem; text-align: center; font-size: 0.8rem;">
                     <span id="toggle-text" style="color: var(--muted);">Não tem uma conta?</span>
                     <a href="#" id="btn-toggle-auth-mode" onclick="toggleAuthMode(event)"
-                        style="color: var(--accent); font-weight: 700; text-decoration: none; margin-left: 0.25rem;">Criar
-                        Conta</a>
+                        style="color: var(--accent); font-weight: 700; text-decoration: none; margin-left: 0.25rem;">Criar Conta</a>
                 </div>
             </div>
         </div>
@@ -241,7 +137,7 @@
     <script type="module" src="src/shared/ui/review-settings-dialog.ts"></script>
     <script type="module" src="src/shared/ui/media.ts"></script>
     <script type="module" src="src/core/router.ts"></script>
-    <script type="module" src="src/pages/comunidade/comunidade.ts"></script>
+    <script type="module" src="src/pages/trilha/trilha.ts"></script>
     <script>document.addEventListener('DOMContentLoaded',()=>{const b=document.getElementById('admin-btn');if(b&&window.isAdmin)b.style.display='';});</script>
 </body>
 

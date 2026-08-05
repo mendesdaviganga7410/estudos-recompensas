@@ -5,8 +5,8 @@ import { hasDiagnostic } from './diagnostic-ui.ts';
 const $n = id => document.getElementById(id);
 
 export const tierName = (xp) => {
-    const t = (window.TIERS || []).find(r => xp >= r.min && xp <= r.max);
-    return t ? `${t.i} ${t.name}` : "🥉 Bronze";
+    const info = window.getLevelInfo ? window.getLevelInfo(xp) : null;
+    return info ? `${info.level.icon} ${info.level.name}` : "🌱 Nível 1";
 };
 export const avatarUrl = (uid, profile) =>
     (profile && profile.avatarUrl) ||

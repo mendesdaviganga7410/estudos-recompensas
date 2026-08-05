@@ -1,18 +1,40 @@
 // @ts-nocheck
-const TIERS = [
-    { name: "Bronze",        min: 0,     max: 499,     i: "🥉" },
-    { name: "Prata",         min: 500,   max: 1499,    i: "🥈" },
-    { name: "Ouro",          min: 1500,  max: 2999,    i: "🥇" },
-    { name: "Platina",       min: 3000,  max: 4999,    i: "💎" },
-    { name: "Diamante",      min: 5000,  max: 7499,    i: "❄️" },
-    { name: "Esmeralda",     min: 7500,  max: 10499,   i: "💚" },
-    { name: "Safira",        min: 10500, max: 14499,   i: "🔹" },
-    { name: "Rubi",          min: 14500, max: 19499,   i: "❤️" },
-    { name: "Ametista",      min: 19500, max: 25499,   i: "💜" },
-    { name: "Opala",         min: 25500, max: 32499,   i: "🌈" },
-    { name: "Obsidiana",     min: 32500, max: 44999,   i: "🖤" },
-    { name: "Diamante Negro",min: 45000, max: Infinity, i: "🌌" }
+// Curva exponencial: T(n) = round(36.76 * 1.2^(n-1)), nível 40 ≈ antigo máximo (45.000 XP)
+const LEVEL_THRESHOLDS = [0, 44, 53, 64, 76, 91, 110, 132, 158, 190, 228, 273, 328, 393, 472, 566, 680, 816, 979, 1174, 1409, 1691, 2029, 2435, 2922, 3507, 4208, 5050, 6060, 7272, 8726, 10471, 12565, 15078, 18094, 21713, 26056, 31267, 37520, 45024, 54029, 64835, 77801, 93362, 112034, 134441, 161329, 193595, 232314, 278777, 334532, 401439, 481726, 578071, 693686, 832423, 998908, 1198689, 1438427, 1726112, 2071335, 2485602, 2982722, 3579266, 4295119, 5154143, 6184972, 7421966, 8906360, 10687632, 12825158, 15390190, 18468228, 22161873, 26594248, 31913097, 38295717, 45954860, 55145832, 66174999];
+
+const LEVEL_RANKS = [
+    { name: "Semente",     icon: "🌱" },
+    { name: "Broto",       icon: "🌿" },
+    { name: "Explorador",  icon: "🗺️" },
+    { name: "Aventureiro", icon: "🏹" },
+    { name: "Guerreiro",   icon: "⚔️" },
+    { name: "Campeão",     icon: "🏆" },
+    { name: "Mestre",      icon: "🎓" },
+    { name: "Herói",       icon: "🦸" },
+    { name: "Lenda",       icon: "⭐" },
+    { name: "Imortal",     icon: "👑" }
 ];
+
+const LEVELS = LEVEL_THRESHOLDS.map((min, i) => {
+    const n = i + 1;
+    const rank = LEVEL_RANKS[Math.floor(i / 8)];
+    return {
+        name: `Nível ${n}`,
+        rank: rank.name,
+        icon: rank.icon,
+        min,
+        max: i < LEVEL_THRESHOLDS.length - 1 ? LEVEL_THRESHOLDS[i + 1] - 1 : Infinity,
+        reward: `Recompensa ${n}`
+    };
+});
+
+function getLevelInfo(xp) {
+    let idx = 0;
+    for (let i = 0; i < LEVELS.length; i++) {
+        if (xp >= LEVELS[i].min) idx = i;
+    }
+    return { index: idx, level: LEVELS[idx], next: LEVELS[idx + 1] || null };
+}
 
 const GUEST_STORAGE_KEY = 'neuroflow_guest_v2';
 
@@ -244,7 +266,8 @@ function calcStreak() {
     return streak;
 }
 
-window.TIERS              = TIERS;
+window.LEVELS             = LEVELS;
+window.getLevelInfo       = getLevelInfo;
 window.GUEST_STORAGE_KEY  = GUEST_STORAGE_KEY;
 window.createDefaultState = createDefaultState;
 window.getMergedLists     = getMergedLists;

@@ -1,0 +1,309 @@
+/* =====================================================================
+   Trilha da Evolução — trilha vertical estilo battle pass
+   ===================================================================== */
+
+.trilha-hero {
+    padding: 1.5rem;
+    text-align: center;
+    margin-bottom: 2.5rem;
+    max-width: 760px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.trilha-hero-title {
+    font-size: 0.72rem;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+}
+
+.trilha-hero-rank {
+    font-size: 1.5rem;
+    font-weight: 900;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    flex-wrap: wrap;
+}
+
+.trilha-hero-rank-tag {
+    font-size: 0.72rem;
+    font-weight: 800;
+    color: var(--text);
+    background: var(--bg);
+    border: 2px solid var(--stroke);
+    border-radius: 999px;
+    padding: 0.25rem 0.8rem;
+}
+
+.trilha-hero-xp {
+    margin-top: 0.4rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.trilha-progress-wrap {
+    margin-top: 1rem;
+    max-width: 480px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.trilha-progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--muted);
+    margin-bottom: 0.3rem;
+}
+
+.trilha-progress-track {
+    height: 8px;
+    background: var(--bg);
+    border-radius: var(--element-radius);
+    border: 2px solid var(--stroke);
+    overflow: hidden;
+}
+
+.trilha-progress-fill {
+    height: 100%;
+    background: var(--accent);
+    border-right: 2px solid var(--stroke);
+    transition: width 0.3s ease;
+}
+
+.trilha-progress-xp {
+    margin-top: 0.35rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+/* Track */
+.trilha-track {
+    position: relative;
+    max-width: 760px;
+    margin: 0 auto;
+    padding: 0 1rem;
+}
+
+.trilha-line,
+.trilha-line-fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    border-radius: 999px;
+}
+
+.trilha-line {
+    background: var(--stroke);
+    opacity: 0.55;
+}
+
+.trilha-line-fill {
+    background: var(--accent);
+    top: auto;
+    bottom: 0;
+}
+
+/* Section divider */
+.trilha-section {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin: 2.2rem 0 1.4rem;
+}
+
+.trilha-section-line {
+    flex: 1;
+    height: 3px;
+    border-radius: 999px;
+    background: var(--stroke);
+    opacity: 0.5;
+}
+
+.trilha-section-label {
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--accent);
+    white-space: nowrap;
+    background: var(--bg);
+    padding: 0.3rem 0.9rem;
+    border: 2px solid var(--stroke);
+    border-radius: 999px;
+}
+
+/* Node */
+.trilha-node {
+    display: grid;
+    grid-template-columns: 1fr 64px 1fr;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.85rem 0;
+    position: relative;
+}
+
+.trilha-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: var(--element-radius);
+    background: var(--panel);
+    border: 3px solid var(--stroke);
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
+    transition: border-color 0.2s ease;
+}
+
+.trilha-cell.left {
+    align-items: flex-start;
+    text-align: left;
+}
+
+.trilha-cell.right {
+    align-items: flex-end;
+    text-align: right;
+}
+
+.trilha-level-name {
+    font-size: 0.9rem;
+    font-weight: 900;
+    color: var(--text);
+}
+
+.trilha-rank-name {
+    font-size: 0.66rem;
+    font-weight: 800;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.trilha-level-min {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--muted);
+}
+
+.trilha-reward-label {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.trilha-reward-status {
+    font-size: 0.68rem;
+    font-weight: 800;
+    color: var(--muted);
+}
+
+.trilha-node.reached .trilha-cell {
+    border-color: var(--accent);
+}
+
+.trilha-cell-reward.locked .trilha-reward-label {
+    color: var(--muted);
+    opacity: 0.55;
+}
+
+.trilha-node.current .trilha-cell {
+    border-color: var(--accent);
+}
+
+/* Marker */
+.trilha-marker-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3rem;
+    z-index: 1;
+}
+
+.trilha-marker {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+    background: var(--bg);
+    border: 3px solid var(--stroke);
+    box-shadow: var(--shadow-depth) var(--shadow-depth) 0px var(--shadow-color);
+    transition: transform 0.2s ease;
+}
+
+.trilha-marker.reached {
+    background: var(--panel);
+    border-color: var(--accent);
+}
+
+.trilha-marker.current {
+    transform: scale(1.15);
+    border-color: var(--accent);
+    background: var(--accent);
+    animation: trilha-pulse 1.8s ease-in-out infinite;
+}
+
+@keyframes trilha-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 var(--accent); }
+    50% { box-shadow: 0 0 0 12px transparent; }
+}
+
+.trilha-current-tag {
+    font-size: 0.58rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--accent);
+    background: var(--bg);
+    border: 2px solid var(--accent);
+    border-radius: 999px;
+    padding: 0.15rem 0.6rem;
+    white-space: nowrap;
+}
+
+/* Mobile */
+@media (max-width: 560px) {
+    .trilha-node {
+        grid-template-columns: 1fr 44px 1fr;
+        gap: 0.4rem;
+    }
+
+    .trilha-marker {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+    }
+
+    .trilha-current-tag {
+        display: none;
+    }
+
+    .trilha-cell {
+        padding: 0.5rem 0.55rem;
+    }
+
+    .trilha-level-name {
+        font-size: 0.76rem;
+    }
+
+    .trilha-reward-label {
+        font-size: 0.72rem;
+    }
+
+    .trilha-hero-rank {
+        font-size: 1.2rem;
+    }
+}
