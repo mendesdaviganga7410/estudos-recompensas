@@ -4,16 +4,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NeuroFlow // Revisão Espaçada</title>
+    <title>NeuroFlow // Trilha</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧠</text></svg>">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css">
-  <script type="module" crossorigin src="./assets/review-4nVcD1yq.js"></script>
+  <script type="module" crossorigin src="./assets/trilha-BggNbGm-.js"></script>
   <link rel="modulepreload" crossorigin href="./assets/router-CJE8uMfb.js">
   <link rel="stylesheet" crossorigin href="./assets/router-BNnhm_1t.css">
-  <link rel="stylesheet" crossorigin href="./assets/review-Crmpf37R.css">
+  <link rel="stylesheet" crossorigin href="./assets/trilha-Dvtb9ulh.css">
   <link rel="stylesheet" crossorigin href="./assets/hero-B01Prlm3.css">
 </head>
 
@@ -27,11 +27,12 @@
             <span>Carregando...</span>
         </div>
 
-        <div id="review-content" style="display:none">
+        <div id="trilha-content" style="display:none">
 
             <div class="top-bar">
                 <div style="display:flex;align-items:center;gap:0.75rem;">
                     <button class="btn-theme auth-only" onclick="navigateTo('index.html')" title="Voltar ao Hub">🏠 Hub</button>
+                    <button class="btn-theme" onclick="navigateTo('panel.html')" title="Painel de Controle">⚙️ Painel</button>
                     <span class="guest-only" style="font-size:0.75rem;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:0.05em;">Modo Visitante</span>
                     <div id="auth-panel" class="auth-panel">
                         <div id="auth-buttons" style="display: flex; gap: 0.5rem;">
@@ -56,8 +57,8 @@
                 </div>
             </div>
 
-            <!-- Conteúdo da página renderizado por review.ts -->
-            <div id="review-page-content"></div>
+            <!-- Conteúdo renderizado por trilha.ts -->
+            <div id="trilha-page-content"></div>
 
         </div>
     </div>
@@ -111,64 +112,6 @@
                     <div class="theme-bento-grid">
                         <button class="theme-bento-item theme-preview-pastel-blue-dark" onclick="selectTheme('pastel-blue-dark')"><div class="theme-swatch"><span class="sw-bg"></span><span class="sw-accent"></span><span class="sw-card"></span></div><span class="theme-name">Modo Escuro</span></button>
                     </div>
-                </div>
-            </div>
-        </div>
-    </dialog>
-
-    <dialog id="add-block-dialog" class="theme-bento-dialog">
-        <div class="bento-card dialog-theme-card" style="max-width:500px;">
-            <div class="dialog-header-block">
-                <h3>Adicionar Novo Bloco de Estudo</h3>
-                <button class="dialog-close-btn" onclick="window.closeAddBlockDialog()">×</button>
-            </div>
-            <div class="dialog-body">
-                <div class="dialog-scroll">
-                    <div class="form-group">
-                        <label for="materiaInput">Matéria</label>
-                        <input type="text" id="materiaInput" placeholder="Ex: Matemática, História" autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label for="topicoInput">Tópico</label>
-                        <input type="text" id="topicoInput" placeholder="Ex: Logaritmos, Revolução Francesa" autocomplete="off">
-                    </div>
-                    <div class="form-group">
-                        <label for="conteudoInput">Conteúdo do Bloco</label>
-                        <textarea id="conteudoInput" placeholder="Resumo, conceitos chave, etc." rows="5"></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label for="blockColorInput">Cor do Bloco</label>
-                        <input type="color" id="blockColorInput" value="#6a6a6a">
-                    </div>
-                </div>
-                <div style="display:flex;gap:0.5rem;justify-content:flex-end;margin-top:1rem;padding-bottom:1rem;">
-                    <button class="btn-theme" onclick="window.closeAddBlockDialog()" style="background:var(--panel);width:auto;">Cancelar</button>
-                    <button class="btn-theme" onclick="window.addStudyBlock()" style="width:auto;">Adicionar Bloco</button>
-                </div>
-            </div>
-        </div>
-    </dialog>
-
-    <dialog id="review-feedback-dialog" class="theme-bento-dialog">
-        <div class="bento-card dialog-theme-card" style="max-width:520px;">
-            <div class="dialog-header-block">
-                <h3>🔄 Revisar Bloco</h3>
-                <button class="dialog-close-btn" onclick="window.closeReviewFeedbackDialog()">×</button>
-            </div>
-            <div class="dialog-body">
-                <h3 id="reviewBlockTitle"></h3>
-                <p id="reviewBlockConteudo" style="font-size:0.9rem;line-height:1.5;background:var(--panel);padding:1rem;border-radius:var(--element-radius);"></p>
-                <p style="font-size:0.85rem;margin-bottom:1rem;text-align:center;">Como foi a revisão?</p>
-                <div class="difficulty-buttons">
-                    <button class="btn-theme difficulty-btn" onclick="window.submitReviewFeedback('hard')" style="background:var(--failure);color:white;width:auto;flex:1;">
-                        🔴 Difícil
-                    </button>
-                    <button class="btn-theme difficulty-btn" onclick="window.submitReviewFeedback('medium')" style="background:var(--accent);color:var(--bg);width:auto;flex:1;">
-                        🟡 Médio
-                    </button>
-                    <button class="btn-theme difficulty-btn" onclick="window.submitReviewFeedback('easy')" style="background:var(--success);color:white;width:auto;flex:1;">
-                        🟢 Fácil
-                    </button>
                 </div>
             </div>
         </div>
